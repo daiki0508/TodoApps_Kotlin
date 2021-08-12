@@ -11,13 +11,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityMainBinding
+import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.MainViewModel
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(){
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModel()
 
@@ -34,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         val currentUser = auth.currentUser
         if (currentUser != null){
             Log.d("test", "CurrentUser")
+            todoIntent()
         }
     }
 
@@ -80,11 +84,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun firebaseAuthWithGoogle(idToken: String){
-        if (viewModel.firebaseAuthWithGoogle(this, auth, idToken)){
-            Log.d("test", "Success!!")
-        }else{
-            Log.w("test", "Failure...")
-            Toast.makeText(this, "認証エラー", Toast.LENGTH_SHORT).show()
-        }
+        viewModel.firebaseAuthWithGoogle(this, auth, idToken)
+            .addOnCompleteListener(this){task ->
+                if (task.isSuccessful){
+                    todoIntent()
+                }else{
+                    Toast.makeText(this, "認証エラー", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun todoIntent(){
+        startActivity(Intent(this, TodoActivity::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }

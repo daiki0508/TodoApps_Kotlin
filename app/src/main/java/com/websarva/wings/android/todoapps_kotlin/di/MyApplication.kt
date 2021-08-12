@@ -1,9 +1,9 @@
 package com.websarva.wings.android.todoapps_kotlin.di
 
 import android.app.Application
+import com.websarva.wings.android.todoapps_kotlin.di.MyModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
-import org.koin.dsl.module
 
 class MyApplication: Application() {
     override fun onCreate() {
@@ -11,7 +11,7 @@ class MyApplication: Application() {
 
         startKoin {
             androidContext(this@MyApplication)
-            module { listOf(MyModule().module, MyModule().repository) }
+            modules(listOf(MyModule().module, MyModule().repository))
         }
     }
 }
