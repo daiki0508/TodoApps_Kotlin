@@ -1,26 +1,25 @@
-package com.websarva.wings.android.todoapps_kotlin.ui
+package com.websarva.wings.android.todoapps_kotlin.ui.main
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityMainBinding
+import com.websarva.wings.android.todoapps_kotlin.viewModel.MainViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by viewModel()
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -81,17 +80,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun firebaseAuthWithGoogle(idToken: String){
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this){task ->
-                if (task.isSuccessful){
-                    Log.d("test", "Success!!")
-                    val currentUser = auth.currentUser
-                    Log.d("test", currentUser?.uid!!)
-                }else{
-                    Log.w("test", "Failure...", task.exception)
-                    Toast.makeText(this, "認証エラー", Toast.LENGTH_SHORT).show()
-                }
-            }
+        if (viewModel.firebaseAuthWithGoogle(this, auth, idToken)){
+            Log.d("test", "Success!!")
+        }else{
+            Log.w("test", "Failure...")
+            Toast.makeText(this, "認証エラー", Toast.LENGTH_SHORT).show()
+        }
     }
 }
