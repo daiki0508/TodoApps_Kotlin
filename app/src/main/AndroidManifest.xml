@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.websarva.wings.android.todoapps_kotlin" >
+    package="com.websarva.wings.android.todoapps_kotlin">
 
     <application
         android:name=".di.MyApplication"
@@ -9,13 +9,16 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TodoApps_Kotlin" >
+        android:theme="@style/Theme.TodoApps_Kotlin">
+        <activity
+            android:name=".ui.add.AddTodoListActivity"
+            android:exported="true" />
         <activity
             android:name=".ui.todo.TodoActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".ui.main.MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

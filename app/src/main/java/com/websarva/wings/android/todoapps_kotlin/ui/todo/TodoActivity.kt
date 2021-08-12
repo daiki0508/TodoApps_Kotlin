@@ -14,8 +14,12 @@ class TodoActivity : AppCompatActivity() {
             setContentView(this.root)
         }
 
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
         binding.fab.setOnClickListener {
-            TODO("AddTodoActivityが未実装のため")
+            //TODO("AddTodoActivityが未実装のため")
+            AddListDialog().show(supportFragmentManager, "AddListDialog")
         }
     }
 }
