@@ -13,5 +13,9 @@ class TodoActivity : AppCompatActivity() {
         binding = ActivityTodoBinding.inflate(layoutInflater).apply {
             setContentView(this.root)
         }
+
+        binding.fab.setOnClickListener {
+            TODO("AddTodoActivityが未実装のため")
+        }
     }
 }
