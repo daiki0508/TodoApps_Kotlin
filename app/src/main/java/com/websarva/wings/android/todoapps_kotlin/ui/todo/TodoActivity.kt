@@ -2,9 +2,11 @@ package com.websarva.wings.android.todoapps_kotlin.ui.todo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.fragment.app.DialogFragment
+import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 
-class TodoActivity : AppCompatActivity() {
+class TodoActivity : AppCompatActivity(), DialogListener {
     private lateinit var binding: ActivityTodoBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,8 +20,11 @@ class TodoActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         binding.fab.setOnClickListener {
-            //TODO("AddTodoActivityが未実装のため")
             AddListDialog().show(supportFragmentManager, "AddListDialog")
         }
+    }
+
+    override fun onDialogFlagReceive(dialog: DialogFragment, list: String) {
+        TODO("Firebaseとの通信処理が未実装のため")
     }
 }
