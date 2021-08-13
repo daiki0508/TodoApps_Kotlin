@@ -18,11 +18,11 @@ import javax.crypto.spec.PBEKeySpec
 
 
 class CryptClass {
-    fun encrypt(context: Context, pass: CharArray, pStr: String){
+    private fun encrypt(context: Context, pass: CharArray, pStr: String){
         val key = generateStrongAESKey(context, pass, 256, true)
         val list = File(context.filesDir, "list")
 
-        val iv = File(context.filesDir, "iv")
+        val iv = File(context.filesDir, "iv_aes")
 
         try {
             val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
@@ -45,7 +45,7 @@ class CryptClass {
             return
         }
         val key = generateStrongAESKey(context, pass, 256, false)
-        val ivFile = context.openFileInput("iv")
+        val ivFile = context.openFileInput("iv_aes")
 
         try {
             val iv = ByteArray(ivFile.available())

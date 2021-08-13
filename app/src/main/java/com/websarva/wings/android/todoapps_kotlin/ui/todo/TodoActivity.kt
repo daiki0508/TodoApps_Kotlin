@@ -44,14 +44,15 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         auth = Firebase.auth
         storage = FirebaseStorage.getInstance()
 
+        viewModel.download(this, storage, auth)
+
         binding.fab.setOnClickListener {
             AddListDialog().show(supportFragmentManager, "AddListDialog")
         }
     }
 
     override fun onDialogFlagReceive(dialog: DialogFragment, list: String) {
-        //TODO("Firebaseとの通信処理が未実装のため")
-        //CryptClass().encrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list)
+        // UI表示処理未実装
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list)
         viewModel.upload(this, storage, auth)
     }

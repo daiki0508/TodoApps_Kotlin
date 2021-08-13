@@ -15,9 +15,7 @@ interface FirebaseStorageUploadRepository {
 }
 
 interface FirebaseStorageDownloadRepository{
-    fun download(){
-        TODO("未実装")
-    }
+    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth)
 }
 
 class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
@@ -31,7 +29,7 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
         val storageRef = storage.reference
 
         uploadTask(context, "list", storageRef, uid)
-        uploadTask(context, "iv", storageRef, uid)
+        uploadTask(context, "iv_aes", storageRef, uid)
         uploadTask(context, "salt", storageRef, uid)
     }
 
@@ -45,6 +43,29 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
             Log.w("test", it)
         }.addOnSuccessListener {
             Log.d("test", "success!!")
+        }
+    }
+}
+
+class FirebaseStorageDownloadRepositoryClient: FirebaseStorageDownloadRepository {
+    override fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth) {
+        val uid = auth.currentUser!!.uid
+
+        val storageRef = storage.reference
+
+        downloadTask(context, "list", storageRef, uid)
+        downloadTask(context, "iv_aes", storageRef, uid)
+        downloadTask(context, "salt", storageRef, uid)
+    }
+
+    private fun downloadTask(context: Context, child: String, storageRef: StorageReference, uid: String){
+        val file = File(context.filesDir, child)
+        //val file = File.createTempFile(child, null)
+        val fileRef = storageRef.child("users/$uid/todo/list/$child")
+        fileRef.getFile(file).addOnSuccessListener {
+            Log.d("test2", "Success!!")
+        }.addOnFailureListener {
+            Log.w("test2", it)
         }
     }
 }
