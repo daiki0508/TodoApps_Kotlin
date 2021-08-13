@@ -36,33 +36,40 @@ class CryptClass {
         }
     }
 
-    fun decrypt(context: Context, pass: CharArray, pStr: String){
-        //TODO("Firebaseとの通信が未実装のため")
+    fun decrypt(context: Context, pass: CharArray, pStr: String, flag: Boolean): String?{
         val listFile = File(context.filesDir, "list")
         if (!listFile.exists()){
             Log.d("test2", "Called!")
             encrypt(context, pass, pStr)
-            return
+            return null
         }
         val key = generateStrongAESKey(context, pass, 256, false)
         val ivFile = context.openFileInput("iv_aes")
+
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        val list: ByteArray
 
         try {
             val iv = ByteArray(ivFile.available())
             ivFile.read(iv)
             val ips = IvParameterSpec(iv)
 
-            val list: ByteArray = listFile.readBytes()
+            list = listFile.readBytes()
 
-            val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
             cipher.init(Cipher.DECRYPT_MODE, key, ips)
 
-            Log.d("test", "${String(cipher.doFinal(list))}\n$pStr")
-            encrypt(context, pass, "${String(cipher.doFinal(list))}\n$pStr")
+            Log.d("test", "${String(cipher.doFinal(list))} $pStr")
+            if (flag){
+                encrypt(context, pass, "${String(cipher.doFinal(list))} $pStr")
+            }
         }finally {
             key.destroy()
             ivFile.close()
         }
+        if (!flag){
+            return String(cipher.doFinal(list))
+        }
+        return null
     }
 
     private fun generateStrongAESKey(context: Context, password: CharArray, keyLength: Int, flag: Boolean): SecretKey{
