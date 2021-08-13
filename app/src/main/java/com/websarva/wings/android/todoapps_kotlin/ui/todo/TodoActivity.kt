@@ -7,14 +7,19 @@ import androidx.fragment.app.DialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
+import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TodoActivity : AppCompatActivity(), DialogListener {
     private lateinit var binding: ActivityTodoBinding
+    private val viewModel: TodoViewModel by viewModel()
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var storage: FirebaseStorage
 
     override fun onStart() {
         super.onStart()
@@ -37,6 +42,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         auth = Firebase.auth
+        storage = FirebaseStorage.getInstance()
 
         binding.fab.setOnClickListener {
             AddListDialog().show(supportFragmentManager, "AddListDialog")
@@ -47,5 +53,6 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         //TODO("Firebaseとの通信処理が未実装のため")
         //CryptClass().encrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list)
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list)
+        viewModel.upload(this, storage, auth)
     }
 }
