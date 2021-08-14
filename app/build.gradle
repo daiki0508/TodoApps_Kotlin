@@ -38,6 +38,7 @@ android {
 
 ext{
     koin_version = "3.1.1"
+    groupie_version = "2.7.1"
 }
 
 dependencies {
@@ -75,4 +76,9 @@ dependencies {
     implementation "io.insert-koin:koin-androidx-workmanager:$koin_version"
     // Koin for Jetpack Compose
     implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+
+    // 現在バグにより使用不可
+    /*implementation "com.github.lisawray.groupie:groupie:$groupie_version"
+    implementation "com.github.lisawray.groupie:groupie:$groupie_version"
+    implementation "com.github.lisawray.groupie:groupie-viewbinding:$groupie_version"*/
 }
