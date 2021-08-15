@@ -3,6 +3,7 @@ package com.websarva.wings.android.todoapps_kotlin.di
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageDownloadRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageUploadRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseTopRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.MainViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -13,6 +14,7 @@ class MyModule {
     val module: Module = module {
         viewModel { MainViewModel(get()) }
         viewModel { TodoViewModel(get(), get()) }
+        viewModel { AddTodoTaskViewModel(get()) }
     }
     val repository: Module = module {
         factory { FirebaseTopRepositoryClient() }

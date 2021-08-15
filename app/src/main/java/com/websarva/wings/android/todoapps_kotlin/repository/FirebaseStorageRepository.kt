@@ -11,7 +11,7 @@ import com.google.firebase.storage.UploadTask
 import java.io.File
 
 interface FirebaseStorageUploadRepository {
-    fun upload(context: Context ,storage: FirebaseStorage, auth: FirebaseAuth, task: String, flag: Boolean)
+    fun upload(context: Context ,storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
 }
 
 interface FirebaseStorageDownloadRepository{
@@ -23,7 +23,7 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
         context: Context,
         storage: FirebaseStorage,
         auth: FirebaseAuth,
-        task: String,
+        task: String?,
         flag: Boolean
     ) {
         val uid = auth.currentUser!!.uid

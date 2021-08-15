@@ -23,7 +23,7 @@ class TodoViewModel(
     }
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageUploadRepository.upload(context, storage, auth, task = "", flag = true)
+        firebaseStorageUploadRepository.upload(context, storage, auth, task = null, flag = true)
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
@@ -37,7 +37,7 @@ class TodoViewModel(
         var todo: MutableMap<String, String>
         for (list in lists?.split(" ")!!){
             Log.d("test", list)
-            todo = mutableMapOf("list" to list, "content" to "")
+            todo = mutableMapOf("list" to list)
             todoList.add(todo)
         }
         _todoList.value = todoList
