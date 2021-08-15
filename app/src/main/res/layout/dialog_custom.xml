@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_dialog_title"
             android:padding="10dp"
-            android:text="リスト"
+            android:text="リストの追加"
             android:textSize="18sp"
             android:textColor="@android:color/white"
             />

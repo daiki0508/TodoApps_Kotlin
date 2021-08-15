@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.DialogFragment
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -16,6 +14,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
+import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoListActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
@@ -53,7 +52,6 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         auth = Firebase.auth
         storage = FirebaseStorage.getInstance()
 
-        //binding.recyclerview.layoutManager = LinearLayoutManager(this)
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         viewModel.download(this, storage, auth)
@@ -62,7 +60,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         }
 
         binding.fab.setOnClickListener {
-            AddListDialog().show(supportFragmentManager, "AddListDialog")
+            AddListDialog(flag = false).show(supportFragmentManager, "AddListDialog")
         }
 
         viewModel.todoList().observe(this, {

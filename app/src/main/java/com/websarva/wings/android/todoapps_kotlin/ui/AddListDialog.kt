@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.todo
+package com.websarva.wings.android.todoapps_kotlin.ui
 
 import android.app.Dialog
 import android.content.Context
@@ -11,11 +11,12 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.R
 
-class AddListDialog: DialogFragment() {
+class AddListDialog(private var flag: Boolean): DialogFragment() {
     private var listener: DialogListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -28,6 +29,9 @@ class AddListDialog: DialogFragment() {
 
         builder.apply {
             setContentView(R.layout.dialog_custom)
+            if (flag){
+                findViewById<TextView>(R.id.tvList).text = "タスクの追加"
+            }
             findViewById<View>(R.id.positive_button).setOnClickListener {
                 val list = Editable.Factory.getInstance().newEditable(findViewById<EditText>(R.id.edList).text)
                 listener?.onDialogFlagReceive(this@AddListDialog, list.toString())
