@@ -53,8 +53,11 @@ class CryptClass {
         }
         if (!encFile.exists()){
             // typeが1の場合かつ、対象ファイルが存在しない場合はサブディレクトリを作成
-            if (type != 0 && !File("${context.filesDir}/task/$task").exists()){
+            if (type == 1 && !File("${context.filesDir}/task/$task").exists()){
                 File("${context.filesDir}/task/$task").mkdirs()
+            }else if (type == 2){
+                // 新規にListは作られたが、まだTaskは作成されていない状態
+                return "NoTask"
             }
             Log.d("test2", "Called!")
             encrypt(context, pass, pStr, type, task)

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
@@ -16,7 +17,12 @@ interface OnItemClickListener {
     fun onItemClickListener(view: View, position: Int, list: String)
 }
 
-class RecyclerViewAdapter(private var items: MutableList<MutableMap<String, String>>, private var activity: TodoActivity, private var viewModel: TodoViewModel): RecyclerView.Adapter<RecyclerViewHolder>() {
+class RecyclerViewAdapter(
+    private var items: MutableList<MutableMap<String, String>>,
+    private var activity: TodoActivity,
+    private var viewModel: TodoViewModel,
+    private var auth: FirebaseAuth
+    ): RecyclerView.Adapter<RecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerViewHolder {
@@ -34,14 +40,14 @@ class RecyclerViewAdapter(private var items: MutableList<MutableMap<String, Stri
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(activity)
-        val contentList: MutableList<MutableMap<String, String>> = mutableListOf()
+        /*val contentList: MutableList<MutableMap<String, String>> = mutableListOf()
         var content: MutableMap<String, String>
         // 動作確認用のテストリストの作成
         for (i in 0..2){
             content = mutableMapOf("content" to "test$i")
             contentList.add(content)
-        }
-        val adapter =  ChildRecyclerViewAdapter(contentList, position)
+        }*/
+        val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(activity, auth, items[position]["list"]!!), position)
         holder.rvContents.adapter = adapter
         adapter.notifyDataSetChanged()
 

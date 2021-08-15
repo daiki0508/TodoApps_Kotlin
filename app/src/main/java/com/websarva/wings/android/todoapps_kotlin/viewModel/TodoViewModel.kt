@@ -13,6 +13,7 @@ import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageDownloadRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageUploadRepositoryClient
 import kotlinx.coroutines.*
+import java.io.File
 
 class TodoViewModel(
     private val firebaseStorageUploadRepository: FirebaseStorageUploadRepositoryClient,
@@ -33,14 +34,34 @@ class TodoViewModel(
     fun createView(context: Context, auth: FirebaseAuth){
         val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, flag = false)
 
-        val todoList: MutableList<MutableMap<String, String>> = mutableListOf()
-        var todo: MutableMap<String, String>
-        for (list in lists?.split(" ")!!){
-            Log.d("test", list)
-            todo = mutableMapOf("list" to list)
-            todoList.add(todo)
+        _todoList.value = createTodoContents(lists, "list")
+    }
+
+    fun getTask(context: Context, auth: FirebaseAuth, task: String): MutableList<MutableMap<String, String>>{
+        val tasks: String? = if (File("${context.filesDir}/task/$task").exists()){
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1,task, flag = false)
+        }else{
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 2,task, flag = false)
         }
-        _todoList.value = todoList
+
+        return createTodoContents(tasks, keyName = "task")
+    }
+
+    private fun createTodoContents(contents: String?, keyName: String): MutableList<MutableMap<String, String>>{
+        val todoContents: MutableList<MutableMap<String, String>> = mutableListOf()
+        var todo: MutableMap<String, String>
+
+        if (contents!!.isNotBlank()){
+            for (content in contents.split(" ")){
+                Log.d("test", content)
+                todo = mutableMapOf(keyName to content)
+                todoContents.add(todo)
+            }
+        }else{
+            todo = mutableMapOf(keyName to contents)
+            todoContents.add(todo)
+        }
+        return todoContents
     }
 
     fun todoList(): MutableLiveData<MutableList<MutableMap<String, String>>>{

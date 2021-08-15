@@ -67,7 +67,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
             if (it.isNotEmpty()){
                 binding.tvNoContent.visibility = View.GONE
 
-                val adapter = RecyclerViewAdapter(it, this, viewModel)
+                val adapter = RecyclerViewAdapter(it, this, viewModel, auth)
                 binding.recyclerview.adapter = adapter
                 adapter.notifyDataSetChanged()
 

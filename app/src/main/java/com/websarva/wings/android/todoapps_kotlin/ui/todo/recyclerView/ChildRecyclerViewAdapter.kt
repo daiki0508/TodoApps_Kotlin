@@ -21,7 +21,7 @@ class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String,
     }
 
     override fun onBindViewHolder(holder: ChildRecyclerViewHolder, position: Int) {
-        holder.content.text = items[position]["content"]
+        holder.content.text = items[position]["task"]
 
         holder.view.setOnClickListener {
             listener.onItemClickListener(it, this.position)
