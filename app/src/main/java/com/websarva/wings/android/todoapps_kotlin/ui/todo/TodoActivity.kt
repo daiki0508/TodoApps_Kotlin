@@ -15,7 +15,7 @@ import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
-import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoListActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
@@ -82,13 +82,13 @@ class TodoActivity : AppCompatActivity(), DialogListener {
     }
 
     override fun onDialogFlagReceive(dialog: DialogFragment, list: String) {
-        CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, true)
+        CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, flag = true)
         viewModel.upload(this, storage, auth)
         viewModel.createView(this, auth)
     }
 
     fun addTodoIntent(list: String){
-        Intent(this@TodoActivity, AddTodoListActivity::class.java).apply {
+        Intent(this@TodoActivity, AddTodoTaskActivity::class.java).apply {
             this.putExtra("list", list)
             startActivity(this)
         }

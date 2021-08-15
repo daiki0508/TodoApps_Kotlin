@@ -23,7 +23,7 @@ class TodoViewModel(
     }
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageUploadRepository.upload(context, storage, auth)
+        firebaseStorageUploadRepository.upload(context, storage, auth, task = "", flag = true)
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
@@ -31,7 +31,7 @@ class TodoViewModel(
     }
 
     fun createView(context: Context, auth: FirebaseAuth){
-        val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", false)
+        val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, flag = false)
 
         val todoList: MutableList<MutableMap<String, String>> = mutableListOf()
         var todo: MutableMap<String, String>

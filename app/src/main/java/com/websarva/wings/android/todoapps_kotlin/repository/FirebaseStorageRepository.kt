@@ -11,7 +11,7 @@ import com.google.firebase.storage.UploadTask
 import java.io.File
 
 interface FirebaseStorageUploadRepository {
-    fun upload(context: Context ,storage: FirebaseStorage, auth: FirebaseAuth)
+    fun upload(context: Context ,storage: FirebaseStorage, auth: FirebaseAuth, task: String, flag: Boolean)
 }
 
 interface FirebaseStorageDownloadRepository{
@@ -22,21 +22,40 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
     override fun upload(
         context: Context,
         storage: FirebaseStorage,
-        auth: FirebaseAuth
+        auth: FirebaseAuth,
+        task: String,
+        flag: Boolean
     ) {
         val uid = auth.currentUser!!.uid
 
         val storageRef = storage.reference
 
-        uploadTask(context, "list", storageRef, uid)
-        uploadTask(context, "iv_aes", storageRef, uid)
-        uploadTask(context, "salt", storageRef, uid)
+        if (flag){
+            uploadTask(context, "list", storageRef, uid, null, flag)
+            uploadTask(context, "iv_aes", storageRef, uid, null, flag)
+            uploadTask(context, "salt", storageRef, uid, null, flag)
+        }else{
+            uploadTask(context, "task/$task/task", storageRef, uid, task, flag)
+            uploadTask(context, "task/$task/iv_aes", storageRef, uid, task, flag)
+            uploadTask(context, "task/$task/salt", storageRef, uid, task, flag)
+        }
     }
 
-    private fun uploadTask(context: Context, child: String, storageRef: StorageReference, uid: String){
+    private fun uploadTask(
+        context: Context,
+        child: String,
+        storageRef: StorageReference,
+        uid: String,
+        task: String?,
+        flag: Boolean
+    ){
         val file = Uri.fromFile(File(context.filesDir, child))
 
-        val fileRef = storageRef.child("users/$uid/todo/list/${file.lastPathSegment}")
+        val fileRef: StorageReference = if (flag){
+            storageRef.child("users/$uid/todo/list/${file.lastPathSegment}")
+        }else{
+            storageRef.child("users/$uid/todo/task/$task/${file.lastPathSegment}")
+        }
 
         val uploadTask = fileRef.putFile(file)
         uploadTask.addOnFailureListener {

@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoApps_Kotlin">
         <activity
-            android:name=".ui.add.AddTodoListActivity"
+            android:name=".ui.add.AddTodoTaskActivity"
             android:exported="true" />
         <activity
             android:name=".ui.todo.TodoActivity"
