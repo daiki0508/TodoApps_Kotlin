@@ -1,5 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.add
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +17,7 @@ import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -47,6 +49,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         Log.d("intent", task)
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
+
+        viewModel.download(this, storage, auth, task)
         if (File("$filesDir/task/$task/task").exists()){
             viewModel.createView(this, auth, task)
         }
@@ -70,9 +74,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
     override fun onDialogFlagReceive(dialog: DialogFragment, list: String) {
         Log.d("dialog", list)
-        //TODO("Firebaseとの通信処理が未実装のため")
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, flag = true)
         viewModel.upload(this, storage, auth, task)
         viewModel.createView(this, auth, task)
+    }
+
+    override fun onBackPressed() {
+        startActivity(Intent(this, TodoActivity::class.java))
+        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
     }
 }

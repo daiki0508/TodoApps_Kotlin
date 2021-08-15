@@ -15,7 +15,7 @@ interface FirebaseStorageUploadRepository {
 }
 
 interface FirebaseStorageDownloadRepository{
-    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth)
+    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
 }
 
 class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
@@ -67,20 +67,42 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
 }
 
 class FirebaseStorageDownloadRepositoryClient: FirebaseStorageDownloadRepository {
-    override fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth) {
+    override fun download(
+        context: Context,
+        storage: FirebaseStorage,
+        auth: FirebaseAuth,
+        task: String?,
+        flag: Boolean
+    ) {
         val uid = auth.currentUser!!.uid
 
         val storageRef = storage.reference
 
-        downloadTask(context, "list", storageRef, uid)
-        downloadTask(context, "iv_aes", storageRef, uid)
-        downloadTask(context, "salt", storageRef, uid)
+        if (flag){
+            downloadTask(context, "list", storageRef, uid, flag)
+            downloadTask(context, "iv_aes", storageRef, uid, flag)
+            downloadTask(context, "salt", storageRef, uid, flag)
+        }else{
+            downloadTask(context, "task/$task/task", storageRef, uid, flag)
+            downloadTask(context, "task/$task/iv_aes", storageRef, uid, flag)
+            downloadTask(context, "task/$task/salt", storageRef, uid, flag)
+        }
     }
 
-    private fun downloadTask(context: Context, child: String, storageRef: StorageReference, uid: String){
+    private fun downloadTask(
+        context: Context,
+        child: String,
+        storageRef: StorageReference,
+        uid: String,
+        flag: Boolean
+    ){
         val file = File(context.filesDir, child)
         //val file = File.createTempFile(child, null)
-        val fileRef = storageRef.child("users/$uid/todo/list/$child")
+        val fileRef = if (flag){
+            storageRef.child("users/$uid/todo/list/$child")
+        }else{
+            storageRef.child("users/$uid/todo/$child")
+        }
         fileRef.getFile(file).addOnSuccessListener {
             Log.d("test2", "Success!!")
         }.addOnFailureListener {

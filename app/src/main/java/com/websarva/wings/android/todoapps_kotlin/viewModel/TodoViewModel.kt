@@ -27,7 +27,7 @@ class TodoViewModel(
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageDownloadRepository.download(context, storage, auth)
+        firebaseStorageDownloadRepository.download(context, storage, auth, task = null, flag = true)
     }
 
     fun createView(context: Context, auth: FirebaseAuth){

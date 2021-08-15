@@ -98,6 +98,5 @@ class MainActivity : AppCompatActivity(){
         startActivity(Intent(this, TodoActivity::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         finish()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }
