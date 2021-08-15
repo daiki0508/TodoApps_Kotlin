@@ -13,6 +13,7 @@
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="17sp" />
+            android:textSize="17sp"
+            android:singleLine="true" />
     </LinearLayout>
 </LinearLayout>

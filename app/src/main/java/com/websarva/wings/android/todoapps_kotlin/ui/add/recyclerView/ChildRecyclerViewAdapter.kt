@@ -23,6 +23,7 @@ class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String,
 
     override fun onBindViewHolder(holder: ChildRecyclerViewHolder, position: Int) {
         holder.content.textSize = 22F
+        holder.content.isSingleLine = false
         val mlp = holder.content.layoutParams as ViewGroup.MarginLayoutParams
         mlp.setMargins(mlp.leftMargin, 15, mlp.rightMargin, 15)
         holder.content.text = items[position]["task"]

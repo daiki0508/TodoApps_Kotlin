@@ -1,5 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView
 
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String,
     }
 
     override fun onBindViewHolder(holder: ChildRecyclerViewHolder, position: Int) {
+        holder.content.ellipsize = TextUtils.TruncateAt.END
         holder.content.text = items[position]["task"]
 
         holder.view.setOnClickListener {
