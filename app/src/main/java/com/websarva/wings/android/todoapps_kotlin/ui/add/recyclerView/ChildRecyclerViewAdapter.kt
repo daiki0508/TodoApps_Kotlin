@@ -1,5 +1,8 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView
 
+import android.graphics.Color
+import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,8 +31,22 @@ class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String,
         mlp.setMargins(mlp.leftMargin, 15, mlp.rightMargin, 15)
         holder.content.text = items[position]["task"]
 
-        holder.view.setOnClickListener {
+        holder.content.setOnClickListener {
             TODO("未実装")
+        }
+
+        holder.checkBox.setOnClickListener {
+            holder.content.apply {
+                if (holder.checkBox.isChecked){
+                    setTextColor(Color.LTGRAY)
+                    paint.flags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    paint.isAntiAlias = true
+                }else{
+                    setTextColor(Color.GRAY)
+                    paint.flags = Paint.ANTI_ALIAS_FLAG
+                    paint.isAntiAlias = false
+                }
+            }
         }
     }
 

@@ -19,7 +19,6 @@ class AddTodoTaskViewModel(
     }
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String){
-        //TODO("未実装")
         firebaseStorageUploadRepository.upload(context, storage, auth, task, flag = false)
     }
 
@@ -38,6 +37,12 @@ class AddTodoTaskViewModel(
             todoTask.add(todo)
         }
         _todoTask.value = todoTask
+    }
+
+    fun update(context: Context, auth: FirebaseAuth, task: String, pStr: String, aStr: String){
+        val tasks = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, flag = false)
+
+        tasks?.replace(pStr, aStr)
     }
 
     fun todoTask(): MutableLiveData<MutableList<MutableMap<String, String>>>{

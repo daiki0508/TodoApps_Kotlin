@@ -25,6 +25,8 @@ class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String,
         holder.content.ellipsize = TextUtils.TruncateAt.END
         holder.content.text = items[position]["task"]
 
+        holder.checkBox.visibility = View.GONE
+
         holder.view.setOnClickListener {
             listener.onItemClickListener(it, this.position)
         }
