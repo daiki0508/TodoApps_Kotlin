@@ -61,7 +61,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         }
 
         binding.fab.setOnClickListener {
-            AddListDialog(flag = false, type = 0, ACAdapter = null, APAdapter = null, position = null).show(supportFragmentManager, "AddListDialog")
+            AddListDialog(flag = false, type = 0, position = null).show(supportFragmentManager, "AddListDialog")
         }
 
         viewModel.todoList().observe(this, {
@@ -87,8 +87,6 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         list: String,
         type: Int,
         flag: Boolean,
-        ACAdapter: ChildRecyclerViewAdapter?,
-        APAdapter: com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter?,
         position: Int?
     ) {
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)

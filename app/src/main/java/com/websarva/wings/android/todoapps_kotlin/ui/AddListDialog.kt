@@ -21,8 +21,6 @@ import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerVi
 class AddListDialog(
     private var flag: Boolean,
     private var type: Int,
-    private var ACAdapter: ChildRecyclerViewAdapter?,
-    private var APAdapter: RecyclerViewAdapter?,
     private var position: Int?
     ): DialogFragment() {
     private var listener: DialogListener? = null
@@ -47,7 +45,7 @@ class AddListDialog(
             }
             findViewById<View>(R.id.positive_button).setOnClickListener {
                 val list = Editable.Factory.getInstance().newEditable(findViewById<EditText>(R.id.edList).text)
-                listener?.onDialogFlagReceive(this@AddListDialog, list.toString(), type, flag, ACAdapter, APAdapter, position)
+                listener?.onDialogFlagReceive(this@AddListDialog, list.toString(), type, flag, position)
                 list.clear()
                 dismiss()
             }

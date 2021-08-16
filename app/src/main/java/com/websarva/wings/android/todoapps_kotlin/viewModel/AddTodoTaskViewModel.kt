@@ -66,14 +66,6 @@ class AddTodoTaskViewModel(
         _todoTask.value = todoTask
     }
 
-    fun setTaskName(name: String){
-        _updateName.value = name
-    }
-
-    fun setListName(name: String){
-        _todoList.value = name
-    }
-
     fun update(
         context: Context,
         auth: FirebaseAuth,
@@ -118,14 +110,6 @@ class AddTodoTaskViewModel(
 
     fun todoTask(): MutableLiveData<MutableList<MutableMap<String, String>>>{
         return _todoTask
-    }
-
-    fun todoList(): MutableLiveData<String>{
-        return _todoList
-    }
-
-    fun updateName(): MutableLiveData<String>{
-        return _updateName
     }
 
     fun setPosition(position: Int, size: Int){

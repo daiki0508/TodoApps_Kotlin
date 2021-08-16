@@ -35,6 +35,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     private lateinit var task: String
     private var position = 0
     private var last = 0
+    private var apAdapter: RecyclerViewAdapter? = null
+    private var acAdapter: ChildRecyclerViewAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,30 +63,29 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             viewModel.createView(this, auth, task)
         }
 
-        binding.fab.setOnClickListener {
-            AddListDialog(flag = true, type = 0, ACAdapter = null, APAdapter = null, position = null).show(supportFragmentManager, "AddTaskDialog")
-        }
-
-        var adapter: RecyclerViewAdapter? = null
-
         viewModel.todoTask().observe(this, {
             if (it.isNotEmpty()){
                 binding.tvNoContent.visibility = View.GONE
-                if (adapter == null){
-                    adapter = RecyclerViewAdapter(viewModel.todoTask().value!!, task, this, viewModel)
-                    binding.recyclerview.adapter = adapter
-                    adapter?.notifyDataSetChanged()
+                if (apAdapter == null){
+                    acAdapter = ChildRecyclerViewAdapter(it)
+                    apAdapter = RecyclerViewAdapter(viewModel.todoTask().value!!, task, this, viewModel, acAdapter)
+                    binding.recyclerview.adapter = apAdapter
+                    apAdapter?.notifyDataSetChanged()
                 }
 
-                adapter?.setOnItemClickListener(object: OnItemClickListener {
+                apAdapter?.setOnItemClickListener(object: OnItemClickListener {
                     override fun onItemClickListener(view: View, position: Int) {
                         // listの更新
                         viewModel.setPosition(this@AddTodoTaskActivity.position, last)
-                        AddListDialog(flag = false, type = 1, ACAdapter = null, APAdapter = adapter, position = null).show(supportFragmentManager, "UpdateListDialog")
+                        AddListDialog(flag = false, type = 1, position = position).show(supportFragmentManager, "UpdateListDialog")
                     }
                 })
             }
         })
+
+        binding.fab.setOnClickListener {
+            AddListDialog(flag = true, type = 0, position = null).show(supportFragmentManager, "AddTaskDialog")
+        }
     }
 
     override fun onDialogFlagReceive(
@@ -92,14 +93,11 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         list: String,
         type: Int,
         flag: Boolean,
-        ACAdapter: ChildRecyclerViewAdapter?,
-        APAdapter: RecyclerViewAdapter?,
         position: Int?
     ) {
         Log.d("dialog", list)
         if (type == 0){
             CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, aStr = null, flag = true)
-            viewModel.createView(this, auth, task)
         }else{
             if (flag){
                 viewModel.update(this, auth, task, list, flag)
@@ -111,18 +109,29 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         if (flag){
             viewModel.upload(this, storage, auth, task, flag)
             //viewModel.setTaskName(list)
-            if (type == 1){
-                ACAdapter!!.items[position!!]["task"] = list
-                ACAdapter.notifyItemChanged(position)
+            when {
+                // taskの更新
+                type == 1 -> {
+                    acAdapter!!.items[position!!]["task"] = list
+                    acAdapter!!.notifyItemChanged(position)
+                }
+                acAdapter == null -> {
+                    // 最初のtaskの追加
+                    viewModel.createView(this, auth, task)
+                }
+                else -> {
+                    // taskのupdate
+                    acAdapter!!.items.add(mutableMapOf("task" to "$list "))
+                    acAdapter!!.notifyItemInserted(acAdapter!!.items.size - 1)
+                }
             }
         }else{
             viewModel.upload(this, storage, auth, task = null, flag)
             viewModel.upload(this, storage, auth, task, flag = true)
             viewModel.delete(storage, auth, task)
-            //viewModel.setListName(list)
-            //viewModel.createView(this, auth, list)
-            APAdapter!!.task = list
-            APAdapter.notifyDataSetChanged()
+
+            apAdapter!!.task = list
+            apAdapter!!.notifyItemChanged(position!!)
             task = list
         }
     }

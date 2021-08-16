@@ -10,8 +10,6 @@ interface DialogListener {
         list: String,
         type: Int,
         flag: Boolean,
-        ACAdapter: ChildRecyclerViewAdapter?,
-        APAdapter: RecyclerViewAdapter?,
         position: Int?
     )
 }

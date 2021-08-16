@@ -23,7 +23,8 @@ class RecyclerViewAdapter(
     var items: MutableList<MutableMap<String, String>>,
     var task: String,
     private var activity: AddTodoTaskActivity,
-    private var viewModel: AddTodoTaskViewModel
+    private var viewModel: AddTodoTaskViewModel,
+    var ACAdapter: ChildRecyclerViewAdapter?
     ): RecyclerView.Adapter<RecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
@@ -43,16 +44,16 @@ class RecyclerViewAdapter(
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(activity)
-        val adapter =  ChildRecyclerViewAdapter(items)
-        holder.rvContents.adapter = adapter
+        //val adapter =  ChildRecyclerViewAdapter(items)
+        holder.rvContents.adapter = ACAdapter
         holder.rvContents.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
-        adapter.notifyDataSetChanged()
+        ACAdapter!!.notifyDataSetChanged()
 
-        adapter.setOnItemClickListener(object: OnChildItemClickListener{
+        ACAdapter!!.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
                 // taskの更新
                 viewModel.setPosition(position, items.size)
-                AddListDialog(flag = true, type = 1, adapter, APAdapter = null, position).show(activity.supportFragmentManager, "UpdateTaskDialog")
+                AddListDialog(flag = true, type = 1, position).show(activity.supportFragmentManager, "UpdateTaskDialog")
             }
         })
     }
