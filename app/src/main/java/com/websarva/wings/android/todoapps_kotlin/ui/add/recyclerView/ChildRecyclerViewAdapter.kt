@@ -8,13 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
+import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 
 interface OnChildItemClickListener {
     fun onItemClickListener(view: View, position: Int)
 }
 
-class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String, String>>): RecyclerView.Adapter<ChildRecyclerViewHolder>() {
+class ChildRecyclerViewAdapter(
+    private var items: MutableList<MutableMap<String, String>>,
+    ): RecyclerView.Adapter<ChildRecyclerViewHolder>() {
     private lateinit var listener: OnChildItemClickListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChildRecyclerViewHolder {
@@ -32,7 +38,9 @@ class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String,
         holder.content.text = items[position]["task"]
 
         holder.content.setOnClickListener {
-            TODO("未実装")
+            /*viewModel.setPosition(position, items.size)
+            AddListDialog(flag = true, type = 1).show(activity.supportFragmentManager, "UpdateTaskDialog")*/
+            listener.onItemClickListener(it, position)
         }
 
         holder.checkBox.setOnClickListener {

@@ -54,13 +54,13 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
-        viewModel.download(this, storage, auth)
+        //viewModel.download(this, storage, auth)
         if (File(filesDir, "list").exists()){
             viewModel.createView(this, auth)
         }
 
         binding.fab.setOnClickListener {
-            AddListDialog(flag = false).show(supportFragmentManager, "AddListDialog")
+            AddListDialog(flag = false, type = 0).show(supportFragmentManager, "AddListDialog")
         }
 
         viewModel.todoList().observe(this, {
@@ -81,7 +81,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         })
     }
 
-    override fun onDialogFlagReceive(dialog: DialogFragment, list: String) {
+    override fun onDialogFlagReceive(dialog: DialogFragment, list: String, type: Int) {
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, flag = true)
         viewModel.upload(this, storage, auth)
         viewModel.createView(this, auth)

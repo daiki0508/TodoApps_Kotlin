@@ -50,13 +50,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
 
-        viewModel.download(this, storage, auth, task)
+        //viewModel.download(this, storage, auth, task)
         if (File("$filesDir/task/$task/task").exists()){
             viewModel.createView(this, auth, task)
         }
 
         binding.fab.setOnClickListener {
-            AddListDialog(flag = true).show(supportFragmentManager, "AddTaskFragment")
+            AddListDialog(flag = true, type = 0).show(supportFragmentManager, "AddTaskDialog")
         }
 
         viewModel.todoTask().observe(this, {
@@ -72,9 +72,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         })
     }
 
-    override fun onDialogFlagReceive(dialog: DialogFragment, list: String) {
+    override fun onDialogFlagReceive(dialog: DialogFragment, list: String, type: Int) {
         Log.d("dialog", list)
-        CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, flag = true)
+        if (type == 0){
+            CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, flag = true)
+        }else{
+            viewModel.update(this, auth, task, list)
+        }
         viewModel.upload(this, storage, auth, task)
         viewModel.createView(this, auth, task)
     }

@@ -9,6 +9,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageDownloadRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageUploadRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 
 class AddTodoTaskViewModel(
     private val firebaseStorageUploadRepository: FirebaseStorageUploadRepositoryClient,
@@ -17,6 +19,9 @@ class AddTodoTaskViewModel(
     private val _todoTask = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
     }
+
+    private var position: Int
+    private var lastPosition: Int
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String){
         firebaseStorageUploadRepository.upload(context, storage, auth, task, flag = false)
@@ -39,17 +44,45 @@ class AddTodoTaskViewModel(
         _todoTask.value = todoTask
     }
 
-    fun update(context: Context, auth: FirebaseAuth, task: String, pStr: String, aStr: String){
-        val tasks = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, flag = false)
+    fun update(
+        context: Context,
+        auth: FirebaseAuth,
+        task: String,
+        aStr: String
+    ){
+        val tasksBefore = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, flag = false)
+        Log.d("update_b", tasksBefore!!)
 
-        tasks?.replace(pStr, aStr)
+        var tasksAfter = ""
+        for ((index, value) in tasksBefore.split(" ").withIndex()){
+            tasksAfter += when (index) {
+                position -> {
+                    if (index == lastPosition)
+                        value.replace(value, aStr)
+                    else
+                        value.replace(value, "$aStr ")
+                }
+                lastPosition -> value
+                else -> "$value "
+            }
+        }
+
+        Log.d("update_a", tasksAfter)
+        CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, flag = true)
     }
 
     fun todoTask(): MutableLiveData<MutableList<MutableMap<String, String>>>{
         return _todoTask
     }
 
+    fun setPosition(position: Int, size: Int){
+        this.position = position
+        this.lastPosition = size - 1
+    }
+
     init {
         _todoTask.value = mutableListOf()
+        position = 0
+        lastPosition = 0
     }
 }

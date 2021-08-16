@@ -16,7 +16,7 @@ import androidx.fragment.app.DialogFragment
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.R
 
-class AddListDialog(private var flag: Boolean): DialogFragment() {
+class AddListDialog(private var flag: Boolean, private var type: Int): DialogFragment() {
     private var listener: DialogListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -29,12 +29,17 @@ class AddListDialog(private var flag: Boolean): DialogFragment() {
 
         builder.apply {
             setContentView(R.layout.dialog_custom)
-            if (flag){
+            // typeは0が追加、1が更新とする
+            if (flag && type == 0){
                 findViewById<TextView>(R.id.tvList).text = "タスクの追加"
+            }else if (flag && type == 1){
+                findViewById<TextView>(R.id.tvList).text = "タスクの更新"
+            }else if (!flag && type == 1){
+                findViewById<TextView>(R.id.tvList).text = "リストの更新"
             }
             findViewById<View>(R.id.positive_button).setOnClickListener {
                 val list = Editable.Factory.getInstance().newEditable(findViewById<EditText>(R.id.edList).text)
-                listener?.onDialogFlagReceive(this@AddListDialog, list.toString())
+                listener?.onDialogFlagReceive(this@AddListDialog, list.toString(), type)
                 list.clear()
                 dismiss()
             }

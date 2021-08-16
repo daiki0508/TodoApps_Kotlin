@@ -85,7 +85,12 @@ class CryptClass {
 
             Log.d("test", "${String(cipher.doFinal(enc))} $pStr")
             if (flag){
-                encrypt(context, pass, "${String(cipher.doFinal(enc))} $pStr", type, task)
+                // typeが3の場合は更新
+                if (type == 3){
+                    encrypt(context, pass, pStr, type, task)
+                }else{
+                    encrypt(context, pass, "${String(cipher.doFinal(enc))} $pStr", type, task)
+                }
             }
         }finally {
             key.destroy()

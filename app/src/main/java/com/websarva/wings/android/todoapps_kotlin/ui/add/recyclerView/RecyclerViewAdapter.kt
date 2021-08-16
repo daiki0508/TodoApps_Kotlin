@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
@@ -38,6 +39,13 @@ class RecyclerViewAdapter(
         holder.rvContents.adapter = adapter
         holder.rvContents.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
         adapter.notifyDataSetChanged()
+
+        adapter.setOnItemClickListener(object: OnChildItemClickListener{
+            override fun onItemClickListener(view: View, position: Int) {
+                viewModel.setPosition(position, items.size)
+                AddListDialog(flag = true, type = 1).show(activity.supportFragmentManager, "UpdateTaskDialog")
+            }
+        })
     }
 
     override fun getItemCount(): Int {
