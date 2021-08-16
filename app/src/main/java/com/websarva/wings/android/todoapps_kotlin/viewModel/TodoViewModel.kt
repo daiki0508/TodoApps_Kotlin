@@ -32,16 +32,16 @@ class TodoViewModel(
     }
 
     fun createView(context: Context, auth: FirebaseAuth){
-        val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, flag = false)
+        val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
 
         _todoList.value = createTodoContents(lists, "list")
     }
 
     fun getTask(context: Context, auth: FirebaseAuth, task: String): MutableList<MutableMap<String, String>>{
         val tasks: String? = if (File("${context.filesDir}/task/$task").exists()){
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1,task, flag = false)
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1,task, aStr = null, flag = false)
         }else{
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 2,task, flag = false)
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 2,task, aStr = null, flag = false)
         }
 
         return createTodoContents(tasks, keyName = "task")

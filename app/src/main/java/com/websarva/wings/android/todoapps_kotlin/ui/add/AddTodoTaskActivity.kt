@@ -16,9 +16,9 @@ import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -31,6 +31,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     private lateinit var storage: FirebaseStorage
 
     private lateinit var task: String
+    private var position = 0
+    private var last = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +48,9 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         storage = FirebaseStorage.getInstance()
 
         task = intent.getStringExtra("list")!!
-        Log.d("intent", task)
+        position = intent.getIntExtra("position", 0)
+        last = intent.getIntExtra("last", 0)
+        Log.d("intent", "$task: $position, $last")
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
 
@@ -59,6 +63,23 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             AddListDialog(flag = true, type = 0).show(supportFragmentManager, "AddTaskDialog")
         }
 
+        viewModel.todoList().observe(this, {
+            if (it.isNotBlank()){
+                val adapter = RecyclerViewAdapter(viewModel.todoTask().value!!, it, this, viewModel)
+                binding.recyclerview.adapter = adapter
+                adapter.notifyDataSetChanged()
+
+                adapter.setOnItemClickListener(object: OnItemClickListener {
+                    override fun onItemClickListener(view: View, position: Int) {
+                        viewModel.setPosition(this@AddTodoTaskActivity.position, last)
+                        AddListDialog(flag = false, type = 1).show(supportFragmentManager, "UpdateListDialog")
+                    }
+                })
+
+                Log.d("test", "Called")
+            }
+        })
+
         viewModel.todoTask().observe(this, {
             if (it.isNotEmpty()){
                 binding.tvNoContent.visibility = View.GONE
@@ -67,20 +88,38 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 binding.recyclerview.adapter = adapter
                 adapter.notifyDataSetChanged()
 
+                adapter.setOnItemClickListener(object: OnItemClickListener {
+                    override fun onItemClickListener(view: View, position: Int) {
+                        viewModel.setPosition(this@AddTodoTaskActivity.position, last)
+                        AddListDialog(flag = false, type = 1).show(supportFragmentManager, "UpdateListDialog")
+                    }
+                })
+
                 Log.d("test", "Called")
             }
         })
     }
 
-    override fun onDialogFlagReceive(dialog: DialogFragment, list: String, type: Int) {
+    override fun onDialogFlagReceive(dialog: DialogFragment, list: String, type: Int, flag: Boolean) {
         Log.d("dialog", list)
         if (type == 0){
-            CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, flag = true)
+            CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, aStr = null, flag = true)
         }else{
-            viewModel.update(this, auth, task, list)
+            if (flag){
+                viewModel.update(this, auth, task, list, flag)
+            }else{
+                viewModel.update(this, auth, task, list, flag)
+            }
         }
-        viewModel.upload(this, storage, auth, task)
-        viewModel.createView(this, auth, task)
+        if (flag){
+            viewModel.upload(this, storage, auth, task, flag)
+            viewModel.createView(this, auth, task)
+        }else{
+            viewModel.upload(this, storage, auth, list, flag = true)
+            viewModel.delete(storage, auth, task)
+            viewModel.setListName(list)
+            task = list
+        }
     }
 
     override fun onBackPressed() {

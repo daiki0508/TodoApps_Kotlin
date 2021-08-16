@@ -73,7 +73,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
                 adapter.setOnItemClickListener(object: OnItemClickListener{
                     override fun onItemClickListener(view: View, position: Int, list: String) {
-                        addTodoIntent(list)
+                        addTodoIntent(list, position, it.size)
                     }
                 })
                 Log.d("test", "Called")
@@ -81,15 +81,17 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         })
     }
 
-    override fun onDialogFlagReceive(dialog: DialogFragment, list: String, type: Int) {
-        CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, flag = true)
+    override fun onDialogFlagReceive(dialog: DialogFragment, list: String, type: Int, flag: Boolean) {
+        CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
         viewModel.upload(this, storage, auth)
         viewModel.createView(this, auth)
     }
 
-    fun addTodoIntent(list: String){
+    fun addTodoIntent(list: String, position: Int, last: Int){
         Intent(this@TodoActivity, AddTodoTaskActivity::class.java).apply {
             this.putExtra("list", list)
+            this.putExtra("position", position)
+            this.putExtra("last", last)
             startActivity(this)
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right,)
             finish()

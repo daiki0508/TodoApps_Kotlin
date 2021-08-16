@@ -39,7 +39,7 @@ class AddListDialog(private var flag: Boolean, private var type: Int): DialogFra
             }
             findViewById<View>(R.id.positive_button).setOnClickListener {
                 val list = Editable.Factory.getInstance().newEditable(findViewById<EditText>(R.id.edList).text)
-                listener?.onDialogFlagReceive(this@AddListDialog, list.toString(), type)
+                listener?.onDialogFlagReceive(this@AddListDialog, list.toString(), type, flag)
                 list.clear()
                 dismiss()
             }

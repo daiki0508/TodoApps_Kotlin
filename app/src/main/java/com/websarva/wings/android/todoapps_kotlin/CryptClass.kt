@@ -6,12 +6,15 @@ import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.security.auth.Destroyable
 import android.content.Context.MODE_PRIVATE
+import android.net.Uri
 import android.os.Build
+import android.os.FileUtils
 import android.util.Base64
 import android.util.Log
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
+import java.nio.file.Paths
 import java.util.*
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
@@ -21,13 +24,13 @@ import javax.crypto.spec.PBEKeySpec
 class CryptClass {
     private fun encrypt(context: Context, pass: CharArray, pStr: String, type: Int, task: String?){
         val key = generateStrongAESKey(context, pass, 256, true, type, task)
-        val list: File = if (type == 0){
+        val list: File = if (type == 0 || type == 4){
             File(context.filesDir, "list")
         }else{
             File("${context.filesDir}/task/$task", "task")
         }
 
-        val iv: File = if (type == 0){
+        val iv: File = if (type == 0 || type == 4){
             File(context.filesDir, "iv_aes")
         }else{
             File("${context.filesDir}/task/$task", "iv_aes")
@@ -45,11 +48,17 @@ class CryptClass {
         }
     }
 
-    fun decrypt(context: Context, pass: CharArray, pStr: String, type: Int, task: String?, flag: Boolean): String?{
-        val encFile: File = if (type == 0){
-            File(context.filesDir, "list")
-        }else{
-            File("${context.filesDir}/task/$task", "task")
+    fun decrypt(context: Context, pass: CharArray, pStr: String, type: Int, task: String?, aStr: String?, flag: Boolean): String?{
+        val encFile: File = when (type) {
+            0 -> {
+                File(context.filesDir, "list")
+            }
+            4 -> {
+                File("${context.filesDir}/task/$aStr", "task")
+            }
+            else -> {
+                File("${context.filesDir}/task/$task", "task")
+            }
         }
         if (!encFile.exists()){
             // typeが1の場合かつ、対象ファイルが存在しない場合はサブディレクトリを作成
@@ -58,13 +67,24 @@ class CryptClass {
             }else if (type == 2){
                 // 新規にListは作られたが、まだTaskは作成されていない状態
                 return "NoTask"
+            }else if (type == 4){
+                // 旧Listディレクトリのファイルを全て新Listディレクトリにコピーして、旧ディレクトリを削除
+                val aStrFile = File("${context.filesDir}/task/$aStr")
+                val from = File("${context.filesDir}/task/$task")
+                from.copyRecursively(aStrFile, true)
+
+                from.deleteRecursively()
+
+                Log.d("test2", "Called!")
+                encrypt(context, pass, pStr, type, aStr)
+                return null
             }
             Log.d("test2", "Called!")
             encrypt(context, pass, pStr, type, task)
             return null
         }
         val key = generateStrongAESKey(context, pass, 256, false, type, task)
-        val ivFile: FileInputStream = if (type == 0){
+        val ivFile: FileInputStream = if (type == 0 || type == 4){
             context.openFileInput("iv_aes")
         }else{
             // ネストされたディレクトリの場合はFileInputStreamでないとエラーが発生
@@ -86,7 +106,7 @@ class CryptClass {
             Log.d("test", "${String(cipher.doFinal(enc))} $pStr")
             if (flag){
                 // typeが3の場合は更新
-                if (type == 3){
+                if (type == 3 || type == 4){
                     encrypt(context, pass, pStr, type, task)
                 }else{
                     encrypt(context, pass, "${String(cipher.doFinal(enc))} $pStr", type, task)
@@ -113,14 +133,14 @@ class CryptClass {
                 salt[i] = password[i].code.toByte()
             }
 
-            val saltFile: File = if (type == 0){
+            val saltFile: File = if (type == 0 || type == 4){
                 File(context.filesDir, "salt")
             }else{
                 File("${context.filesDir}/task/$task", "salt")
             }
             saltFile.writeBytes(salt)
         }else{
-            val saltFile: FileInputStream = if (type == 0){
+            val saltFile: FileInputStream = if (type == 0 || type == 4){
                 context.openFileInput("salt")
             }else{
                 // ネストされたディレクトリの場合はFileInputStreamでないとエラーが発生

@@ -18,6 +18,10 @@ interface FirebaseStorageDownloadRepository{
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
 }
 
+interface FirebaseStorageDeleteRepository{
+    fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?)
+}
+
 class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
     override fun upload(
         context: Context,
@@ -104,6 +108,40 @@ class FirebaseStorageDownloadRepositoryClient: FirebaseStorageDownloadRepository
             storageRef.child("users/$uid/todo/$child")
         }
         fileRef.getFile(file).addOnSuccessListener {
+            Log.d("test2", "Success!!")
+        }.addOnFailureListener {
+            Log.w("test2", it)
+        }
+    }
+}
+
+class FirebaseStorageDeleteRepositoryClient: FirebaseStorageDeleteRepository{
+    override fun delete(
+        storage: FirebaseStorage,
+        auth: FirebaseAuth,
+        task: String?
+    ) {
+        val uid = auth.currentUser!!.uid
+
+        val storageRef = storage.reference
+
+        deleteTask("task/$task/task", storageRef, uid, flag = false)
+        deleteTask("task/$task/iv_aes", storageRef, uid, flag = false)
+        deleteTask("task/$task/salt", storageRef, uid, flag = false)
+    }
+
+    private fun deleteTask(
+        child: String,
+        storageRef: StorageReference,
+        uid: String,
+        flag: Boolean
+    ){
+        val fileRef = if (flag){
+            storageRef.child("users/$uid/todo/list/$child")
+        }else{
+            storageRef.child("users/$uid/todo/$child")
+        }
+        fileRef.delete().addOnSuccessListener {
             Log.d("test2", "Success!!")
         }.addOnFailureListener {
             Log.w("test2", it)

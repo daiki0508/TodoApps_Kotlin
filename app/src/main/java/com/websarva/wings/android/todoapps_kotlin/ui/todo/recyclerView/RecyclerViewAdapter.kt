@@ -40,20 +40,13 @@ class RecyclerViewAdapter(
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(activity)
-        /*val contentList: MutableList<MutableMap<String, String>> = mutableListOf()
-        var content: MutableMap<String, String>
-        // 動作確認用のテストリストの作成
-        for (i in 0..2){
-            content = mutableMapOf("content" to "test$i")
-            contentList.add(content)
-        }*/
         val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(activity, auth, items[position]["list"]!!), position)
         holder.rvContents.adapter = adapter
         adapter.notifyDataSetChanged()
 
         adapter.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
-                activity.addTodoIntent(items[position]["list"]!!)
+                activity.addTodoIntent(items[position]["list"]!!, position, items.size)
             }
         })
     }
