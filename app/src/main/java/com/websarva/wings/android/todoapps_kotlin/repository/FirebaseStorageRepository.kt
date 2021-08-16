@@ -34,7 +34,7 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
 
         val storageRef = storage.reference
 
-        if (flag){
+        if (!flag){
             uploadTask(context, "list", storageRef, uid, null, flag)
             uploadTask(context, "iv_aes", storageRef, uid, null, flag)
             uploadTask(context, "salt", storageRef, uid, null, flag)
@@ -55,7 +55,7 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
     ){
         val file = Uri.fromFile(File(context.filesDir, child))
 
-        val fileRef: StorageReference = if (flag){
+        val fileRef: StorageReference = if (!flag){
             storageRef.child("users/$uid/todo/list/${file.lastPathSegment}")
         }else{
             storageRef.child("users/$uid/todo/task/$task/${file.lastPathSegment}")

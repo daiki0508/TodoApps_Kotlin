@@ -16,6 +16,7 @@ import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
@@ -60,7 +61,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         }
 
         binding.fab.setOnClickListener {
-            AddListDialog(flag = false, type = 0).show(supportFragmentManager, "AddListDialog")
+            AddListDialog(flag = false, type = 0, ACAdapter = null, APAdapter = null, position = null).show(supportFragmentManager, "AddListDialog")
         }
 
         viewModel.todoList().observe(this, {
@@ -81,7 +82,15 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         })
     }
 
-    override fun onDialogFlagReceive(dialog: DialogFragment, list: String, type: Int, flag: Boolean) {
+    override fun onDialogFlagReceive(
+        dialog: DialogFragment,
+        list: String,
+        type: Int,
+        flag: Boolean,
+        ACAdapter: ChildRecyclerViewAdapter?,
+        APAdapter: com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter?,
+        position: Int?
+    ) {
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
         viewModel.upload(this, storage, auth)
         viewModel.createView(this, auth)

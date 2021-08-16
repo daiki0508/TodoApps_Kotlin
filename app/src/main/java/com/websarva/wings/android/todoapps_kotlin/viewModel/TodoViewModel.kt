@@ -24,7 +24,7 @@ class TodoViewModel(
     }
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageUploadRepository.upload(context, storage, auth, task = null, flag = true)
+        firebaseStorageUploadRepository.upload(context, storage, auth, task = null, flag = false)
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){

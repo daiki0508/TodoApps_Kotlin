@@ -20,8 +20,8 @@ interface OnItemClickListener {
 }
 
 class RecyclerViewAdapter(
-    private var items: MutableList<MutableMap<String, String>>,
-    private var task: String,
+    var items: MutableList<MutableMap<String, String>>,
+    var task: String,
     private var activity: AddTodoTaskActivity,
     private var viewModel: AddTodoTaskViewModel
     ): RecyclerView.Adapter<RecyclerViewHolder>() {
@@ -50,8 +50,9 @@ class RecyclerViewAdapter(
 
         adapter.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
+                // taskの更新
                 viewModel.setPosition(position, items.size)
-                AddListDialog(flag = true, type = 1).show(activity.supportFragmentManager, "UpdateTaskDialog")
+                AddListDialog(flag = true, type = 1, adapter, APAdapter = null, position).show(activity.supportFragmentManager, "UpdateTaskDialog")
             }
         })
     }

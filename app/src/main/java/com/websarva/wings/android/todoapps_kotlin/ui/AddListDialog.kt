@@ -15,8 +15,16 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter
 
-class AddListDialog(private var flag: Boolean, private var type: Int): DialogFragment() {
+class AddListDialog(
+    private var flag: Boolean,
+    private var type: Int,
+    private var ACAdapter: ChildRecyclerViewAdapter?,
+    private var APAdapter: RecyclerViewAdapter?,
+    private var position: Int?
+    ): DialogFragment() {
     private var listener: DialogListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -39,7 +47,7 @@ class AddListDialog(private var flag: Boolean, private var type: Int): DialogFra
             }
             findViewById<View>(R.id.positive_button).setOnClickListener {
                 val list = Editable.Factory.getInstance().newEditable(findViewById<EditText>(R.id.edList).text)
-                listener?.onDialogFlagReceive(this@AddListDialog, list.toString(), type, flag)
+                listener?.onDialogFlagReceive(this@AddListDialog, list.toString(), type, flag, ACAdapter, APAdapter, position)
                 list.clear()
                 dismiss()
             }

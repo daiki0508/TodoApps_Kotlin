@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -16,6 +17,7 @@ import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
@@ -60,50 +62,44 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         }
 
         binding.fab.setOnClickListener {
-            AddListDialog(flag = true, type = 0).show(supportFragmentManager, "AddTaskDialog")
+            AddListDialog(flag = true, type = 0, ACAdapter = null, APAdapter = null, position = null).show(supportFragmentManager, "AddTaskDialog")
         }
 
-        viewModel.todoList().observe(this, {
-            if (it.isNotBlank()){
-                val adapter = RecyclerViewAdapter(viewModel.todoTask().value!!, it, this, viewModel)
-                binding.recyclerview.adapter = adapter
-                adapter.notifyDataSetChanged()
-
-                adapter.setOnItemClickListener(object: OnItemClickListener {
-                    override fun onItemClickListener(view: View, position: Int) {
-                        viewModel.setPosition(this@AddTodoTaskActivity.position, last)
-                        AddListDialog(flag = false, type = 1).show(supportFragmentManager, "UpdateListDialog")
-                    }
-                })
-
-                Log.d("test", "Called")
-            }
-        })
+        var adapter: RecyclerViewAdapter? = null
 
         viewModel.todoTask().observe(this, {
             if (it.isNotEmpty()){
                 binding.tvNoContent.visibility = View.GONE
+                if (adapter == null){
+                    adapter = RecyclerViewAdapter(viewModel.todoTask().value!!, task, this, viewModel)
+                    binding.recyclerview.adapter = adapter
+                    adapter?.notifyDataSetChanged()
+                }
 
-                val adapter = RecyclerViewAdapter(it, task, this, viewModel)
-                binding.recyclerview.adapter = adapter
-                adapter.notifyDataSetChanged()
-
-                adapter.setOnItemClickListener(object: OnItemClickListener {
+                adapter?.setOnItemClickListener(object: OnItemClickListener {
                     override fun onItemClickListener(view: View, position: Int) {
+                        // listの更新
                         viewModel.setPosition(this@AddTodoTaskActivity.position, last)
-                        AddListDialog(flag = false, type = 1).show(supportFragmentManager, "UpdateListDialog")
+                        AddListDialog(flag = false, type = 1, ACAdapter = null, APAdapter = adapter, position = null).show(supportFragmentManager, "UpdateListDialog")
                     }
                 })
-
-                Log.d("test", "Called")
             }
         })
     }
 
-    override fun onDialogFlagReceive(dialog: DialogFragment, list: String, type: Int, flag: Boolean) {
+    override fun onDialogFlagReceive(
+        dialog: DialogFragment,
+        list: String,
+        type: Int,
+        flag: Boolean,
+        ACAdapter: ChildRecyclerViewAdapter?,
+        APAdapter: RecyclerViewAdapter?,
+        position: Int?
+    ) {
         Log.d("dialog", list)
         if (type == 0){
             CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, aStr = null, flag = true)
+            viewModel.createView(this, auth, task)
         }else{
             if (flag){
                 viewModel.update(this, auth, task, list, flag)
@@ -111,13 +107,22 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 viewModel.update(this, auth, task, list, flag)
             }
         }
+        // trueがタスク、falseがリスト
         if (flag){
             viewModel.upload(this, storage, auth, task, flag)
-            viewModel.createView(this, auth, task)
+            //viewModel.setTaskName(list)
+            if (type == 1){
+                ACAdapter!!.items[position!!]["task"] = list
+                ACAdapter.notifyItemChanged(position)
+            }
         }else{
-            viewModel.upload(this, storage, auth, list, flag = true)
+            viewModel.upload(this, storage, auth, task = null, flag)
+            viewModel.upload(this, storage, auth, task, flag = true)
             viewModel.delete(storage, auth, task)
-            viewModel.setListName(list)
+            //viewModel.setListName(list)
+            //viewModel.createView(this, auth, list)
+            APAdapter!!.task = list
+            APAdapter.notifyDataSetChanged()
             task = list
         }
     }

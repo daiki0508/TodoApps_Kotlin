@@ -19,7 +19,7 @@ interface OnChildItemClickListener {
 }
 
 class ChildRecyclerViewAdapter(
-    private var items: MutableList<MutableMap<String, String>>,
+    var items: MutableList<MutableMap<String, String>>,
     ): RecyclerView.Adapter<ChildRecyclerViewHolder>() {
     private lateinit var listener: OnChildItemClickListener
 
@@ -38,8 +38,6 @@ class ChildRecyclerViewAdapter(
         holder.content.text = items[position]["task"]
 
         holder.content.setOnClickListener {
-            /*viewModel.setPosition(position, items.size)
-            AddListDialog(flag = true, type = 1).show(activity.supportFragmentManager, "UpdateTaskDialog")*/
             listener.onItemClickListener(it, position)
         }
 

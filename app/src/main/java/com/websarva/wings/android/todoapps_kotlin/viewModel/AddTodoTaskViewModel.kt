@@ -26,14 +26,18 @@ class AddTodoTaskViewModel(
         MutableLiveData<MutableList<MutableMap<String, String>>>()
     }
 
+    private val _updateName = MutableLiveData<String>().apply {
+        MutableLiveData<String>()
+    }
+
     private var position: Int
     private var lastPosition: Int
 
-    fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String, flag: Boolean){
+    fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean){
         if (flag){
-            firebaseStorageUploadRepository.upload(context, storage, auth, task, flag = false)
+            firebaseStorageUploadRepository.upload(context, storage, auth, task, flag)
         }else{
-            firebaseStorageUploadRepository.upload(context, storage, auth, task, flag = true)
+            firebaseStorageUploadRepository.upload(context, storage, auth, task, flag)
         }
     }
 
@@ -60,6 +64,10 @@ class AddTodoTaskViewModel(
             todoTask.add(todo)
         }
         _todoTask.value = todoTask
+    }
+
+    fun setTaskName(name: String){
+        _updateName.value = name
     }
 
     fun setListName(name: String){
@@ -116,6 +124,10 @@ class AddTodoTaskViewModel(
         return _todoList
     }
 
+    fun updateName(): MutableLiveData<String>{
+        return _updateName
+    }
+
     fun setPosition(position: Int, size: Int){
         this.position = position
         this.lastPosition = size - 1
@@ -124,6 +136,7 @@ class AddTodoTaskViewModel(
     init {
         _todoList.value = ""
         _todoTask.value = mutableListOf()
+        _updateName.value = ""
         position = 0
         lastPosition = 0
     }
