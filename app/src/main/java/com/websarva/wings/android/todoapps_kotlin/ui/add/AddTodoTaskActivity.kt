@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +17,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
+import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
@@ -68,31 +71,31 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     acAdapter = ChildRecyclerViewAdapter(it)
                     apAdapter = RecyclerViewAdapter(viewModel.todoTask().value!!, task, this, viewModel, acAdapter)
                     binding.recyclerview.adapter = apAdapter
-                    apAdapter?.notifyDataSetChanged()
+                    //apAdapter!!.notifyDataSetChanged()
+
+                    apAdapter?.setOnItemClickListener(object: OnItemClickListener {
+                        override fun onItemClickListener(view: View, position: Int) {
+                            // listの更新
+                            viewModel.setPosition(this@AddTodoTaskActivity.position, last)
+                            AddListDialog(flag = false, type = 1, position = position).show(supportFragmentManager, "UpdateListDialog")
+                        }
+                    })
+
+                    acAdapter?.setPreferenceReadListener(object: OnPreferenceReadListener{
+                        override fun onPreferenceListener(keyName: String): Boolean {
+                            // checkFlagの状態を取得、デフォルト値はfalse
+                            return viewModel.readPreference(this@AddTodoTaskActivity, task, keyName)
+                        }
+                    })
+
+                    acAdapter?.setPreferenceWriteListener(object: OnPreferenceWriteListener {
+                        override fun onPreferenceListener(position: Int, keyName: String, checkFlag: Boolean) {
+                            // checkBoxの状態を保存しUIに反映
+                            viewModel.writePreference(this@AddTodoTaskActivity, task, keyName, checkFlag)
+                            acAdapter!!.notifyItemChanged(position)
+                        }
+                    })
                 }
-
-                apAdapter?.setOnItemClickListener(object: OnItemClickListener {
-                    override fun onItemClickListener(view: View, position: Int) {
-                        // listの更新
-                        viewModel.setPosition(this@AddTodoTaskActivity.position, last)
-                        AddListDialog(flag = false, type = 1, position = position).show(supportFragmentManager, "UpdateListDialog")
-                    }
-                })
-
-                acAdapter?.setPreferenceReadListener(object: OnPreferenceReadListener{
-                    override fun onPreferenceListener(keyName: String): Boolean {
-                        // checkFlagの状態を取得、デフォルト値はfalse
-                        return viewModel.readPreference(this@AddTodoTaskActivity, task, keyName)
-                    }
-                })
-
-                acAdapter?.setPreferenceWriteListener(object: OnPreferenceWriteListener {
-                    override fun onPreferenceListener(position: Int, keyName: String, checkFlag: Boolean) {
-                        // checkBoxの状態を保存してUIに反映
-                        viewModel.writePreference(this@AddTodoTaskActivity, task, keyName, checkFlag)
-                        acAdapter?.notifyItemChanged(position)
-                    }
-                })
             }
         })
 
@@ -120,7 +123,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         }
         // trueがタスク、falseがリスト
         if (flag){
-            viewModel.upload(this, storage, auth, task, flag)
+            //viewModel.upload(this, storage, auth, task, flag)
             when {
                 // taskの更新
                 type == 1 -> {
@@ -134,14 +137,14 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 }
                 else -> {
                     // taskの追加
-                    acAdapter!!.items.add(mutableMapOf("task" to "$list "))
+                    acAdapter!!.items.add(mutableMapOf("task" to list))
                     acAdapter!!.notifyItemInserted(acAdapter!!.items.size - 1)
                 }
             }
         }else{
-            viewModel.upload(this, storage, auth, task = null, flag)
+            /*viewModel.upload(this, storage, auth, task = null, flag)
             viewModel.upload(this, storage, auth, list, flag = true)
-            viewModel.delete(storage, auth, task)
+            viewModel.delete(storage, auth, task)*/
 
             // preferenceを手動でmove
             for (i in 0 until acAdapter!!.items.size){
@@ -160,8 +163,35 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_options_menu, menu)
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var retValue = true
+        when(item.itemId){
+            R.id.allCheck -> {
+                for (i in 0 until acAdapter!!.items.size){
+                    viewModel.writePreference(this, task, keyName = acAdapter!!.items[i]["task"]!!, checkFlag = true)
+                }
+                acAdapter!!.notifyDataSetChanged()
+            }
+            R.id.allUnCheck ->{
+                for (i in 0 until acAdapter!!.items.size){
+                    viewModel.writePreference(this, task, keyName = acAdapter!!.items[i]["task"]!!, checkFlag = false)
+                }
+                acAdapter!!.notifyDataSetChanged()
+            }
+            else -> retValue = super.onOptionsItemSelected(item)
+        }
+        return retValue
+    }
+
     override fun onBackPressed() {
         startActivity(Intent(this, TodoActivity::class.java))
         overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+        finish()
     }
 }

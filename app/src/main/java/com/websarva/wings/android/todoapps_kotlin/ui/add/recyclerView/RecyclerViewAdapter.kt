@@ -44,10 +44,8 @@ class RecyclerViewAdapter(
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(activity)
-        //val adapter =  ChildRecyclerViewAdapter(items)
         holder.rvContents.adapter = ACAdapter
         holder.rvContents.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
-        ACAdapter!!.notifyDataSetChanged()
 
         ACAdapter!!.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {

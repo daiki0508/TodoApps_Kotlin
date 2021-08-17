@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import java.io.File
@@ -24,6 +25,7 @@ class PreferenceRepositoryClient: PreferenceRepository {
     }
 
     override fun read(activity: Activity, task: String, keyName: String): Boolean {
+        Log.d("preference", "$keyName, ${createPreference(activity, task).getBoolean(keyName, false)}")
         return createPreference(activity, task).getBoolean(keyName, false)
     }
 

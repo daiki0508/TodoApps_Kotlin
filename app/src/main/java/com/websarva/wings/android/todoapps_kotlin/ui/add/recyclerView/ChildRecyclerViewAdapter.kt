@@ -52,18 +52,18 @@ class ChildRecyclerViewAdapter(
                 setTextColor(Color.LTGRAY)
                 paint.flags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 paint.isAntiAlias = true
+                holder.checkBox.isChecked = true
             }else{
                 setTextColor(Color.GRAY)
                 paint.flags = Paint.ANTI_ALIAS_FLAG
                 paint.isAntiAlias = false
+                holder.checkBox.isChecked = false
             }
         }
 
         holder.content.setOnClickListener {
             cListener.onItemClickListener(it, position)
         }
-
-        holder.checkBox.isChecked = prListener.onPreferenceListener(holder.content.text.toString())
 
         holder.checkBox.setOnClickListener {
             holder.content.apply {

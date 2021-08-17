@@ -31,4 +31,7 @@
     アカウントのメールアドレスを入力してください。</string>
     <string name="repassword">パスワード再設定メールを送信する</string>
     <string name="reset">パスワードを忘れた</string>
+    
+    <string name="option_allCheck_title">全てのタスクを完了済みにする</string>
+    <string name="option_allUnCheck_title">全てのタスクを未完了にする</string>
 </resources>
