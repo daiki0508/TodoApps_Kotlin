@@ -18,10 +18,20 @@ interface OnChildItemClickListener {
     fun onItemClickListener(view: View, position: Int)
 }
 
+interface OnPreferenceWriteListener{
+    fun onPreferenceListener(keyName: String, checkFlag: Boolean)
+}
+
+interface OnPreferenceReadListener{
+    fun onPreferenceListener(keyName: String): Boolean
+}
+
 class ChildRecyclerViewAdapter(
     var items: MutableList<MutableMap<String, String>>,
     ): RecyclerView.Adapter<ChildRecyclerViewHolder>() {
-    private lateinit var listener: OnChildItemClickListener
+    private lateinit var cListener: OnChildItemClickListener
+    private lateinit var pwListener: OnPreferenceWriteListener
+    private lateinit var prListener: OnPreferenceReadListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChildRecyclerViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -37,20 +47,30 @@ class ChildRecyclerViewAdapter(
         mlp.setMargins(mlp.leftMargin, 15, mlp.rightMargin, 15)
         holder.content.text = items[position]["task"]
 
-        holder.content.setOnClickListener {
-            listener.onItemClickListener(it, position)
+        holder.content.apply {
+            if (prListener.onPreferenceListener(holder.content.text.toString())){
+                setTextColor(Color.LTGRAY)
+                paint.flags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                paint.isAntiAlias = true
+            }else{
+                setTextColor(Color.GRAY)
+                paint.flags = Paint.ANTI_ALIAS_FLAG
+                paint.isAntiAlias = false
+            }
         }
+
+        holder.content.setOnClickListener {
+            cListener.onItemClickListener(it, position)
+        }
+
+        holder.checkBox.isChecked = prListener.onPreferenceListener(holder.content.text.toString())
 
         holder.checkBox.setOnClickListener {
             holder.content.apply {
                 if (holder.checkBox.isChecked){
-                    setTextColor(Color.LTGRAY)
-                    paint.flags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                    paint.isAntiAlias = true
+                    pwListener.onPreferenceListener(holder.content.text.toString(), true)
                 }else{
-                    setTextColor(Color.GRAY)
-                    paint.flags = Paint.ANTI_ALIAS_FLAG
-                    paint.isAntiAlias = false
+                    pwListener.onPreferenceListener(holder.content.text.toString(), false)
                 }
             }
         }
@@ -61,6 +81,14 @@ class ChildRecyclerViewAdapter(
     }
 
     fun setOnItemClickListener(listener: OnChildItemClickListener){
-        this.listener = listener
+        this.cListener = listener
+    }
+
+    fun setPreferenceWriteListener(listener: OnPreferenceWriteListener){
+        this.pwListener = listener
+    }
+
+    fun setPreferenceReadListener(listener: OnPreferenceReadListener){
+        this.prListener = listener
     }
 }

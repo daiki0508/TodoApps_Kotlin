@@ -10,19 +10,13 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import java.io.File
 
-interface FirebaseStorageUploadRepository {
+interface FirebaseStorageRepository {
     fun upload(context: Context ,storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
-}
-
-interface FirebaseStorageDownloadRepository{
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
-}
-
-interface FirebaseStorageDeleteRepository{
     fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?)
 }
 
-class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
+class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
     override fun upload(
         context: Context,
         storage: FirebaseStorage,
@@ -43,6 +37,38 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
             uploadTask(context, "task/$task/iv_aes", storageRef, uid, task, flag)
             uploadTask(context, "task/$task/salt", storageRef, uid, task, flag)
         }
+    }
+
+    override fun download(
+        context: Context,
+        storage: FirebaseStorage,
+        auth: FirebaseAuth,
+        task: String?,
+        flag: Boolean
+    ) {
+        val uid = auth.currentUser!!.uid
+
+        val storageRef = storage.reference
+
+        if (flag){
+            downloadTask(context, "list", storageRef, uid, flag)
+            downloadTask(context, "iv_aes", storageRef, uid, flag)
+            downloadTask(context, "salt", storageRef, uid, flag)
+        }else{
+            downloadTask(context, "task/$task/task", storageRef, uid, flag)
+            downloadTask(context, "task/$task/iv_aes", storageRef, uid, flag)
+            downloadTask(context, "task/$task/salt", storageRef, uid, flag)
+        }
+    }
+
+    override fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?) {
+        val uid = auth.currentUser!!.uid
+
+        val storageRef = storage.reference
+
+        deleteTask("task/$task/task", storageRef, uid, flag = false)
+        deleteTask("task/$task/iv_aes", storageRef, uid, flag = false)
+        deleteTask("task/$task/salt", storageRef, uid, flag = false)
     }
 
     private fun uploadTask(
@@ -68,30 +94,6 @@ class FirebaseStorageUploadRepositoryClient: FirebaseStorageUploadRepository {
             Log.d("test", "success!!")
         }
     }
-}
-
-class FirebaseStorageDownloadRepositoryClient: FirebaseStorageDownloadRepository {
-    override fun download(
-        context: Context,
-        storage: FirebaseStorage,
-        auth: FirebaseAuth,
-        task: String?,
-        flag: Boolean
-    ) {
-        val uid = auth.currentUser!!.uid
-
-        val storageRef = storage.reference
-
-        if (flag){
-            downloadTask(context, "list", storageRef, uid, flag)
-            downloadTask(context, "iv_aes", storageRef, uid, flag)
-            downloadTask(context, "salt", storageRef, uid, flag)
-        }else{
-            downloadTask(context, "task/$task/task", storageRef, uid, flag)
-            downloadTask(context, "task/$task/iv_aes", storageRef, uid, flag)
-            downloadTask(context, "task/$task/salt", storageRef, uid, flag)
-        }
-    }
 
     private fun downloadTask(
         context: Context,
@@ -112,22 +114,6 @@ class FirebaseStorageDownloadRepositoryClient: FirebaseStorageDownloadRepository
         }.addOnFailureListener {
             Log.w("test2", it)
         }
-    }
-}
-
-class FirebaseStorageDeleteRepositoryClient: FirebaseStorageDeleteRepository{
-    override fun delete(
-        storage: FirebaseStorage,
-        auth: FirebaseAuth,
-        task: String?
-    ) {
-        val uid = auth.currentUser!!.uid
-
-        val storageRef = storage.reference
-
-        deleteTask("task/$task/task", storageRef, uid, flag = false)
-        deleteTask("task/$task/iv_aes", storageRef, uid, flag = false)
-        deleteTask("task/$task/salt", storageRef, uid, flag = false)
     }
 
     private fun deleteTask(

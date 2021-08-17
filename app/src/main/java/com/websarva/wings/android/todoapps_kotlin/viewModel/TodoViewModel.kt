@@ -10,25 +10,23 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
-import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageDownloadRepositoryClient
-import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageUploadRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
 import kotlinx.coroutines.*
 import java.io.File
 
 class TodoViewModel(
-    private val firebaseStorageUploadRepository: FirebaseStorageUploadRepositoryClient,
-    private val firebaseStorageDownloadRepository: FirebaseStorageDownloadRepositoryClient
+    private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
 ): ViewModel() {
     private val _todoList = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
     }
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageUploadRepository.upload(context, storage, auth, task = null, flag = false)
+        firebaseStorageRepository.upload(context, storage, auth, task = null, flag = false)
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageDownloadRepository.download(context, storage, auth, task = null, flag = true)
+        firebaseStorageRepository.download(context, storage, auth, task = null, flag = true)
     }
 
     fun createView(context: Context, auth: FirebaseAuth){

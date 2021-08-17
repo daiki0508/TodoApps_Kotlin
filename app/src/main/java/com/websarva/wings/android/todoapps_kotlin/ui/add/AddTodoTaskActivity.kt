@@ -17,9 +17,7 @@ import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
-import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter
-import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.OnItemClickListener
-import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -78,6 +76,20 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                         // listの更新
                         viewModel.setPosition(this@AddTodoTaskActivity.position, last)
                         AddListDialog(flag = false, type = 1, position = position).show(supportFragmentManager, "UpdateListDialog")
+                    }
+                })
+
+                acAdapter?.setPreferenceReadListener(object: OnPreferenceReadListener{
+                    override fun onPreferenceListener(keyName: String): Boolean {
+                        // checkFlagの状態を取得、デフォルト値はfalse
+                        return viewModel.readPreference(this@AddTodoTaskActivity, task, keyName)
+                    }
+                })
+
+                acAdapter?.setPreferenceWriteListener(object: OnPreferenceWriteListener {
+                    override fun onPreferenceListener(keyName: String, checkFlag: Boolean) {
+                        // checkBoxの状態を保存
+                        viewModel.writePreference(this@AddTodoTaskActivity, task, keyName, checkFlag)
                     }
                 })
             }

@@ -1,5 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.viewModel
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -7,17 +8,14 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
-import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageDeleteRepositoryClient
-import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageDownloadRepositoryClient
-import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageUploadRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.repository.*
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import java.io.File
 
 class AddTodoTaskViewModel(
-    private val firebaseStorageUploadRepository: FirebaseStorageUploadRepositoryClient,
-    private val firebaseStorageDownloadRepository: FirebaseStorageDownloadRepositoryClient,
-    private val firebaseStorageDeleteRepository: FirebaseStorageDeleteRepositoryClient
+    private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
+    private val preferenceRepository: PreferenceRepositoryClient
 ): ViewModel() {
     private val _todoList = MutableLiveData<String>().apply {
         MutableLiveData<String>()
@@ -35,22 +33,30 @@ class AddTodoTaskViewModel(
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean){
         if (flag){
-            firebaseStorageUploadRepository.upload(context, storage, auth, task, flag)
+            firebaseStorageRepository.upload(context, storage, auth, task, flag)
         }else{
-            firebaseStorageUploadRepository.upload(context, storage, auth, task, flag)
+            firebaseStorageRepository.upload(context, storage, auth, task, flag)
         }
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String, flag: Boolean){
         if (flag){
-            firebaseStorageDownloadRepository.download(context, storage, auth, task, flag = false)
+            firebaseStorageRepository.download(context, storage, auth, task, flag = false)
         }else{
-            firebaseStorageDownloadRepository.download(context, storage, auth, task, flag = true)
+            firebaseStorageRepository.download(context, storage, auth, task, flag = true)
         }
     }
 
     fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String){
-        firebaseStorageDeleteRepository.delete(storage, auth, task)
+        firebaseStorageRepository.delete(storage, auth, task)
+    }
+
+    fun writePreference(activity: Activity, task: String, keyName: String, checkFlag: Boolean){
+        preferenceRepository.write(activity, task, keyName, checkFlag)
+    }
+
+    fun readPreference(activity: Activity, task: String, keyName: String): Boolean{
+        return preferenceRepository.read(activity, task, keyName)
     }
 
     fun createView(context: Context, auth: FirebaseAuth, task: String){
