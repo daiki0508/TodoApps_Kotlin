@@ -19,7 +19,7 @@ interface OnChildItemClickListener {
 }
 
 interface OnPreferenceWriteListener{
-    fun onPreferenceListener(keyName: String, checkFlag: Boolean)
+    fun onPreferenceListener(position: Int, keyName: String, checkFlag: Boolean)
 }
 
 interface OnPreferenceReadListener{
@@ -68,9 +68,9 @@ class ChildRecyclerViewAdapter(
         holder.checkBox.setOnClickListener {
             holder.content.apply {
                 if (holder.checkBox.isChecked){
-                    pwListener.onPreferenceListener(holder.content.text.toString(), true)
+                    pwListener.onPreferenceListener(position, holder.content.text.toString(), true)
                 }else{
-                    pwListener.onPreferenceListener(holder.content.text.toString(), false)
+                    pwListener.onPreferenceListener(position, holder.content.text.toString(), false)
                 }
             }
         }

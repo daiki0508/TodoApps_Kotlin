@@ -59,6 +59,10 @@ class AddTodoTaskViewModel(
         return preferenceRepository.read(activity, task, keyName)
     }
 
+    fun deletePreference(activity: Activity, task: String){
+        preferenceRepository.delete(activity, task)
+    }
+
     fun createView(context: Context, auth: FirebaseAuth, task: String){
         val tasks = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, null, flag = false)
 

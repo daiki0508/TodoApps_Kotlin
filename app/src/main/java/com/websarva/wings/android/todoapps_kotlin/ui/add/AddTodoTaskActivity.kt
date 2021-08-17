@@ -87,9 +87,10 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 })
 
                 acAdapter?.setPreferenceWriteListener(object: OnPreferenceWriteListener {
-                    override fun onPreferenceListener(keyName: String, checkFlag: Boolean) {
-                        // checkBoxの状態を保存
+                    override fun onPreferenceListener(position: Int, keyName: String, checkFlag: Boolean) {
+                        // checkBoxの状態を保存してUIに反映
                         viewModel.writePreference(this@AddTodoTaskActivity, task, keyName, checkFlag)
+                        acAdapter?.notifyItemChanged(position)
                     }
                 })
             }
@@ -120,11 +121,11 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         // trueがタスク、falseがリスト
         if (flag){
             viewModel.upload(this, storage, auth, task, flag)
-            //viewModel.setTaskName(list)
             when {
                 // taskの更新
                 type == 1 -> {
-                    acAdapter!!.items[position!!]["task"] = list
+                    viewModel.writePreference(this, task, keyName = acAdapter!!.items[position!!]["task"]!!, checkFlag = false)
+                    acAdapter!!.items[position]["task"] = list
                     acAdapter!!.notifyItemChanged(position)
                 }
                 acAdapter == null -> {
@@ -132,15 +133,26 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     viewModel.createView(this, auth, task)
                 }
                 else -> {
-                    // taskのupdate
+                    // taskの追加
                     acAdapter!!.items.add(mutableMapOf("task" to "$list "))
                     acAdapter!!.notifyItemInserted(acAdapter!!.items.size - 1)
                 }
             }
         }else{
             viewModel.upload(this, storage, auth, task = null, flag)
-            viewModel.upload(this, storage, auth, task, flag = true)
+            viewModel.upload(this, storage, auth, list, flag = true)
             viewModel.delete(storage, auth, task)
+
+            // preferenceを手動でmove
+            for (i in 0 until acAdapter!!.items.size){
+                viewModel.writePreference(
+                    this,
+                    task = list,
+                    keyName = acAdapter!!.items[i]["task"]!!,
+                    checkFlag = viewModel.readPreference(this, task, acAdapter!!.items[i]["task"]!!))
+            }
+            // 旧preferenceを削除
+            viewModel.deletePreference(this, task)
 
             apAdapter!!.task = list
             apAdapter!!.notifyItemChanged(position!!)
