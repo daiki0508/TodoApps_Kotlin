@@ -26,7 +26,8 @@ class TodoViewModel(
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageRepository.download(context, storage, auth, task = null, flag = true)
+        TODO("repositoryの引数が変更されたため")
+        //firebaseStorageRepository.download(context, storage, auth, task = null, flag = true)
     }
 
     fun createView(context: Context, auth: FirebaseAuth){

@@ -17,11 +17,11 @@ class AddTodoTaskViewModel(
     private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
     private val preferenceRepository: PreferenceRepositoryClient
 ): ViewModel() {
-    private val _todoList = MutableLiveData<String>().apply {
-        MutableLiveData<String>()
-    }
     private val _todoTask = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
+    }
+    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean>>().apply {
+        MutableLiveData<MutableMap<String, Boolean>>()
     }
 
     private val _updateName = MutableLiveData<String>().apply {
@@ -31,18 +31,14 @@ class AddTodoTaskViewModel(
     private var position: Int
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean){
-        if (flag){
-            firebaseStorageRepository.upload(context, storage, auth, task, flag)
-        }else{
-            firebaseStorageRepository.upload(context, storage, auth, task, flag)
-        }
+        firebaseStorageRepository.upload(context, storage, auth, task, flag)
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String, flag: Boolean){
         if (flag){
-            firebaseStorageRepository.download(context, storage, auth, task, flag = false)
+            firebaseStorageRepository.download(context, this, storage, auth, task, flag = false)
         }else{
-            firebaseStorageRepository.download(context, storage, auth, task, flag = true)
+            firebaseStorageRepository.download(context, this, storage, auth, task, flag = true)
         }
     }
 
@@ -109,7 +105,7 @@ class AddTodoTaskViewModel(
     fun taskDelete(context: Context, auth: FirebaseAuth, task: String, position: Int){
         val tasksBefore = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, aStr = null, flag = false)
         Log.d("update_b", tasksBefore!!)
-        var tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
+        val tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
         if (tasksBefore == tasksAfter){
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task, aStr = null, flag = true)
 
@@ -119,8 +115,16 @@ class AddTodoTaskViewModel(
         Log.d("update_a", tasksAfter)
     }
 
+    fun completeFlag(): MutableLiveData<MutableMap<String, Boolean>>{
+        return _completeFlag
+    }
+
     fun todoTask(): MutableLiveData<MutableList<MutableMap<String, String>>>{
         return _todoTask
+    }
+
+    fun setCompleteFlag(taskMap: MutableMap<String, Boolean>){
+        _completeFlag.value = taskMap
     }
 
     fun setPosition(position: Int){
@@ -128,7 +132,7 @@ class AddTodoTaskViewModel(
     }
 
     init {
-        _todoList.value = ""
+        _completeFlag.value = mutableMapOf("task" to false, "iv_aes" to false, "salt" to false)
         _todoTask.value = mutableListOf()
         _updateName.value = ""
         position = 0

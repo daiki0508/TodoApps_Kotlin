@@ -59,19 +59,22 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
 
-        //viewModel.download(this, storage, auth, task)
-        if (File("$filesDir/task/$task/task").exists()){
-            viewModel.createView(this, auth, task)
-        }
+        // FirebaseStorageからデータをダウンロード
+        //viewModel.download(this, storage, auth, task, flag = true)
+
+        viewModel.completeFlag().observe(this, {
+            // 全てのダウンロードが終了してからRecyclerViewの生成に入る
+            if (it["task"]!! and it["iv_aes"]!! and it["salt"]!!){
+                viewModel.createView(this, auth, task)
+            }
+        })
 
         viewModel.todoTask().observe(this, {
             if (it.isNotEmpty()){
                 if (apAdapter == null){
-                    // recyclerviewがdeleteTaskによって非表示の場合は再表示し、NoContentsを非表示にする
-                    if (binding.recyclerview.visibility == View.GONE){
-                        binding.tvNoContent.visibility = View.GONE
-                        binding.recyclerview.visibility = View.VISIBLE
-                    }
+                    // recyclerviewがdeleteTask等によって非表示の場合は再表示し、NoContentsを非表示にする
+                    binding.tvNoContent.visibility = View.GONE
+                    binding.recyclerview.visibility = View.VISIBLE
 
                     acAdapter = ChildRecyclerViewAdapter(it, viewModel)
                     apAdapter = RecyclerViewAdapter(viewModel.todoTask().value!!, task, this, viewModel, acAdapter)
@@ -213,11 +216,19 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 if (acAdapter!!.itemCount == 0){
                     binding.recyclerview.visibility = View.GONE
                     binding.tvNoContent.visibility = View.VISIBLE
+
                     acAdapter = null
                     apAdapter = null
+                    // FirebaseStorageからtaskを完全削除
+                    viewModel.delete(storage, auth, task)
+                    // 内部ストレージからtaskファイルを完全削除する
+                    viewModel.taskDelete(this, auth, task, position)
+                }else{
+                    // 内部ストレージから該当taskを削除
+                    viewModel.taskDelete(this, auth, task, position)
+                    // FirebaseStorageを更新
+                    viewModel.upload(this, storage, auth, task, flag = true)
                 }
-
-                viewModel.taskDelete(this, auth, task, position)
             }
             else -> retValue = super.onContextItemSelected(item)
         }
