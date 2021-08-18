@@ -29,7 +29,6 @@ class AddTodoTaskViewModel(
     }
 
     private var position: Int
-    private var lastPosition: Int
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean){
         if (flag){
@@ -83,7 +82,12 @@ class AddTodoTaskViewModel(
         aStr: String,
         flag: Boolean
     ){
-        // flagがfalseがlistのupdate、trueがtaskのupdate
+        /*
+         flagがfalseがlistのupdate、trueがtaskのupdate
+         tasksAfter...置換後のファイルの中身
+         task...oldFileName
+         aStr...listのupdate時はnewFileName, taskのupdate時は新しいtask名
+         */
         val tasksBefore = if (!flag){
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task, aStr = null, flag = false)
         }else{
@@ -91,26 +95,10 @@ class AddTodoTaskViewModel(
         }
         Log.d("update_b", tasksBefore!!)
 
-        var tasksAfter = ""
-        for ((index, value) in tasksBefore.split(" ").withIndex()){
-            tasksAfter += when (index) {
-                position -> {
-                    if (index == lastPosition){
-                        value.replace(value, aStr)
-                    } else
-                        value.replace(value, "$aStr ")
-                }
-                lastPosition -> value
-                else -> "$value "
-            }
-        }
+        val tasksAfter = tasksBefore.replace(tasksBefore.split(" ")[position], aStr)
 
         Log.d("update_a", tasksAfter)
-        /*
-         tasksAfter...置換後のファイルの中身
-         task...oldFileName
-         aTask...newFileName
-         */
+
         if (!flag){
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 4, task, aStr, flag = true)
         }else{
@@ -118,13 +106,25 @@ class AddTodoTaskViewModel(
         }
     }
 
+    fun taskDelete(context: Context, auth: FirebaseAuth, task: String, position: Int){
+        val tasksBefore = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, aStr = null, flag = false)
+        Log.d("update_b", tasksBefore!!)
+        var tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
+        if (tasksBefore == tasksAfter){
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task, aStr = null, flag = true)
+
+        }else{
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, aStr = null, flag = true)
+        }
+        Log.d("update_a", tasksAfter)
+    }
+
     fun todoTask(): MutableLiveData<MutableList<MutableMap<String, String>>>{
         return _todoTask
     }
 
-    fun setPosition(position: Int, size: Int){
+    fun setPosition(position: Int){
         this.position = position
-        this.lastPosition = size - 1
     }
 
     init {
@@ -132,6 +132,5 @@ class AddTodoTaskViewModel(
         _todoTask.value = mutableListOf()
         _updateName.value = ""
         position = 0
-        lastPosition = 0
     }
 }

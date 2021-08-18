@@ -25,7 +25,7 @@ class PreferenceRepositoryClient: PreferenceRepository {
     }
 
     override fun read(activity: Activity, task: String, keyName: String): Boolean {
-        Log.d("preference", "$keyName, ${createPreference(activity, task).getBoolean(keyName, false)}")
+        //Log.d("preference", "$keyName, ${createPreference(activity, task).getBoolean(keyName, false)}")
         return createPreference(activity, task).getBoolean(keyName, false)
     }
 

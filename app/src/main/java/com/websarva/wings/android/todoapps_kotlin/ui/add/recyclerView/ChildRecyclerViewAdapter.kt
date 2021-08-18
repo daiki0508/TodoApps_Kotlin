@@ -28,6 +28,7 @@ interface OnPreferenceReadListener{
 
 class ChildRecyclerViewAdapter(
     var items: MutableList<MutableMap<String, String>>,
+    var viewModel: AddTodoTaskViewModel
     ): RecyclerView.Adapter<ChildRecyclerViewHolder>() {
     private lateinit var cListener: OnChildItemClickListener
     private lateinit var pwListener: OnPreferenceWriteListener
@@ -61,10 +62,22 @@ class ChildRecyclerViewAdapter(
             }
         }
 
+        // taskタップ時
         holder.content.setOnClickListener {
             cListener.onItemClickListener(it, position)
         }
 
+        // taskが長押しされた時
+        holder.content.setOnLongClickListener(View.OnLongClickListener {
+            viewModel.setPosition(position)
+            setPosition(holder.absoluteAdapterPosition)
+            return@OnLongClickListener false
+        })
+
+        // contextMenuの生成Listener
+        holder.contentView.setOnCreateContextMenuListener(holder)
+
+        // checkBoxタップ時
         holder.checkBox.setOnClickListener {
             holder.content.apply {
                 if (holder.checkBox.isChecked){
@@ -78,6 +91,15 @@ class ChildRecyclerViewAdapter(
 
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    private var position = 0
+    fun getPosition(): Int{
+        return position
+    }
+
+    private fun setPosition(position: Int){
+        this.position = position
     }
 
     fun setOnItemClickListener(listener: OnChildItemClickListener){

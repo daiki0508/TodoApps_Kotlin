@@ -66,17 +66,22 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
         viewModel.todoTask().observe(this, {
             if (it.isNotEmpty()){
-                binding.tvNoContent.visibility = View.GONE
                 if (apAdapter == null){
-                    acAdapter = ChildRecyclerViewAdapter(it)
+                    // recyclerviewがdeleteTaskによって非表示の場合は再表示し、NoContentsを非表示にする
+                    if (binding.recyclerview.visibility == View.GONE){
+                        binding.tvNoContent.visibility = View.GONE
+                        binding.recyclerview.visibility = View.VISIBLE
+                    }
+
+                    acAdapter = ChildRecyclerViewAdapter(it, viewModel)
                     apAdapter = RecyclerViewAdapter(viewModel.todoTask().value!!, task, this, viewModel, acAdapter)
                     binding.recyclerview.adapter = apAdapter
-                    //apAdapter!!.notifyDataSetChanged()
+                    //apAdapter!!.notifyItemChanged(0)
 
                     apAdapter?.setOnItemClickListener(object: OnItemClickListener {
                         override fun onItemClickListener(view: View, position: Int) {
                             // listの更新
-                            viewModel.setPosition(this@AddTodoTaskActivity.position, last)
+                            viewModel.setPosition(this@AddTodoTaskActivity.position)
                             AddListDialog(flag = false, type = 1, position = position).show(supportFragmentManager, "UpdateListDialog")
                         }
                     })
@@ -138,7 +143,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 else -> {
                     // taskの追加
                     acAdapter!!.items.add(mutableMapOf("task" to list))
-                    acAdapter!!.notifyItemInserted(acAdapter!!.items.size - 1)
+                    acAdapter!!.notifyItemInserted(acAdapter!!.itemCount - 1)
                 }
             }
         }else{
@@ -173,18 +178,48 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         var retValue = true
         when(item.itemId){
             R.id.allCheck -> {
-                for (i in 0 until acAdapter!!.items.size){
+                for (i in 0 until acAdapter!!.itemCount){
                     viewModel.writePreference(this, task, keyName = acAdapter!!.items[i]["task"]!!, checkFlag = true)
                 }
                 acAdapter!!.notifyDataSetChanged()
             }
             R.id.allUnCheck ->{
-                for (i in 0 until acAdapter!!.items.size){
+                for (i in 0 until acAdapter!!.itemCount){
                     viewModel.writePreference(this, task, keyName = acAdapter!!.items[i]["task"]!!, checkFlag = false)
                 }
                 acAdapter!!.notifyDataSetChanged()
             }
             else -> retValue = super.onOptionsItemSelected(item)
+        }
+        return retValue
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        Log.d("context", "Called!")
+        var retValue = true
+
+        when(item.itemId){
+            // taskの削除
+            1 -> {
+                val position = acAdapter!!.getPosition()
+                Log.d("context", position.toString())
+                acAdapter!!.items.removeAt(position)
+                acAdapter!!.notifyItemRemoved(position)
+
+                /*
+                 taskの件数が0になったらrecyclerviewを非表示にしてNoContentを表示
+                 acAdapterとapAdapterを初期化
+                 */
+                if (acAdapter!!.itemCount == 0){
+                    binding.recyclerview.visibility = View.GONE
+                    binding.tvNoContent.visibility = View.VISIBLE
+                    acAdapter = null
+                    apAdapter = null
+                }
+
+                viewModel.taskDelete(this, auth, task, position)
+            }
+            else -> retValue = super.onContextItemSelected(item)
         }
         return retValue
     }

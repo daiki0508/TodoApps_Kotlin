@@ -82,6 +82,11 @@ class CryptClass {
             Log.d("test2", "Called!")
             encrypt(context, pass, pStr, type, task)
             return null
+        }else{
+            if (type == 5){
+                File("${context.filesDir}/task/$task").deleteRecursively()
+                return null
+            }
         }
         val key = generateStrongAESKey(context, pass, 256, false, type, task)
         val ivFile: FileInputStream = if (type == 0 || type == 4){

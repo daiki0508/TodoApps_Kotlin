@@ -50,7 +50,7 @@ class RecyclerViewAdapter(
         ACAdapter!!.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
                 // taskの更新
-                viewModel.setPosition(position, items.size)
+                viewModel.setPosition(position)
                 AddListDialog(flag = true, type = 1, position).show(activity.supportFragmentManager, "UpdateTaskDialog")
             }
         })
