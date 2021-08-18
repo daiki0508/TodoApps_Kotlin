@@ -56,9 +56,16 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         //viewModel.download(this, storage, auth)
-        if (File(filesDir, "list").exists()){
+        /*if (File(filesDir, "list").exists()){
             viewModel.createView(this, auth)
-        }
+        }*/
+
+        viewModel.completeFlag().observe(this, {
+            // 全てのダウンロードが終了してからRecyclerViewの生成に入る
+            if (it["task"]!! and it["iv_aes"]!! and it["salt"]!!){
+                viewModel.createView(this, auth)
+            }
+        })
 
         binding.fab.setOnClickListener {
             AddListDialog(flag = false, type = 0, position = null).show(supportFragmentManager, "AddListDialog")
@@ -90,8 +97,8 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         position: Int?
     ) {
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
-        viewModel.upload(this, storage, auth)
-        viewModel.createView(this, auth)
+        //viewModel.upload(this, storage, auth)
+        //viewModel.createView(this, auth)
     }
 
     fun addTodoIntent(list: String, position: Int, last: Int){

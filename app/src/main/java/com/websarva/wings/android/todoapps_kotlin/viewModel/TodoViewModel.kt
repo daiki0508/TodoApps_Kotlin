@@ -20,14 +20,17 @@ class TodoViewModel(
     private val _todoList = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
     }
+    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean>>().apply {
+        MutableLiveData<MutableMap<String, Boolean>>()
+    }
 
     fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
         firebaseStorageRepository.upload(context, storage, auth, task = null, flag = false)
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        TODO("repositoryの引数が変更されたため")
-        //firebaseStorageRepository.download(context, storage, auth, task = null, flag = true)
+        //TODO("repositoryの引数が変更されたため")
+        firebaseStorageRepository.download(context, addViewModel = null, this, storage, auth, task = null, flag = false)
     }
 
     fun createView(context: Context, auth: FirebaseAuth){
@@ -63,11 +66,20 @@ class TodoViewModel(
         return todoContents
     }
 
+    fun completeFlag(): MutableLiveData<MutableMap<String, Boolean>>{
+        return _completeFlag
+    }
+
     fun todoList(): MutableLiveData<MutableList<MutableMap<String, String>>>{
         return _todoList
     }
 
+    fun setCompleteFlag(taskMap: MutableMap<String, Boolean>){
+        _completeFlag.value = taskMap
+    }
+
     init {
+        _completeFlag.value = mutableMapOf("task" to false, "iv_aes" to false, "salt" to false)
         _todoList.value = mutableListOf()
     }
 }

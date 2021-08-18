@@ -10,12 +10,13 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import java.io.File
 import java.io.IOException
 
 interface FirebaseStorageRepository {
     fun upload(context: Context ,storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
-    fun download(context: Context,viewModel: AddTodoTaskViewModel, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean): Boolean
+    fun download(context: Context,addViewModel: AddTodoTaskViewModel?, todoViewModel: TodoViewModel?, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean): Boolean
     fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?)
 }
 
@@ -44,7 +45,8 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
 
     override fun download(
         context: Context,
-        viewModel: AddTodoTaskViewModel,
+        addViewModel: AddTodoTaskViewModel?,
+        todoViewModel: TodoViewModel?,
         storage: FirebaseStorage,
         auth: FirebaseAuth,
         task: String?,
@@ -55,13 +57,13 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         val storageRef = storage.reference
 
         if (flag){
-            downloadTask(context, viewModel, "list", storageRef, uid, flag)
-            downloadTask(context, viewModel, "iv_aes", storageRef, uid, flag)
-            downloadTask(context, viewModel, "salt", storageRef, uid, flag)
+            downloadTask(context, addViewModel, todoViewModel, "task/$task/task", storageRef, uid, flag)
+            downloadTask(context, addViewModel, todoViewModel, "task/$task/iv_aes", storageRef, uid, flag)
+            downloadTask(context, addViewModel, todoViewModel, "task/$task/salt", storageRef, uid, flag)
         }else{
-            downloadTask(context, viewModel, "task/$task/task", storageRef, uid, flag)
-            downloadTask(context, viewModel, "task/$task/iv_aes", storageRef, uid, flag)
-            downloadTask(context, viewModel, "task/$task/salt", storageRef, uid, flag)
+            downloadTask(context, addViewModel, todoViewModel, "list", storageRef, uid, flag)
+            downloadTask(context, addViewModel, todoViewModel, "iv_aes", storageRef, uid, flag)
+            downloadTask(context, addViewModel, todoViewModel, "salt", storageRef, uid, flag)
         }
 
         return true
@@ -103,7 +105,8 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
 
     private fun downloadTask(
         context: Context,
-        viewModel: AddTodoTaskViewModel,
+        addViewModel: AddTodoTaskViewModel?,
+        todoViewModel: TodoViewModel?,
         child: String,
         storageRef: StorageReference,
         uid: String,
@@ -111,29 +114,41 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
     ){
         val file = File(context.filesDir, child)
         //val file = File.createTempFile(child, null)
-        if (!file.exists()){
-            try {
-                file.createNewFile()
-            }catch (e: IOException){
-                File(File(context.filesDir, child).parent!!).mkdirs()
+        if (flag){
+            if (!file.exists()){
                 try {
                     file.createNewFile()
                 }catch (e: IOException){
-                    Log.e("ERROR", e.toString())
+                    File(File(context.filesDir, child).parent!!).mkdirs()
+                    try {
+                        file.createNewFile()
+                    }catch (e: IOException){
+                        Log.e("ERROR", e.toString())
+                    }
                 }
             }
+        }else{
+            file.createNewFile()
         }
 
         val fileRef = if (flag){
-            storageRef.child("users/$uid/todo/list/$child")
-        }else{
             storageRef.child("users/$uid/todo/$child")
+        }else{
+            storageRef.child("users/$uid/todo/list/$child")
         }
         fileRef.getFile(file).addOnSuccessListener {
             Log.d("test2", "Success!!")
-            val completeFlag = viewModel.completeFlag().value!!
+            val completeFlag = if (flag){
+                addViewModel!!.completeFlag().value!!
+            }else{
+                todoViewModel!!.completeFlag().value!!
+            }
             completeFlag[Uri.fromFile(file).lastPathSegment!!] = true
-            viewModel.setCompleteFlag(completeFlag)
+            if (flag){
+                addViewModel!!.setCompleteFlag(completeFlag)
+            }else{
+                todoViewModel!!.setCompleteFlag(completeFlag)
+            }
         }.addOnFailureListener {
             Log.w("test2", it)
         }
