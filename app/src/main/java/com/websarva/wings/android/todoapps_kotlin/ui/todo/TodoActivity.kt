@@ -12,11 +12,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
-import com.websarva.wings.android.todoapps_kotlin.DialogListener
+import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.ChildRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
@@ -57,7 +56,14 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
+        /*
+         FirebaseStorageからデータをダウンロード
+         FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
+         */
         //viewModel.download(this, storage, auth)
+        if (File(filesDir, "list").exists()){
+            viewModel.createView(this, auth)
+        }
 
         viewModel.completeFlag().observe(this, {
             // 全てのダウンロードが終了してからRecyclerViewの生成に入る

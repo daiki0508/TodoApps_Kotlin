@@ -11,28 +11,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
-
-interface OnChildItemClickListener {
-    fun onItemClickListener(view: View, position: Int)
-}
-
-interface OnPreferenceWriteListener{
-    fun onPreferenceListener(position: Int, keyName: String, checkFlag: Boolean)
-}
-
-interface OnPreferenceReadListener{
-    fun onPreferenceListener(keyName: String): Boolean
-}
 
 class ChildRecyclerViewAdapter(
     var items: MutableList<MutableMap<String, String>>,
     var viewModel: AddTodoTaskViewModel
     ): RecyclerView.Adapter<ChildRecyclerViewHolder>() {
     private lateinit var cListener: OnChildItemClickListener
-    private lateinit var pwListener: OnPreferenceWriteListener
-    private lateinit var prListener: OnPreferenceReadListener
+    private lateinit var pListener: OnPreferenceListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChildRecyclerViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -42,14 +31,18 @@ class ChildRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ChildRecyclerViewHolder, position: Int) {
-        holder.content.textSize = 22F
-        holder.content.isSingleLine = false
+        /*holder.content.textSize = 22F
+        holder.content.isSingleLine = false*/
         val mlp = holder.content.layoutParams as ViewGroup.MarginLayoutParams
         mlp.setMargins(mlp.leftMargin, 15, mlp.rightMargin, 15)
-        holder.content.text = items[position]["task"]
+        //holder.content.text = items[position]["task"]
 
         holder.content.apply {
-            if (prListener.onPreferenceListener(holder.content.text.toString())){
+            textSize = 22F
+            isSingleLine = false
+            text = items[position]["task"]
+
+            if (pListener.onPreferenceReadListener(holder.content.text.toString())){
                 setTextColor(Color.LTGRAY)
                 paint.flags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 paint.isAntiAlias = true
@@ -81,9 +74,9 @@ class ChildRecyclerViewAdapter(
         holder.checkBox.setOnClickListener {
             holder.content.apply {
                 if (holder.checkBox.isChecked){
-                    pwListener.onPreferenceListener(position, holder.content.text.toString(), true)
+                    pListener.onPreferenceWriteListener(position, holder.content.text.toString(), true)
                 }else{
-                    pwListener.onPreferenceListener(position, holder.content.text.toString(), false)
+                    pListener.onPreferenceWriteListener(position, holder.content.text.toString(), false)
                 }
             }
         }
@@ -106,11 +99,7 @@ class ChildRecyclerViewAdapter(
         this.cListener = listener
     }
 
-    fun setPreferenceWriteListener(listener: OnPreferenceWriteListener){
-        this.pwListener = listener
-    }
-
-    fun setPreferenceReadListener(listener: OnPreferenceReadListener){
-        this.prListener = listener
+    fun setPreferenceListener(listener: OnPreferenceListener){
+        this.pListener = listener
     }
 }

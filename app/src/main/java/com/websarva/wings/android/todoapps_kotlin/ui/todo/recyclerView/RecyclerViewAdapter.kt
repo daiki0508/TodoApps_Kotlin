@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
@@ -46,6 +48,21 @@ class RecyclerViewAdapter(
         adapter.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
                 activity.addTodoIntent(items[position]["list"]!!, position)
+            }
+        })
+
+        adapter.setPreferenceListener(object: OnPreferenceListener{
+            override fun onPreferenceWriteListener(
+                position: Int,
+                keyName: String,
+                checkFlag: Boolean
+            ) {
+                return
+            }
+
+            override fun onPreferenceReadListener(keyName: String): Boolean {
+                //TODO("未実装")
+                return viewModel.readPreference(activity, holder.title.text.toString(), keyName)
             }
         })
     }

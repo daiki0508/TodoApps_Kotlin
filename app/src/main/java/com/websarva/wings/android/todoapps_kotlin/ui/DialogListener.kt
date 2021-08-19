@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin
+package com.websarva.wings.android.todoapps_kotlin.ui
 
 import androidx.fragment.app.DialogFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter

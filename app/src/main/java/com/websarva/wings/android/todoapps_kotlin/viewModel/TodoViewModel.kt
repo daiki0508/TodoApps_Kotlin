@@ -1,5 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.viewModel
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.annotation.UiThread
@@ -11,11 +12,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
 import kotlinx.coroutines.*
 import java.io.File
 
 class TodoViewModel(
     private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
+    private val preferenceRepository: PreferenceRepositoryClient
 ): ViewModel() {
     private val _todoList = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
@@ -30,6 +33,10 @@ class TodoViewModel(
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
         firebaseStorageRepository.download(context, addViewModel = null, this, storage, auth, task = null, flag = false)
+    }
+
+    fun readPreference(activity: Activity, task: String, keyName: String): Boolean{
+        return preferenceRepository.read(activity, task, keyName)
     }
 
     fun createView(context: Context, auth: FirebaseAuth){

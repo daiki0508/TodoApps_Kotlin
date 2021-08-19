@@ -11,7 +11,7 @@ import org.koin.dsl.module
 class MyModule {
     val module: Module = module {
         viewModel { MainViewModel(get()) }
-        viewModel { TodoViewModel(get()) }
+        viewModel { TodoViewModel(get(), get()) }
         viewModel { AddTodoTaskViewModel(get(), get()) }
     }
     val repository: Module = module {

@@ -9,17 +9,16 @@ import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
-import com.websarva.wings.android.todoapps_kotlin.DialogListener
+import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
@@ -56,8 +55,14 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
 
-        // FirebaseStorageからデータをダウンロード
+        /*
+         FirebaseStorageからデータをダウンロード
+         FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
+         */
         //viewModel.download(this, storage, auth, task, flag = true)
+        if (File(filesDir, "task/$task/task").exists()){
+            viewModel.createView(this, auth, task)
+        }
 
         viewModel.completeFlag().observe(this, {
             // 全てのダウンロードが終了してからRecyclerViewの生成に入る
@@ -85,18 +90,15 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                         }
                     })
 
-                    acAdapter?.setPreferenceReadListener(object: OnPreferenceReadListener{
-                        override fun onPreferenceListener(keyName: String): Boolean {
-                            // checkFlagの状態を取得、デフォルト値はfalse
-                            return viewModel.readPreference(this@AddTodoTaskActivity, task, keyName)
-                        }
-                    })
-
-                    acAdapter?.setPreferenceWriteListener(object: OnPreferenceWriteListener {
-                        override fun onPreferenceListener(position: Int, keyName: String, checkFlag: Boolean) {
+                    acAdapter?.setPreferenceListener(object: OnPreferenceListener {
+                        override fun onPreferenceWriteListener(position: Int, keyName: String, checkFlag: Boolean) {
                             // checkBoxの状態を保存しUIに反映
                             viewModel.writePreference(this@AddTodoTaskActivity, task, keyName, checkFlag)
                             acAdapter!!.notifyItemChanged(position)
+                        }
+
+                        override fun onPreferenceReadListener(keyName: String): Boolean {
+                            return viewModel.readPreference(this@AddTodoTaskActivity, task, keyName)
                         }
                     })
                 }
