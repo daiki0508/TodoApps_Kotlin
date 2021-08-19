@@ -29,7 +29,6 @@ class TodoViewModel(
     }
 
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        //TODO("repositoryの引数が変更されたため")
         firebaseStorageRepository.download(context, addViewModel = null, this, storage, auth, task = null, flag = false)
     }
 
@@ -40,7 +39,8 @@ class TodoViewModel(
     }
 
     fun getTask(context: Context, auth: FirebaseAuth, task: String): MutableList<MutableMap<String, String>>{
-        val tasks: String? = if (File("${context.filesDir}/task/$task").exists()){
+        val taskFile = File("${context.filesDir}/task/$task/task")
+        val tasks: String? = if (taskFile.exists() || taskFile.length() != 0L){
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1,task, aStr = null, flag = false)
         }else{
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 2,task, aStr = null, flag = false)
@@ -79,7 +79,7 @@ class TodoViewModel(
     }
 
     init {
-        _completeFlag.value = mutableMapOf("task" to false, "iv_aes" to false, "salt" to false)
+        _completeFlag.value = mutableMapOf("list" to false, "iv_aes" to false, "salt" to false)
         _todoList.value = mutableListOf()
     }
 }

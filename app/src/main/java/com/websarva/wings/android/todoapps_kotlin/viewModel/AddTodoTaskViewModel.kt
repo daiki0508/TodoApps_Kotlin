@@ -37,8 +37,6 @@ class AddTodoTaskViewModel(
     fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String, flag: Boolean){
         if (flag){
             firebaseStorageRepository.download(context, this, todoViewModel = null, storage, auth, task, flag)
-        }else{
-            firebaseStorageRepository.download(context, this, todoViewModel = null, storage, auth, task, flag)
         }
     }
 

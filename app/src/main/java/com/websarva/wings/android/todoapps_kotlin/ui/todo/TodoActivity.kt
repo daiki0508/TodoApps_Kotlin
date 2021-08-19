@@ -16,7 +16,7 @@ import com.websarva.wings.android.todoapps_kotlin.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.ChildRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
@@ -29,6 +29,8 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
+    private var apAdapter: RecyclerViewAdapter? = null
+    //private var acAdapter: ChildRecyclerViewAdapter? = null
 
     override fun onStart() {
         super.onStart()
@@ -56,13 +58,10 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         //viewModel.download(this, storage, auth)
-        /*if (File(filesDir, "list").exists()){
-            viewModel.createView(this, auth)
-        }*/
 
         viewModel.completeFlag().observe(this, {
             // 全てのダウンロードが終了してからRecyclerViewの生成に入る
-            if (it["task"]!! and it["iv_aes"]!! and it["salt"]!!){
+            if (it["list"]!! and it["iv_aes"]!! and it["salt"]!!){
                 viewModel.createView(this, auth)
             }
         })
@@ -75,13 +74,13 @@ class TodoActivity : AppCompatActivity(), DialogListener {
             if (it.isNotEmpty()){
                 binding.tvNoContent.visibility = View.GONE
 
-                val adapter = RecyclerViewAdapter(it, this, viewModel, auth)
-                binding.recyclerview.adapter = adapter
-                adapter.notifyDataSetChanged()
+                apAdapter = RecyclerViewAdapter(it, this, viewModel, auth)
+                binding.recyclerview.adapter = apAdapter
+                //apAdapter!!.notifyDataSetChanged()
 
-                adapter.setOnItemClickListener(object: OnItemClickListener{
+                apAdapter!!.setOnItemClickListener(object: OnItemClickListener{
                     override fun onItemClickListener(view: View, position: Int, list: String) {
-                        addTodoIntent(list, position, it.size)
+                        addTodoIntent(list, position)
                     }
                 })
                 Log.d("test", "Called")
@@ -97,15 +96,20 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         position: Int?
     ) {
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
+
+        if (apAdapter == null){
+            viewModel.createView(this, auth)
+        }else{
+            apAdapter!!.items.add(mutableMapOf("list" to list))
+            apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
+        }
         //viewModel.upload(this, storage, auth)
-        //viewModel.createView(this, auth)
     }
 
-    fun addTodoIntent(list: String, position: Int, last: Int){
+    fun addTodoIntent(list: String, position: Int){
         Intent(this@TodoActivity, AddTodoTaskActivity::class.java).apply {
             this.putExtra("list", list)
             this.putExtra("position", position)
-            this.putExtra("last", last)
             startActivity(this)
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right,)
             finish()

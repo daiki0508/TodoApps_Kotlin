@@ -60,7 +60,7 @@ class CryptClass {
                 File("${context.filesDir}/task/$task", "task")
             }
         }
-        if (!encFile.exists()){
+        if (!encFile.exists() || encFile.length() == 0L){
             // typeが1の場合かつ、対象ファイルが存在しない場合はサブディレクトリを作成
             if (type == 1 && !File("${context.filesDir}/task/$task").exists()){
                 File("${context.filesDir}/task/$task").mkdirs()

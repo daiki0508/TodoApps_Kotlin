@@ -18,10 +18,10 @@ interface OnItemClickListener {
 }
 
 class RecyclerViewAdapter(
-    private var items: MutableList<MutableMap<String, String>>,
+    var items: MutableList<MutableMap<String, String>>,
     private var activity: TodoActivity,
     private var viewModel: TodoViewModel,
-    private var auth: FirebaseAuth
+    private var auth: FirebaseAuth,
     ): RecyclerView.Adapter<RecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
@@ -42,11 +42,10 @@ class RecyclerViewAdapter(
         holder.rvContents.layoutManager = LinearLayoutManager(activity)
         val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(activity, auth, items[position]["list"]!!), position)
         holder.rvContents.adapter = adapter
-        adapter.notifyDataSetChanged()
 
         adapter.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
-                activity.addTodoIntent(items[position]["list"]!!, position, items.size)
+                activity.addTodoIntent(items[position]["list"]!!, position)
             }
         })
     }

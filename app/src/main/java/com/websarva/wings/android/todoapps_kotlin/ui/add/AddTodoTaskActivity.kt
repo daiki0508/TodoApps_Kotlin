@@ -35,7 +35,6 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
     private lateinit var task: String
     private var position = 0
-    private var last = 0
     private var apAdapter: RecyclerViewAdapter? = null
     private var acAdapter: ChildRecyclerViewAdapter? = null
 
@@ -54,8 +53,6 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
         task = intent.getStringExtra("list")!!
         position = intent.getIntExtra("position", 0)
-        last = intent.getIntExtra("last", 0)
-        Log.d("intent", "$task: $position, $last")
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
 
@@ -79,7 +76,6 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     acAdapter = ChildRecyclerViewAdapter(it, viewModel)
                     apAdapter = RecyclerViewAdapter(viewModel.todoTask().value!!, task, this, viewModel, acAdapter)
                     binding.recyclerview.adapter = apAdapter
-                    //apAdapter!!.notifyItemChanged(0)
 
                     apAdapter?.setOnItemClickListener(object: OnItemClickListener {
                         override fun onItemClickListener(view: View, position: Int) {
