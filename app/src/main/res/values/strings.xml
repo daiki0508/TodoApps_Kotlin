@@ -35,4 +35,5 @@
     <string name="option_allCheck_title">全てのタスクを完了済みにする</string>
     <string name="option_allUnCheck_title">全てのタスクを未完了にする</string>
     <string name="context_deleteTask_title">このタスクを削除する</string>
+    <string name="context_deleteList_title">このリストを削除する</string>
 </resources>

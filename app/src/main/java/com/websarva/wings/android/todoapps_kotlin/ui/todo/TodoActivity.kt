@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -60,15 +61,18 @@ class TodoActivity : AppCompatActivity(), DialogListener {
          FirebaseStorageからデータをダウンロード
          FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
          */
-        //viewModel.download(this, storage, auth)
-        if (File(filesDir, "list").exists()){
+        viewModel.download(this, storage, auth, flag = true)
+        /*if (File(filesDir, "list").exists()){
             viewModel.createView(this, auth)
-        }
+        }*/
 
         viewModel.completeFlag().observe(this, {
+            TODO("バグが原因")
             // 全てのダウンロードが終了してからRecyclerViewの生成に入る
-            if (it["list"]!! and it["iv_aes"]!! and it["salt"]!!){
+            if (it["list_list"]!! and it["iv_aes_list"]!! and it["salt_list"]!! and it["task_task"]!! and it["iv_aes_task"]!! and it["salt_task"]!!){
                 viewModel.createView(this, auth)
+            }else if (it["list_list"]!! and it["iv_aes_list"]!! and it["salt_list"]!!){
+                viewModel.download(this, storage, auth, flag = false)
             }
         })
 
@@ -79,10 +83,10 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         viewModel.todoList().observe(this, {
             if (it.isNotEmpty()){
                 binding.tvNoContent.visibility = View.GONE
+                binding.recyclerview.visibility = View.VISIBLE
 
                 apAdapter = RecyclerViewAdapter(it, this, viewModel, auth)
                 binding.recyclerview.adapter = apAdapter
-                //apAdapter!!.notifyDataSetChanged()
 
                 apAdapter!!.setOnItemClickListener(object: OnItemClickListener{
                     override fun onItemClickListener(view: View, position: Int, list: String) {
@@ -109,7 +113,37 @@ class TodoActivity : AppCompatActivity(), DialogListener {
             apAdapter!!.items.add(mutableMapOf("list" to list))
             apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
         }
-        //viewModel.upload(this, storage, auth)
+        viewModel.upload(this, storage, auth)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        var retValue = true
+
+        when(item.itemId){
+            1 -> {
+                val position = apAdapter!!.getPosition()
+                Log.d("context", position.toString())
+                apAdapter!!.items.removeAt(position)
+                apAdapter!!.notifyItemRemoved(position)
+
+                if (apAdapter!!.itemCount == 0){
+                    binding.recyclerview.visibility = View.GONE
+                    binding.tvNoContent.visibility = View.VISIBLE
+
+                    apAdapter = null
+                    // FirebaseStorageからtaskを完全削除
+                    viewModel.delete(storage, auth)
+                    // 内部ストレージからtaskファイルを完全削除する
+                    viewModel.listDelete(this, auth, position)
+                }else{
+                    // 内部ストレージから該当taskを削除
+                    viewModel.listDelete(this, auth, position)
+                    // FirebaseStorageを更新
+                    viewModel.upload(this, storage, auth)
+                }
+            }else -> retValue = super.onContextItemSelected(item)
+        }
+        return retValue
     }
 
     fun addTodoIntent(list: String, position: Int){

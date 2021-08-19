@@ -45,6 +45,14 @@ class RecyclerViewAdapter(
         val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(activity, auth, items[position]["list"]!!), position)
         holder.rvContents.adapter = adapter
 
+        holder.cardView.setOnCreateContextMenuListener(holder)
+
+        // listが長押しされた時
+        holder.cardView.setOnLongClickListener(View.OnLongClickListener {
+            setPosition(holder.absoluteAdapterPosition)
+            return@OnLongClickListener false
+        })
+
         adapter.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
                 activity.addTodoIntent(items[position]["list"]!!, position)
@@ -61,7 +69,6 @@ class RecyclerViewAdapter(
             }
 
             override fun onPreferenceReadListener(keyName: String): Boolean {
-                //TODO("未実装")
                 return viewModel.readPreference(activity, holder.title.text.toString(), keyName)
             }
         })
@@ -73,5 +80,14 @@ class RecyclerViewAdapter(
 
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    private var position = 0
+    fun getPosition(): Int{
+        return position
+    }
+
+    private fun setPosition(position: Int){
+        this.position = position
     }
 }

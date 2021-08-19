@@ -50,7 +50,7 @@ class CryptClass {
 
     fun decrypt(context: Context, pass: CharArray, pStr: String, type: Int, task: String?, aStr: String?, flag: Boolean): String?{
         val encFile: File = when (type) {
-            0 -> {
+            0, 6 -> {
                 File(context.filesDir, "list")
             }
             4 -> {
@@ -86,6 +86,10 @@ class CryptClass {
             if (type == 5){
                 File("${context.filesDir}/task/$task").deleteRecursively()
                 return null
+            }else if (type == 6){
+                File("${context.filesDir}/list").deleteRecursively()
+                File("${context.filesDir}/iv_aes").deleteRecursively()
+                File("${context.filesDir}/list").deleteRecursively()
             }
         }
         val key = generateStrongAESKey(context, pass, 256, false, type, task)

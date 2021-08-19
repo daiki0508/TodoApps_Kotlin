@@ -59,14 +59,14 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
          FirebaseStorageからデータをダウンロード
          FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
          */
-        //viewModel.download(this, storage, auth, task, flag = true)
-        if (File(filesDir, "task/$task/task").exists()){
+        //viewModel.download(this, storage, auth, task)
+        /*if (File(filesDir, "task/$task/task").exists()){
             viewModel.createView(this, auth, task)
-        }
+        }*/
 
         viewModel.completeFlag().observe(this, {
             // 全てのダウンロードが終了してからRecyclerViewの生成に入る
-            if (it["task"]!! and it["iv_aes"]!! and it["salt"]!!){
+            if (it["task_task"]!! and it["iv_aes_task"]!! and it["salt_task"]!!){
                 viewModel.createView(this, auth, task)
             }
         })
@@ -129,7 +129,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         }
         // trueがタスク、falseがリスト
         if (flag){
-            //viewModel.upload(this, storage, auth, task, flag)
+            viewModel.upload(this, storage, auth, task, flag)
             when {
                 // taskの更新
                 type == 1 -> {

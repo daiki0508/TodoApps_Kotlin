@@ -31,8 +31,19 @@ class TodoViewModel(
         firebaseStorageRepository.upload(context, storage, auth, task = null, flag = false)
     }
 
-    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageRepository.download(context, addViewModel = null, this, storage, auth, task = null, flag = false)
+    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, flag: Boolean){
+        if (flag){
+            firebaseStorageRepository.download(context, addViewModel = null, this, storage, auth, tasks = null, flag)
+        }else{
+            if (File(context.filesDir, "list").exists()){
+                val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
+                firebaseStorageRepository.download(context, addViewModel = null, this, storage, auth, lists, flag = flag)
+            }
+        }
+    }
+
+    fun delete(storage: FirebaseStorage, auth: FirebaseAuth){
+        firebaseStorageRepository.delete(storage, auth, task = null, flag = true)
     }
 
     fun readPreference(activity: Activity, task: String, keyName: String): Boolean{
@@ -73,6 +84,18 @@ class TodoViewModel(
         return todoContents
     }
 
+    fun listDelete(context: Context, auth: FirebaseAuth, position: Int){
+        val tasksBefore = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+        Log.d("update_b", tasksBefore!!)
+        val tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
+        if (tasksBefore == tasksAfter){
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 6, task = null, aStr = null, flag = true)
+        }else{
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 4, task = null, aStr = null, flag = true)
+        }
+        Log.d("update_a", tasksAfter)
+    }
+
     fun completeFlag(): MutableLiveData<MutableMap<String, Boolean>>{
         return _completeFlag
     }
@@ -86,7 +109,14 @@ class TodoViewModel(
     }
 
     init {
-        _completeFlag.value = mutableMapOf("list" to false, "iv_aes" to false, "salt" to false)
+        _completeFlag.value = mutableMapOf(
+            "list_list" to false,
+            "iv_aes_list" to false,
+            "salt_list" to false,
+            "task_task" to false,
+            "iv_aes_task" to false,
+            "salt_task" to false
+        )
         _todoList.value = mutableListOf()
     }
 }

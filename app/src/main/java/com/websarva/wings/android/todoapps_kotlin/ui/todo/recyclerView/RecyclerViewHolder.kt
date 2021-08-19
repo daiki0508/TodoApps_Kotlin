@@ -8,7 +8,17 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 
-class RecyclerViewHolder(var view: View): RecyclerView.ViewHolder(view) {
+class RecyclerViewHolder(var view: View): RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
     val title: TextView = view.findViewById(R.id.title)
     val rvContents: RecyclerView = view.findViewById(R.id.rvContents)
+
+    val cardView: View = view.findViewById(R.id.cardview)
+
+    override fun onCreateContextMenu(
+        menu: ContextMenu?,
+        view: View?,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        menu!!.add(Menu.NONE, 1, Menu.NONE, R.string.context_deleteList_title)
+    }
 }

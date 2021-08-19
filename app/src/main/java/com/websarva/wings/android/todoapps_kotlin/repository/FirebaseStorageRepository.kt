@@ -16,11 +16,24 @@ import java.io.IOException
 
 interface FirebaseStorageRepository {
     fun upload(context: Context ,storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
-    fun download(context: Context,addViewModel: AddTodoTaskViewModel?, todoViewModel: TodoViewModel?, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean): Boolean
-    fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?)
+    fun download(
+        context: Context,
+        addViewModel: AddTodoTaskViewModel?,
+        todoViewModel: TodoViewModel?,
+        storage: FirebaseStorage,
+        auth: FirebaseAuth,
+        tasks: String?,
+        flag: Boolean
+    ): Boolean
+    fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
 }
 
 class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
+    private lateinit var storage: FirebaseStorage
+    private lateinit var auth: FirebaseAuth
+    private var position: Int = 0
+    private var tasks = ""
+
     override fun upload(
         context: Context,
         storage: FirebaseStorage,
@@ -49,34 +62,49 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         todoViewModel: TodoViewModel?,
         storage: FirebaseStorage,
         auth: FirebaseAuth,
-        task: String?,
+        tasks: String?,
         flag: Boolean
     ): Boolean {
         val uid = auth.currentUser!!.uid
 
         val storageRef = storage.reference
 
-        if (flag){
-            downloadTask(context, addViewModel, todoViewModel, "task/$task/task", storageRef, uid, flag)
-            downloadTask(context, addViewModel, todoViewModel, "task/$task/iv_aes", storageRef, uid, flag)
-            downloadTask(context, addViewModel, todoViewModel, "task/$task/salt", storageRef, uid, flag)
+        if (!flag){
+            this.tasks = tasks!!
+            val cnt = this.tasks.split(" ").size
+            if (cnt == 1){
+                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/task", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/iv_aes", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/salt", storageRef, uid, flag, cnt)
+            }else{
+                this.auth = auth
+                this.storage = storage
+                val task = this.tasks.split(" ")[position]
+                downloadTask(context, addViewModel, todoViewModel, "task/$task/task", storageRef, uid, flag, cnt)
+            }
         }else{
-            downloadTask(context, addViewModel, todoViewModel, "list", storageRef, uid, flag)
-            downloadTask(context, addViewModel, todoViewModel, "iv_aes", storageRef, uid, flag)
-            downloadTask(context, addViewModel, todoViewModel, "salt", storageRef, uid, flag)
+            downloadTask(context, addViewModel, todoViewModel, "list", storageRef, uid, flag, cnt = null)
+            downloadTask(context, addViewModel, todoViewModel, "iv_aes", storageRef, uid, flag, cnt = null)
+            downloadTask(context, addViewModel, todoViewModel, "salt", storageRef, uid, flag, cnt = null)
         }
 
         return true
     }
 
-    override fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?) {
+    override fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean) {
         val uid = auth.currentUser!!.uid
 
         val storageRef = storage.reference
 
-        deleteTask("task/$task/task", storageRef, uid, flag = false)
-        deleteTask("task/$task/iv_aes", storageRef, uid, flag = false)
-        deleteTask("task/$task/salt", storageRef, uid, flag = false)
+        if (flag){
+            deleteTask("list", storageRef, uid, flag)
+            deleteTask("iv_aes", storageRef, uid, flag)
+            deleteTask("salt", storageRef, uid, flag)
+        }else{
+            deleteTask("task/$task/task", storageRef, uid, flag)
+            deleteTask("task/$task/iv_aes", storageRef, uid, flag)
+            deleteTask("task/$task/salt", storageRef, uid, flag)
+        }
     }
 
     private fun uploadTask(
@@ -110,11 +138,12 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         child: String,
         storageRef: StorageReference,
         uid: String,
-        flag: Boolean
+        flag: Boolean,
+        cnt: Int?
     ){
         val file = File(context.filesDir, child)
         //val file = File.createTempFile(child, null)
-        if (flag){
+        if (!flag){
             if (!file.exists()){
                 try {
                     file.createNewFile()
@@ -131,22 +160,31 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             file.createNewFile()
         }
 
-        val fileRef = if (flag){
+        val fileRef = if (!flag){
             storageRef.child("users/$uid/todo/$child")
         }else{
             storageRef.child("users/$uid/todo/list/$child")
         }
         fileRef.getFile(file).addOnSuccessListener {
             Log.d("test2", "Success!!")
-            val completeFlag = if (flag){
-                addViewModel!!.completeFlag().value!!
-            }else{
+            val completeFlag = if ((!flag && todoViewModel != null) or (flag && todoViewModel != null)){
                 todoViewModel!!.completeFlag().value!!
-            }
-            completeFlag[Uri.fromFile(file).lastPathSegment!!] = true
-            if (flag){
-                addViewModel!!.setCompleteFlag(completeFlag)
             }else{
+                addViewModel!!.completeFlag().value!!
+            }
+            if (!flag && addViewModel != null){
+                completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = true
+                addViewModel.setCompleteFlag(completeFlag)
+            }else if (!flag){
+                position++
+                if (cnt == position){
+                    completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = true
+                    todoViewModel!!.setCompleteFlag(completeFlag)
+                }else{
+                    download(context, addViewModel = null, todoViewModel, storage, auth, tasks, flag)
+                }
+            } else{
+                completeFlag["${Uri.fromFile(file).lastPathSegment!!}_list"] = true
                 todoViewModel!!.setCompleteFlag(completeFlag)
             }
         }.addOnFailureListener {

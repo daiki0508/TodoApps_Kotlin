@@ -34,14 +34,12 @@ class AddTodoTaskViewModel(
         firebaseStorageRepository.upload(context, storage, auth, task, flag)
     }
 
-    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String, flag: Boolean){
-        if (flag){
-            firebaseStorageRepository.download(context, this, todoViewModel = null, storage, auth, task, flag)
-        }
+    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String){
+        firebaseStorageRepository.download(context, this, todoViewModel = null, storage, auth, task, flag = false)
     }
 
     fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String){
-        firebaseStorageRepository.delete(storage, auth, task)
+        firebaseStorageRepository.delete(storage, auth, task, flag = false)
     }
 
     fun writePreference(activity: Activity, task: String, keyName: String, checkFlag: Boolean){
@@ -106,7 +104,6 @@ class AddTodoTaskViewModel(
         val tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
         if (tasksBefore == tasksAfter){
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task, aStr = null, flag = true)
-
         }else{
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, aStr = null, flag = true)
         }
@@ -130,7 +127,7 @@ class AddTodoTaskViewModel(
     }
 
     init {
-        _completeFlag.value = mutableMapOf("task" to false, "iv_aes" to false, "salt" to false)
+        _completeFlag.value = mutableMapOf("task_task" to false, "iv_aes_task" to false, "salt_task" to false)
         _todoTask.value = mutableListOf()
         _updateName.value = ""
         position = 0
