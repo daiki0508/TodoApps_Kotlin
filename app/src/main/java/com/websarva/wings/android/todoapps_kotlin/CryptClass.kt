@@ -24,13 +24,13 @@ import javax.crypto.spec.PBEKeySpec
 class CryptClass {
     private fun encrypt(context: Context, pass: CharArray, pStr: String, type: Int, task: String?){
         val key = generateStrongAESKey(context, pass, 256, true, type, task)
-        val list: File = if (type == 0 || type == 4){
+        val list: File = if (type == 0 || type == 4 || type == 7){
             File(context.filesDir, "list")
         }else{
             File("${context.filesDir}/task/$task", "task")
         }
 
-        val iv: File = if (type == 0 || type == 4){
+        val iv: File = if (type == 0 || type == 4 || type == 7){
             File(context.filesDir, "iv_aes")
         }else{
             File("${context.filesDir}/task/$task", "iv_aes")
@@ -50,7 +50,7 @@ class CryptClass {
 
     fun decrypt(context: Context, pass: CharArray, pStr: String, type: Int, task: String?, aStr: String?, flag: Boolean): String?{
         val encFile: File = when (type) {
-            0, 6 -> {
+            0, 6, 7 -> {
                 File(context.filesDir, "list")
             }
             4 -> {
@@ -87,13 +87,15 @@ class CryptClass {
                 File("${context.filesDir}/task/$task").deleteRecursively()
                 return null
             }else if (type == 6){
+                //File("${context.filesDir}/task/$task").deleteRecursively()
                 File("${context.filesDir}/list").deleteRecursively()
                 File("${context.filesDir}/iv_aes").deleteRecursively()
-                File("${context.filesDir}/list").deleteRecursively()
+                File("${context.filesDir}/salt").deleteRecursively()
+                return null
             }
         }
         val key = generateStrongAESKey(context, pass, 256, false, type, task)
-        val ivFile: FileInputStream = if (type == 0 || type == 4){
+        val ivFile: FileInputStream = if (type == 0 || type == 4 || type == 7){
             context.openFileInput("iv_aes")
         }else{
             // ネストされたディレクトリの場合はFileInputStreamでないとエラーが発生
@@ -115,7 +117,7 @@ class CryptClass {
             Log.d("test", "${String(cipher.doFinal(enc))} $pStr")
             if (flag){
                 // typeが3の場合は更新
-                if (type == 3 || type == 4){
+                if (type == 3 || type == 4 || type == 7){
                     encrypt(context, pass, pStr, type, task)
                 }else{
                     encrypt(context, pass, "${String(cipher.doFinal(enc))} $pStr", type, task)
@@ -142,14 +144,14 @@ class CryptClass {
                 salt[i] = password[i].code.toByte()
             }
 
-            val saltFile: File = if (type == 0 || type == 4){
+            val saltFile: File = if (type == 0 || type == 4 || type == 7){
                 File(context.filesDir, "salt")
             }else{
                 File("${context.filesDir}/task/$task", "salt")
             }
             saltFile.writeBytes(salt)
         }else{
-            val saltFile: FileInputStream = if (type == 0 || type == 4){
+            val saltFile: FileInputStream = if (type == 0 || type == 4 || type == 7){
                 context.openFileInput("salt")
             }else{
                 // ネストされたディレクトリの場合はFileInputStreamでないとエラーが発生

@@ -81,6 +81,8 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                 this.storage = storage
                 val task = this.tasks.split(" ")[position]
                 downloadTask(context, addViewModel, todoViewModel, "task/$task/task", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$task/iv_aes", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$task/salt", storageRef, uid, flag, cnt)
             }
         }else{
             downloadTask(context, addViewModel, todoViewModel, "list", storageRef, uid, flag, cnt = null)
@@ -167,7 +169,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         }
         fileRef.getFile(file).addOnSuccessListener {
             Log.d("test2", "Success!!")
-            val completeFlag = if ((!flag && todoViewModel != null) or (flag && todoViewModel != null)){
+            val completeFlag: MutableMap<String, Boolean?> = if ((!flag && todoViewModel != null) or (flag && todoViewModel != null)){
                 todoViewModel!!.completeFlag().value!!
             }else{
                 addViewModel!!.completeFlag().value!!
@@ -176,11 +178,12 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                 completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = true
                 addViewModel.setCompleteFlag(completeFlag)
             }else if (!flag){
-                position++
-                if (cnt == position){
+                if (cnt!!.minus(1) == position){
                     completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = true
                     todoViewModel!!.setCompleteFlag(completeFlag)
+                    position = 0
                 }else{
+                    position++
                     download(context, addViewModel = null, todoViewModel, storage, auth, tasks, flag)
                 }
             } else{
@@ -189,6 +192,22 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             }
         }.addOnFailureListener {
             Log.w("test2", it)
+            val completeFlag: MutableMap<String, Boolean?> = if ((!flag && todoViewModel != null) or (flag && todoViewModel != null)){
+                todoViewModel!!.completeFlag().value!!
+            }else{
+                addViewModel!!.completeFlag().value!!
+            }
+
+            if (!flag && addViewModel != null){
+                completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = false
+                addViewModel.setCompleteFlag(completeFlag)
+            }else if (!flag){
+                completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = false
+                todoViewModel!!.setCompleteFlag(completeFlag)
+            }else{
+                completeFlag["${Uri.fromFile(file).lastPathSegment!!}_list"] = false
+                todoViewModel!!.setCompleteFlag(completeFlag)
+            }
         }
     }
 

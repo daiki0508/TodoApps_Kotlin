@@ -20,8 +20,8 @@ class AddTodoTaskViewModel(
     private val _todoTask = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
     }
-    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean>>().apply {
-        MutableLiveData<MutableMap<String, Boolean>>()
+    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>().apply {
+        MutableLiveData<MutableMap<String, Boolean?>>()
     }
 
     private val _updateName = MutableLiveData<String>().apply {
@@ -101,16 +101,21 @@ class AddTodoTaskViewModel(
     fun taskDelete(context: Context, auth: FirebaseAuth, task: String, position: Int){
         val tasksBefore = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, aStr = null, flag = false)
         Log.d("update_b", tasksBefore!!)
-        val tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
+        var tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
         if (tasksBefore == tasksAfter){
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task, aStr = null, flag = true)
+            tasksAfter = tasksBefore.replace(" ${tasksBefore.split(" ")[position]}", "")
+            if (tasksBefore == tasksAfter){
+                CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task, aStr = null, flag = true)
+            }else{
+                CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, aStr = null, flag = true)
+            }
         }else{
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, aStr = null, flag = true)
         }
         Log.d("update_a", tasksAfter)
     }
 
-    fun completeFlag(): MutableLiveData<MutableMap<String, Boolean>>{
+    fun completeFlag(): MutableLiveData<MutableMap<String, Boolean?>>{
         return _completeFlag
     }
 
@@ -118,7 +123,7 @@ class AddTodoTaskViewModel(
         return _todoTask
     }
 
-    fun setCompleteFlag(taskMap: MutableMap<String, Boolean>){
+    fun setCompleteFlag(taskMap: MutableMap<String, Boolean?>){
         _completeFlag.value = taskMap
     }
 

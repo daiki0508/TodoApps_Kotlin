@@ -67,11 +67,13 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         }*/
 
         viewModel.completeFlag().observe(this, {
-            TODO("バグが原因")
+            //TODO("バグが原因")
             // 全てのダウンロードが終了してからRecyclerViewの生成に入る
-            if (it["list_list"]!! and it["iv_aes_list"]!! and it["salt_list"]!! and it["task_task"]!! and it["iv_aes_task"]!! and it["salt_task"]!!){
+            if ((it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == true) and (it["iv_aes_task"] == true) and (it["salt_task"] == true)){
                 viewModel.createView(this, auth)
-            }else if (it["list_list"]!! and it["iv_aes_list"]!! and it["salt_list"]!!){
+            }else if ((it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == false) and (it["iv_aes_task"] == false) and (it["salt_task"] == false)){
+                viewModel.createView(this, auth)
+            } else if ((it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true)){
                 viewModel.download(this, storage, auth, flag = false)
             }
         })
@@ -131,14 +133,22 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                     binding.tvNoContent.visibility = View.VISIBLE
 
                     apAdapter = null
-                    // FirebaseStorageからtaskを完全削除
-                    viewModel.delete(storage, auth)
+                    /*
+                     FirebaseStorageからlistとtaskを完全削除
+                     trueがlistでfalseがtask
+                     */
+                    viewModel.delete(this, storage, auth, position, flag = true)
+                    viewModel.delete(this, storage, auth, position, flag = false)
                     // 内部ストレージからtaskファイルを完全削除する
                     viewModel.listDelete(this, auth, position)
                 }else{
-                    // 内部ストレージから該当taskを削除
+                    /*
+                     内部ストレージのlistから該当task名を削除
+                     該当taskも削除
+                     */
+                    viewModel.delete(this, storage, auth, position, flag = false)
                     viewModel.listDelete(this, auth, position)
-                    // FirebaseStorageを更新
+                    // FirebaseStorageのlist更新
                     viewModel.upload(this, storage, auth)
                 }
             }else -> retValue = super.onContextItemSelected(item)
