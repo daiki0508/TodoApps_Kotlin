@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -36,6 +37,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     private var position = 0
     private var apAdapter: RecyclerViewAdapter? = null
     private var acAdapter: ChildRecyclerViewAdapter? = null
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,13 +57,15 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
 
+        viewModel.setInit(list = task, auth, this, storage)
+
         /*
          FirebaseStorageからデータをダウンロード
          FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
          */
         //viewModel.download(this, storage, auth, task)
-        if (File(filesDir, "task/$task/task").exists()){
-            viewModel.createView(this, auth, task)
+        if (File(filesDir, "task/$task/task").length() != 0L){
+            viewModel.createView()
         }
 
         /*viewModel.completeFlag().observe(this, {
@@ -79,7 +83,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     binding.recyclerview.visibility = View.VISIBLE
 
                     acAdapter = ChildRecyclerViewAdapter(it, viewModel)
-                    apAdapter = RecyclerViewAdapter(viewModel.todoTask().value!!, task, this, viewModel, acAdapter)
+                    itemTouchHelper = ItemTouchHelper(acAdapter!!.getRecyclerViewSimpleCallBack())
+                    apAdapter = RecyclerViewAdapter(itemTouchHelper/*viewModel.todoTask().value!!*/, task, this, viewModel, acAdapter)
                     binding.recyclerview.adapter = apAdapter
 
                     apAdapter?.setOnItemClickListener(object: OnItemClickListener {
@@ -93,12 +98,12 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     acAdapter?.setPreferenceListener(object: OnPreferenceListener {
                         override fun onPreferenceWriteListener(position: Int, keyName: String, checkFlag: Boolean) {
                             // checkBoxの状態を保存しUIに反映
-                            viewModel.writePreference(this@AddTodoTaskActivity, task, keyName, checkFlag)
+                            viewModel.writePreference(keyName, checkFlag)
                             acAdapter!!.notifyItemChanged(position)
                         }
 
                         override fun onPreferenceReadListener(keyName: String): Boolean {
-                            return viewModel.readPreference(this@AddTodoTaskActivity, task, keyName)
+                            return viewModel.readPreference(keyName)
                         }
                     })
                 }
@@ -122,24 +127,24 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, aStr = null, flag = true)
         }else{
             if (flag){
-                viewModel.update(this, auth, task, list, flag)
+                viewModel.update(list, flag)
             }else{
-                viewModel.update(this, auth, task, list, flag)
+                viewModel.update(list, flag)
             }
         }
         // trueがタスク、falseがリスト
         if (flag){
-            viewModel.upload(this, storage, auth, task, flag)
+            viewModel.upload(flag)
             when {
                 // taskの更新
                 type == 1 -> {
-                    viewModel.writePreference(this, task, keyName = acAdapter!!.items[position!!]["task"]!!, checkFlag = false)
+                    viewModel.writePreference(keyName = acAdapter!!.items[position!!]["task"]!!, checkFlag = false)
                     acAdapter!!.items[position]["task"] = list
                     acAdapter!!.notifyItemChanged(position)
                 }
                 acAdapter == null -> {
                     // 最初のtaskの追加
-                    viewModel.createView(this, auth, task)
+                    viewModel.createView()
                 }
                 else -> {
                     // taskの追加
@@ -155,13 +160,11 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             // preferenceを手動でmove
             for (i in 0 until acAdapter!!.items.size){
                 viewModel.writePreference(
-                    this,
-                    task = list,
                     keyName = acAdapter!!.items[i]["task"]!!,
-                    checkFlag = viewModel.readPreference(this, task, acAdapter!!.items[i]["task"]!!))
+                    checkFlag = viewModel.readPreference(acAdapter!!.items[i]["task"]!!))
             }
             // 旧preferenceを削除
-            viewModel.deletePreference(this, task)
+            viewModel.deletePreference(task)
 
             apAdapter!!.task = list
             apAdapter!!.notifyItemChanged(position!!)
@@ -180,13 +183,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         when(item.itemId){
             R.id.allCheck -> {
                 for (i in 0 until acAdapter!!.itemCount){
-                    viewModel.writePreference(this, task, keyName = acAdapter!!.items[i]["task"]!!, checkFlag = true)
+                    viewModel.writePreference(keyName = acAdapter!!.items[i]["task"]!!, checkFlag = true)
                 }
                 acAdapter!!.notifyDataSetChanged()
             }
             R.id.allUnCheck ->{
                 for (i in 0 until acAdapter!!.itemCount){
-                    viewModel.writePreference(this, task, keyName = acAdapter!!.items[i]["task"]!!, checkFlag = false)
+                    viewModel.writePreference(keyName = acAdapter!!.items[i]["task"]!!, checkFlag = false)
                 }
                 acAdapter!!.notifyDataSetChanged()
             }
@@ -218,14 +221,14 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     acAdapter = null
                     apAdapter = null
                     // FirebaseStorageからtaskを完全削除
-                    viewModel.delete(storage, auth, task)
+                    viewModel.delete()
                     // 内部ストレージからtaskファイルを完全削除する
-                    viewModel.taskDelete(this, auth, task, position)
+                    viewModel.taskDelete(position)
                 }else{
                     // 内部ストレージから該当taskを削除
-                    viewModel.taskDelete(this, auth, task, position)
+                    viewModel.taskDelete(position)
                     // FirebaseStorageを更新
-                    viewModel.upload(this, storage, auth, task, flag = true)
+                    viewModel.upload(flag = true)
                 }
             }
             else -> retValue = super.onContextItemSelected(item)

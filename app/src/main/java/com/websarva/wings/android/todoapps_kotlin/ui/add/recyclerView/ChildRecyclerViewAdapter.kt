@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.marginTop
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
@@ -31,11 +32,8 @@ class ChildRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ChildRecyclerViewHolder, position: Int) {
-        /*holder.content.textSize = 22F
-        holder.content.isSingleLine = false*/
         val mlp = holder.content.layoutParams as ViewGroup.MarginLayoutParams
         mlp.setMargins(mlp.leftMargin, 15, mlp.rightMargin, 15)
-        //holder.content.text = items[position]["task"]
 
         holder.content.apply {
             textSize = 22F
@@ -101,5 +99,30 @@ class ChildRecyclerViewAdapter(
 
     fun setPreferenceListener(listener: OnPreferenceListener){
         this.pListener = listener
+    }
+
+    fun getRecyclerViewSimpleCallBack() = object: ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+        ItemTouchHelper.ACTION_STATE_IDLE
+    ){
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val fromPosition = viewHolder.absoluteAdapterPosition
+            val toPosition = target.absoluteAdapterPosition
+
+            viewModel.remove(items, fromPosition, toPosition)
+
+            items.add(toPosition, items.removeAt(fromPosition))
+            this@ChildRecyclerViewAdapter.notifyItemMoved(fromPosition, toPosition)
+
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            return
+        }
     }
 }

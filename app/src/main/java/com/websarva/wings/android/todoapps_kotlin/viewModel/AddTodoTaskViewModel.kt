@@ -1,5 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.viewModel
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -29,33 +30,38 @@ class AddTodoTaskViewModel(
     }
 
     private var position: Int
+    private var list: String
+    private var auth: FirebaseAuth?
+    @SuppressLint("StaticFieldLeak")
+    private var context: Activity?
+    private var storage: FirebaseStorage?
 
-    fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean){
-        firebaseStorageRepository.upload(context, storage, auth, task, flag)
+    fun upload(flag: Boolean){
+        firebaseStorageRepository.upload(context!!, storage!!, auth!!, list, flag)
     }
 
-    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, task: String){
-        firebaseStorageRepository.download(context, this, todoViewModel = null, storage, auth, task, flag = false)
+    fun download(){
+        firebaseStorageRepository.download(context!!, this, todoViewModel = null, storage!!, auth!!, list, flag = false)
     }
 
-    fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String){
-        firebaseStorageRepository.delete(storage, auth, task, flag = false)
+    fun delete(){
+        firebaseStorageRepository.delete(storage!!, auth!!, list, flag = false)
     }
 
-    fun writePreference(activity: Activity, task: String, keyName: String, checkFlag: Boolean){
-        preferenceRepository.write(activity, task, keyName, checkFlag)
+    fun writePreference(keyName: String, checkFlag: Boolean){
+        preferenceRepository.write(context!!, list, keyName, checkFlag)
     }
 
-    fun readPreference(activity: Activity, task: String, keyName: String): Boolean{
-        return preferenceRepository.read(activity, task, keyName)
+    fun readPreference(keyName: String): Boolean{
+        return preferenceRepository.read(context!!, list, keyName)
     }
 
-    fun deletePreference(activity: Activity, list: String){
-        preferenceRepository.delete(activity, list)
+    fun deletePreference(list: String){
+        preferenceRepository.delete(context!!, list)
     }
 
-    fun createView(context: Context, auth: FirebaseAuth, task: String){
-        val tasks = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, null, flag = false)
+    fun createView(){
+        val tasks = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
 
         val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
         var todo: MutableMap<String, String>
@@ -68,9 +74,6 @@ class AddTodoTaskViewModel(
     }
 
     fun update(
-        context: Context,
-        auth: FirebaseAuth,
-        task: String,
         aStr: String,
         flag: Boolean
     ){
@@ -81,9 +84,9 @@ class AddTodoTaskViewModel(
          aStr...listのupdate時はnewFileName, taskのupdate時は新しいtask名
          */
         val tasksBefore = if (!flag){
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task, aStr = null, flag = false)
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, list, aStr = null, flag = false)
         }else{
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, aStr = null, flag = false)
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
         }
         Log.d("update_b", tasksBefore!!)
 
@@ -92,14 +95,53 @@ class AddTodoTaskViewModel(
         Log.d("update_a", tasksAfter)
 
         if (!flag){
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 4, task, aStr, flag = true)
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 4, list, aStr, flag = true)
         }else{
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, aStr = null, flag = true)
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
         }
     }
 
-    fun taskDelete(context: Context, auth: FirebaseAuth, task: String, position: Int){
-        val tasksBefore = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, aStr = null, flag = false)
+    fun remove(items: MutableList<MutableMap<String, String>>, fromPosition: Int, toPosition: Int){
+        val toPositionItem = items[toPosition]["task"]
+        val fromPositionItem = items[fromPosition]["task"]
+        //Log.d("remove", tmp!!)
+        val tasks = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+
+        Log.d("remove_b", tasks!!)
+        var newTasks = ""
+        for ((i, value) in tasks!!.split(" ").withIndex()){
+            when (i) {
+                toPosition -> {
+                    newTasks += if (i.plus(1) == items.size){
+                        fromPositionItem
+                    }else{
+                        "$fromPositionItem "
+                    }
+                }
+                fromPosition -> {
+                    newTasks += if (i.plus(1) == items.size){
+                        toPositionItem
+                    }else{
+                        "$toPositionItem "
+                    }
+                }
+                else -> {
+                    newTasks += if (i.plus(1) == items.size){
+                        value
+                    }else{
+                        "$value "
+                    }
+                }
+            }
+        }
+        Log.d("remove_a", newTasks)
+        CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newTasks, type = 3, list, aStr = null, flag = true)
+
+        upload(flag = true)
+    }
+
+    fun taskDelete(position: Int){
+        val tasksBefore = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
         Log.d("update_b", tasksBefore!!)
         // taskファイルから該当タスクを削除
         var tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
@@ -107,12 +149,12 @@ class AddTodoTaskViewModel(
             tasksAfter = tasksBefore.replace(" ${tasksBefore.split(" ")[position]}", "")
             if (tasksBefore == tasksAfter){
                 // listから該当task名を削除
-                CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task, aStr = null, flag = true)
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 5, list, aStr = null, flag = true)
             }else{
-                CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, aStr = null, flag = true)
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
             }
         }else{
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, aStr = null, flag = true)
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
         }
         Log.d("update_a", tasksAfter)
     }
@@ -133,10 +175,21 @@ class AddTodoTaskViewModel(
         this.position = position
     }
 
+    fun setInit(list: String, auth: FirebaseAuth, context: Activity, storage: FirebaseStorage){
+        this.list = list
+        this.auth = auth
+        this.context = context
+        this.storage = storage
+    }
+
     init {
         _completeFlag.value = mutableMapOf("task_task" to false, "iv_aes_task" to false, "salt_task" to false)
         _todoTask.value = mutableListOf()
         _updateName.value = ""
         position = 0
+        list = ""
+        auth = null
+        context = null
+        storage = null
     }
 }

@@ -27,9 +27,6 @@ class ChildRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ChildRecyclerViewHolder, position: Int) {
-        /*holder.content.ellipsize = TextUtils.TruncateAt.END
-        holder.content.text = items[position]["task"]*/
-
         holder.content.apply {
             ellipsize = TextUtils.TruncateAt.END
             text = items[position]["task"]

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
@@ -21,7 +22,8 @@ interface OnItemClickListener {
 }
 
 class RecyclerViewAdapter(
-    var items: MutableList<MutableMap<String, String>>,
+    //var items: MutableList<MutableMap<String, String>>,
+    var itemTouchHelper: ItemTouchHelper,
     var task: String,
     private var activity: AddTodoTaskActivity,
     private var viewModel: AddTodoTaskViewModel,
@@ -55,6 +57,8 @@ class RecyclerViewAdapter(
                 AddListDialog(flag = true, type = 1, position).show(activity.supportFragmentManager, "UpdateTaskDialog")
             }
         })
+
+        itemTouchHelper.attachToRecyclerView(holder.rvContents)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener){
