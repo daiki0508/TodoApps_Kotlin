@@ -55,7 +55,7 @@ class ChildRecyclerViewAdapter(
             return@OnLongClickListener false
         })
 
-        holder.view.setOnClickListener {
+        holder.contentView.setOnClickListener {
             listener.onItemClickListener(it, this.position)
         }
     }

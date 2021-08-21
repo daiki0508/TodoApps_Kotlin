@@ -50,8 +50,8 @@ class AddTodoTaskViewModel(
         return preferenceRepository.read(activity, task, keyName)
     }
 
-    fun deletePreference(activity: Activity, task: String){
-        preferenceRepository.delete(activity, task)
+    fun deletePreference(activity: Activity, list: String){
+        preferenceRepository.delete(activity, list)
     }
 
     fun createView(context: Context, auth: FirebaseAuth, task: String){

@@ -37,7 +37,7 @@ class RecyclerViewAdapter(
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
         holder.title.text = items[position]["list"]
 
-        holder.view.setOnClickListener {
+        holder.titleView.setOnClickListener {
             listener.onItemClickListener(it, position, items[position]["list"]!!)
         }
 

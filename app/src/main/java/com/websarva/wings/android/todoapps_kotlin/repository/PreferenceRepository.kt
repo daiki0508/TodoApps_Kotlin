@@ -13,7 +13,7 @@ import java.io.File
 interface PreferenceRepository {
     fun write(activity: Activity, task: String, keyName: String, checkFlag: Boolean)
     fun read(activity: Activity, task: String, keyName: String): Boolean
-    fun delete(activity: Activity, task: String)
+    fun delete(activity: Activity, list: String)
 }
 
 class PreferenceRepositoryClient: PreferenceRepository {
@@ -29,11 +29,11 @@ class PreferenceRepositoryClient: PreferenceRepository {
         return createPreference(activity, task).getBoolean(keyName, false)
     }
 
-    override fun delete(activity: Activity, task: String) {
+    override fun delete(activity: Activity, list: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            activity.deleteSharedPreferences(task)
+            activity.deleteSharedPreferences(list)
         }else{
-            File("${activity.filesDir.parent}/shared_prefs/$task").delete()
+            File("${activity.filesDir.parent}/shared_prefs/$list").delete()
         }
     }
 

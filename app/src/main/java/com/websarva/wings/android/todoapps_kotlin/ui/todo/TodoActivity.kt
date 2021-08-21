@@ -127,6 +127,10 @@ class TodoActivity : AppCompatActivity(), DialogListener {
             1 -> {
                 val position = apAdapter!!.getPosition()
                 Log.d("context", position.toString())
+
+                val list = apAdapter!!.items[position]["list"]
+                viewModel.deletePreference(this, list!!)
+
                 apAdapter!!.items.removeAt(position)
                 apAdapter!!.notifyItemRemoved(position)
 
