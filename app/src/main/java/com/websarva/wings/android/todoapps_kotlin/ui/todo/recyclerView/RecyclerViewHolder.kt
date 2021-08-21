@@ -12,7 +12,7 @@ class RecyclerViewHolder(var view: View): RecyclerView.ViewHolder(view), View.On
     val title: TextView = view.findViewById(R.id.title)
     val rvContents: RecyclerView = view.findViewById(R.id.rvContents)
 
-    val cardView: View = view.findViewById(R.id.cardview)
+    val titleView: View = view.findViewById(R.id.title)
 
     override fun onCreateContextMenu(
         menu: ContextMenu?,

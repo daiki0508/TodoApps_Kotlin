@@ -48,7 +48,6 @@ class TodoViewModel(
         }else{
             val tasks = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
             if (File("${context.filesDir}/task/${tasks!!.split(" ")[position]}/task").exists()){
-                //TODO("未実装")
                 firebaseStorageRepository.delete(storage, auth, tasks.split(" ")[position], flag)
             }
         }
@@ -66,7 +65,7 @@ class TodoViewModel(
 
     fun getTask(context: Context, auth: FirebaseAuth, task: String): MutableList<MutableMap<String, String>>{
         val taskFile = File("${context.filesDir}/task/$task/task")
-        val tasks: String? = if (/*taskFile.exists() || */taskFile.length() != 0L){
+        val tasks: String? = if (taskFile.length() != 0L){
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1,task, aStr = null, flag = false)
         }else{
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 2,task, aStr = null, flag = false)
@@ -111,7 +110,7 @@ class TodoViewModel(
             CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), listsAfter, type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
         }
         if (File("${context.filesDir}/task/${listsBefore.split(" ")[position]}/task").exists()){
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), listsAfter, type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
         }
         Log.d("update_a", listsAfter)
     }

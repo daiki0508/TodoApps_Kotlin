@@ -101,10 +101,12 @@ class AddTodoTaskViewModel(
     fun taskDelete(context: Context, auth: FirebaseAuth, task: String, position: Int){
         val tasksBefore = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1, task, aStr = null, flag = false)
         Log.d("update_b", tasksBefore!!)
+        // taskファイルから該当タスクを削除
         var tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
         if (tasksBefore == tasksAfter){
             tasksAfter = tasksBefore.replace(" ${tasksBefore.split(" ")[position]}", "")
             if (tasksBefore == tasksAfter){
+                // listから該当task名を削除
                 CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task, aStr = null, flag = true)
             }else{
                 CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, task, aStr = null, flag = true)

@@ -42,13 +42,12 @@ class RecyclerViewAdapter(
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(activity)
-        val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(activity, auth, items[position]["list"]!!), position)
+        val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(activity, auth, items[position]["list"]!!), this, position)
         holder.rvContents.adapter = adapter
 
-        holder.cardView.setOnCreateContextMenuListener(holder)
-
+        holder.titleView.setOnCreateContextMenuListener(holder)
         // listが長押しされた時
-        holder.cardView.setOnLongClickListener(View.OnLongClickListener {
+        holder.titleView.setOnLongClickListener(View.OnLongClickListener {
             setPosition(holder.absoluteAdapterPosition)
             return@OnLongClickListener false
         })
@@ -87,7 +86,7 @@ class RecyclerViewAdapter(
         return position
     }
 
-    private fun setPosition(position: Int){
+    fun setPosition(position: Int){
         this.position = position
     }
 }

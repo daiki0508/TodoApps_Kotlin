@@ -11,7 +11,11 @@ import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 
-class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String, String>>, private var position: Int): RecyclerView.Adapter<ChildRecyclerViewHolder>() {
+class ChildRecyclerViewAdapter(
+    private var items: MutableList<MutableMap<String, String>>,
+    private var apAdapter: RecyclerViewAdapter,
+    private var position: Int
+    ): RecyclerView.Adapter<ChildRecyclerViewHolder>() {
     private lateinit var listener: OnChildItemClickListener
     private lateinit var pListener: OnPreferenceListener
 
@@ -44,6 +48,12 @@ class ChildRecyclerViewAdapter(private var items: MutableList<MutableMap<String,
         }
 
         holder.checkBox.visibility = View.GONE
+
+        holder.contentView.setOnCreateContextMenuListener(holder)
+        holder.contentView.setOnLongClickListener(View.OnLongClickListener {
+            apAdapter.setPosition(this.position)
+            return@OnLongClickListener false
+        })
 
         holder.view.setOnClickListener {
             listener.onItemClickListener(it, this.position)

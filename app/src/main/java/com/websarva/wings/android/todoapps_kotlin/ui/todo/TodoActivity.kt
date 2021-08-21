@@ -67,14 +67,16 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         }*/
 
         viewModel.completeFlag().observe(this, {
-            //TODO("バグが原因")
-            // 全てのダウンロードが終了してからRecyclerViewの生成に入る
-            if ((it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == true) and (it["iv_aes_task"] == true) and (it["salt_task"] == true)){
-                viewModel.createView(this, auth)
-            }else if ((it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == false) and (it["iv_aes_task"] == false) and (it["salt_task"] == false)){
-                viewModel.createView(this, auth)
-            } else if ((it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true)){
-                viewModel.download(this, storage, auth, flag = false)
+            when {
+                (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == true) and (it["iv_aes_task"] == true) and (it["salt_task"] == true) -> {
+                    viewModel.createView(this, auth)
+                }
+                (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == false) and (it["iv_aes_task"] == false) and (it["salt_task"] == false) -> {
+                    viewModel.createView(this, auth)
+                }
+                (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) -> {
+                    viewModel.download(this, storage, auth, flag = false)
+                }
             }
         })
 
