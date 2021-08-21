@@ -84,8 +84,10 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
                     acAdapter = ChildRecyclerViewAdapter(it, viewModel)
                     itemTouchHelper = ItemTouchHelper(acAdapter!!.getRecyclerViewSimpleCallBack())
-                    apAdapter = RecyclerViewAdapter(itemTouchHelper/*viewModel.todoTask().value!!*/, task, this, viewModel, acAdapter)
+                    apAdapter = RecyclerViewAdapter(itemTouchHelper, task, this, viewModel, acAdapter)
                     binding.recyclerview.adapter = apAdapter
+
+                    binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
 
                     apAdapter?.setOnItemClickListener(object: OnItemClickListener {
                         override fun onItemClickListener(view: View, position: Int) {
@@ -100,6 +102,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                             // checkBoxの状態を保存しUIに反映
                             viewModel.writePreference(keyName, checkFlag)
                             acAdapter!!.notifyItemChanged(position)
+
+                            binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
                         }
 
                         override fun onPreferenceReadListener(keyName: String): Boolean {

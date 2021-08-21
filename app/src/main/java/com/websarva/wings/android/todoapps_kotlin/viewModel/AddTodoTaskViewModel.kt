@@ -60,6 +60,17 @@ class AddTodoTaskViewModel(
         preferenceRepository.delete(context!!, list)
     }
 
+    fun countUnCompleteTask(items: MutableList<MutableMap<String, String>>): Int{
+        var cnt = 0
+
+        for (item in items){
+          if (!readPreference(item["task"]!!)){
+              cnt++
+          }
+        }
+        return cnt
+    }
+
     fun createView(){
         val tasks = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
 
@@ -104,7 +115,6 @@ class AddTodoTaskViewModel(
     fun remove(items: MutableList<MutableMap<String, String>>, fromPosition: Int, toPosition: Int){
         val toPositionItem = items[toPosition]["task"]
         val fromPositionItem = items[fromPosition]["task"]
-        //Log.d("remove", tmp!!)
         val tasks = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
 
         Log.d("remove_b", tasks!!)

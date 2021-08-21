@@ -31,7 +31,8 @@
     アカウントのメールアドレスを入力してください。</string>
     <string name="repassword">パスワード再設定メールを送信する</string>
     <string name="reset">パスワードを忘れた</string>
-    
+
+    <string name="unCompleteTaskCount">未完了タスク %1$d件</string>
     <string name="option_allCheck_title">全てのタスクを完了済みにする</string>
     <string name="option_allUnCheck_title">全てのタスクを未完了にする</string>
     <string name="context_deleteTask_title">このタスクを削除する</string>

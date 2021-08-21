@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -30,7 +31,6 @@ class TodoActivity : AppCompatActivity(), DialogListener {
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
     private var apAdapter: RecyclerViewAdapter? = null
-    //private var acAdapter: ChildRecyclerViewAdapter? = null
 
     override fun onStart() {
         super.onStart()
@@ -85,7 +85,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         }
 
         viewModel.todoList().observe(this, {
-            if (it.isNotEmpty()){
+            if (it.isNotEmpty() && apAdapter == null){
                 binding.tvNoContent.visibility = View.GONE
                 binding.recyclerview.visibility = View.VISIBLE
 
