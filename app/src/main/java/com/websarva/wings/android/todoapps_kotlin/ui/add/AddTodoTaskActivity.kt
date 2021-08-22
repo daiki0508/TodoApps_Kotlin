@@ -190,12 +190,16 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     viewModel.writePreference(keyName = acAdapter!!.items[i]["task"]!!, checkFlag = true)
                 }
                 acAdapter!!.notifyDataSetChanged()
+
+                binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
             }
             R.id.allUnCheck ->{
                 for (i in 0 until acAdapter!!.itemCount){
                     viewModel.writePreference(keyName = acAdapter!!.items[i]["task"]!!, checkFlag = false)
                 }
                 acAdapter!!.notifyDataSetChanged()
+
+                binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
             }
             else -> retValue = super.onOptionsItemSelected(item)
         }

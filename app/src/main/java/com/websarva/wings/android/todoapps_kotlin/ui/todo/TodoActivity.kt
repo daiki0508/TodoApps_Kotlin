@@ -6,18 +6,23 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
+import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
@@ -31,6 +36,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
     private var apAdapter: RecyclerViewAdapter? = null
+    private var nvAdapter: NavRecyclerViewAdapter? = null
 
     override fun onStart() {
         super.onStart()
@@ -52,10 +58,19 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        val toggle = ActionBarDrawerToggle(this, binding.drawerLayout,binding.toolbar, R.string.drawer_open, R.string.drawer_close)
+        binding.drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        /*val menu = binding.navigationView.menu
+        val menuGroup = menu.addSubMenu("My Menu Group")
+        menuGroup.add("Foo")
+        menuGroup.add("Bar")*/
+
         auth = Firebase.auth
         storage = FirebaseStorage.getInstance()
 
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.navRecyclerView.layoutManager = LinearLayoutManager(this)
 
         /*
          FirebaseStorageからデータをダウンロード
@@ -98,6 +113,9 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                     }
                 })
                 Log.d("test", "Called")
+
+                nvAdapter = NavRecyclerViewAdapter(it)
+                binding.navRecyclerView.adapter = nvAdapter
             }
         })
     }

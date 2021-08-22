@@ -63,6 +63,7 @@ class TodoViewModel(
 
     fun createView(context: Context, auth: FirebaseAuth){
         val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+        Log.d("lists", lists!!)
 
         _todoList.value = createTodoContents(lists, "list")
     }
@@ -84,7 +85,6 @@ class TodoViewModel(
 
         if (contents!!.isNotBlank()){
             for (content in contents.split(" ")){
-                Log.d("test", content)
                 todo = mutableMapOf(keyName to content)
                 todoContents.add(todo)
             }

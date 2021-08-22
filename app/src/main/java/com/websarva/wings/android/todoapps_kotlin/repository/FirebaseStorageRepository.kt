@@ -72,6 +72,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         if (!flag){
             this.tasks = tasks!!
             val cnt = this.tasks.split(" ").size
+            //Log.d("cnt", cnt.toString())
             if (cnt == 1){
                 downloadTask(context, addViewModel, todoViewModel, "task/$tasks/task", storageRef, uid, flag, cnt)
                 downloadTask(context, addViewModel, todoViewModel, "task/$tasks/iv_aes", storageRef, uid, flag, cnt)
@@ -80,6 +81,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                 this.auth = auth
                 this.storage = storage
                 val task = this.tasks.split(" ")[position]
+                //Log.d("task", task)
                 downloadTask(context, addViewModel, todoViewModel, "task/$task/task", storageRef, uid, flag, cnt)
                 downloadTask(context, addViewModel, todoViewModel, "task/$task/iv_aes", storageRef, uid, flag, cnt)
                 downloadTask(context, addViewModel, todoViewModel, "task/$task/salt", storageRef, uid, flag, cnt)
