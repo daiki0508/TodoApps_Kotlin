@@ -6,7 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 
-class NavRecyclerViewAdapter(private var items: MutableList<MutableMap<String, String>>): RecyclerView.Adapter<NavRecyclerViewHolder>() {
+class NavRecyclerViewAdapter(
+    private var items: MutableList<MutableMap<String, String>>,
+    private var position: Int
+): RecyclerView.Adapter<NavRecyclerViewHolder>() {
+    private lateinit var listener: OnItemClickListener
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NavRecyclerViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val view = layoutInflater.inflate(R.layout.row_nav, parent, false)
@@ -19,18 +24,22 @@ class NavRecyclerViewAdapter(private var items: MutableList<MutableMap<String, S
         holder.count.text = "0"
 
         // テスト用
-        if (position == 0){
+        if (position == this.position){
             holder.view.setBackgroundColor(Color.LTGRAY)
         }else{
             holder.view.setBackgroundColor(Color.WHITE)
         }
 
         holder.view.setOnClickListener {
-            TODO("未実装")
+            listener.onItemClickListener(it, position, items[position]["list"]!!)
         }
     }
 
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener){
+        this.listener = listener
     }
 }

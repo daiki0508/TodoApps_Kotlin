@@ -114,8 +114,14 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 })
                 Log.d("test", "Called")
 
-                nvAdapter = NavRecyclerViewAdapter(it)
+                nvAdapter = NavRecyclerViewAdapter(it, 0)
                 binding.navRecyclerView.adapter = nvAdapter
+
+                nvAdapter!!.setOnItemClickListener(object: OnItemClickListener{
+                    override fun onItemClickListener(view: View, position: Int, list: String) {
+                        addTodoIntent(list, position)
+                    }
+                })
             }
         })
     }

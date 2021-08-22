@@ -84,6 +84,18 @@ class AddTodoTaskViewModel(
         _todoTask.value = todoTask
     }
 
+    fun getList(): MutableList<MutableMap<String, String>>{
+        val lists = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+
+        val todoList: MutableList<MutableMap<String, String>> = mutableListOf()
+        var todo: MutableMap<String, String>
+        for (list in lists!!.split(" ")){
+            todo = mutableMapOf("list" to list)
+            todoList.add(todo)
+        }
+        return todoList
+    }
+
     fun update(
         aStr: String,
         flag: Boolean

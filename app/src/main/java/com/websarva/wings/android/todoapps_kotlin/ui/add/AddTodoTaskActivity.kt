@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +23,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -37,6 +39,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     private var position = 0
     private var apAdapter: RecyclerViewAdapter? = null
     private var acAdapter: ChildRecyclerViewAdapter? = null
+    private var nvAdapter: NavRecyclerViewAdapter? = null
     private lateinit var itemTouchHelper: ItemTouchHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +52,10 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        val toggle = ActionBarDrawerToggle(this, binding.drawerLayout,binding.toolbar, R.string.drawer_open, R.string.drawer_close)
+        binding.drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
         auth = Firebase.auth
         storage = FirebaseStorage.getInstance()
 
@@ -56,6 +63,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         position = intent.getIntExtra("position", 0)
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
+        binding.unCompleteCount.visibility = View.GONE
+        binding.navRecyclerView.layoutManager = LinearLayoutManager(this)
 
         viewModel.setInit(list = task, auth, this, storage)
 
@@ -75,12 +84,23 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             }
         })*/
 
+        nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position)
+        binding.navRecyclerView.adapter = nvAdapter
+
+        nvAdapter!!.setOnItemClickListener(object:
+            com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener {
+            override fun onItemClickListener(view: View, position: Int, list: String) {
+                TODO("未実装")
+            }
+        })
+
         viewModel.todoTask().observe(this, {
             if (it.isNotEmpty()){
                 if (apAdapter == null){
                     // recyclerviewがdeleteTask等によって非表示の場合は再表示し、NoContentsを非表示にする
                     binding.tvNoContent.visibility = View.GONE
                     binding.recyclerview.visibility = View.VISIBLE
+                    binding.unCompleteCount.visibility = View.VISIBLE
 
                     acAdapter = ChildRecyclerViewAdapter(it, viewModel)
                     itemTouchHelper = ItemTouchHelper(acAdapter!!.getRecyclerViewSimpleCallBack())
@@ -225,6 +245,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 if (acAdapter!!.itemCount == 0){
                     binding.recyclerview.visibility = View.GONE
                     binding.tvNoContent.visibility = View.VISIBLE
+                    binding.unCompleteCount.visibility = View.GONE
 
                     acAdapter = null
                     apAdapter = null
