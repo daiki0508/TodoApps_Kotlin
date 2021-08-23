@@ -142,6 +142,8 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         }else{
             apAdapter!!.items.add(mutableMapOf("list" to list))
             apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
+
+            nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
         }
         viewModel.upload()
     }
@@ -158,7 +160,9 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 viewModel.deletePreference(list!!)
 
                 apAdapter!!.items.removeAt(position)
-                apAdapter!!.notifyItemRemoved(position)
+                apAdapter?.notifyItemRemoved(position)
+
+                nvAdapter?.notifyItemRemoved(position)
 
                 if (apAdapter!!.itemCount == 0){
                     binding.recyclerview.visibility = View.GONE
