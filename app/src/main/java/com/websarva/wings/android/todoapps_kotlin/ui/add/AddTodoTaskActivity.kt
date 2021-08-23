@@ -110,6 +110,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
                     acAdapter = ChildRecyclerViewAdapter(it, viewModel)
                     itemTouchHelper = ItemTouchHelper(acAdapter!!.getRecyclerViewSimpleCallBack())
+
                     apAdapter = RecyclerViewAdapter(itemTouchHelper, task, this, viewModel, acAdapter)
                     binding.recyclerview.adapter = apAdapter
 

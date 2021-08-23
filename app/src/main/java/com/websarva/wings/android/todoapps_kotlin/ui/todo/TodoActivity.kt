@@ -37,6 +37,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
     private lateinit var storage: FirebaseStorage
     private var apAdapter: RecyclerViewAdapter? = null
     private var nvAdapter: NavRecyclerViewAdapter? = null
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     override fun onStart() {
         super.onStart()
@@ -118,6 +119,8 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
                 nvAdapter = NavRecyclerViewAdapter(it, 0, todoViewModel = viewModel, addTodoTaskViewModel = null)
                 binding.navRecyclerView.adapter = nvAdapter
+                itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(apAdapter, addRecyclerView = null))
+                itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
 
                 nvAdapter!!.setOnItemClickListener(object: OnItemClickListener{
                     override fun onItemClickListener(view: View, position: Int, list: String) {

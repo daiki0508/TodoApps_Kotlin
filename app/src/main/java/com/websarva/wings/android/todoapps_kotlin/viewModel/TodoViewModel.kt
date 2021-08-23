@@ -125,6 +125,44 @@ class TodoViewModel(
         return todoContents
     }
 
+    fun move(items: MutableList<MutableMap<String, String>>, fromPosition: Int, toPosition: Int){
+        val toPositionItem = items[toPosition]["list"]
+        val fromPositionItem = items[fromPosition]["list"]
+        val lists = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+
+        Log.d("remove_b", lists!!)
+        var newLists = ""
+        for ((i, value) in lists!!.split(" ").withIndex()){
+            when (i) {
+                toPosition -> {
+                    newLists += if (i.plus(1) == items.size){
+                        fromPositionItem
+                    }else{
+                        "$fromPositionItem "
+                    }
+                }
+                fromPosition -> {
+                    newLists += if (i.plus(1) == items.size){
+                        toPositionItem
+                    }else{
+                        "$toPositionItem "
+                    }
+                }
+                else -> {
+                    newLists += if (i.plus(1) == items.size){
+                        value
+                    }else{
+                        "$value "
+                    }
+                }
+            }
+        }
+        Log.d("remove_a", newLists)
+        CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newLists, type = 7, task = null, aStr = null, flag = true)
+
+        upload()
+    }
+
     fun listDelete(position: Int){
         val listsBefore = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         Log.d("update_b", listsBefore!!)

@@ -3,6 +3,7 @@ package com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter
@@ -10,7 +11,7 @@ import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
 class NavRecyclerViewAdapter(
-    var items: MutableList<MutableMap<String, String>>,
+    private var items: MutableList<MutableMap<String, String>>,
     private var position: Int,
     private var todoViewModel: TodoViewModel?,
     private var addTodoTaskViewModel: AddTodoTaskViewModel?
@@ -50,5 +51,35 @@ class NavRecyclerViewAdapter(
 
     fun setOnItemClickListener(listener: OnItemClickListener){
         this.listener = listener
+    }
+
+    fun getRecyclerViewSimpleCallBack(todoRecyclerView: RecyclerViewAdapter?, addRecyclerView: com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter?) = object: ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+        ItemTouchHelper.ACTION_STATE_IDLE
+    ){
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val fromPosition = viewHolder.absoluteAdapterPosition
+            val toPosition = target.absoluteAdapterPosition
+
+            if (todoViewModel != null){
+                todoViewModel!!.move(items, fromPosition, toPosition)
+                todoRecyclerView?.notifyItemMoved(fromPosition, toPosition)
+            }else{
+                TODO("未実装")
+            }
+
+            items.add(toPosition, items.removeAt(fromPosition))
+            this@NavRecyclerViewAdapter.notifyItemMoved(fromPosition, toPosition)
+
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            return
+        }
     }
 }
