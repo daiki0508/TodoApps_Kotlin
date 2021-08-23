@@ -90,7 +90,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         nvAdapter!!.setOnItemClickListener(object:
             com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener {
             override fun onItemClickListener(view: View, position: Int, list: String) {
-                TODO("未実装")
+                Intent(intent).apply {
+                    this.putExtra("list", list)
+                    this.putExtra("position", position)
+                    startActivity(this)
+                    overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                    finish()
+                }
             }
         })
 

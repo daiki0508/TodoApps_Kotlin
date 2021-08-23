@@ -204,8 +204,13 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                 completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = false
                 addViewModel.setCompleteFlag(completeFlag)
             }else if (!flag){
-                completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = false
-                todoViewModel!!.setCompleteFlag(completeFlag)
+                if (cnt!!.minus(1) == position){
+                    completeFlag["${Uri.fromFile(file).lastPathSegment!!}_task"] = false
+                    todoViewModel!!.setCompleteFlag(completeFlag)
+                }else{
+                    position++
+                    download(context, addViewModel = null, todoViewModel, storage, auth, tasks, flag)
+                }
             }else{
                 completeFlag["${Uri.fromFile(file).lastPathSegment!!}_list"] = false
                 todoViewModel!!.setCompleteFlag(completeFlag)
