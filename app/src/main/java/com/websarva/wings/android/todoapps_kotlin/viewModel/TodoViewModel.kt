@@ -1,5 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.viewModel
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -16,6 +17,7 @@ import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositor
 import kotlinx.coroutines.*
 import java.io.File
 
+@SuppressLint("StaticFieldLeak")
 class TodoViewModel(
     private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
     private val preferenceRepository: PreferenceRepositoryClient
@@ -27,53 +29,81 @@ class TodoViewModel(
         MutableLiveData<MutableMap<String, Boolean?>>()
     }
 
-    fun upload(context: Context, storage: FirebaseStorage, auth: FirebaseAuth){
-        firebaseStorageRepository.upload(context, storage, auth, task = null, flag = false)
+    private var activity: Activity?
+    private var storage: FirebaseStorage?
+    private var auth: FirebaseAuth?
+    //private var list: String
+
+    fun upload(){
+        firebaseStorageRepository.upload(activity!!, storage!!, auth!!, task = null, flag = false)
     }
 
-    fun download(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, flag: Boolean){
+    fun download(flag: Boolean){
         if (flag){
-            firebaseStorageRepository.download(context, addViewModel = null, this, storage, auth, tasks = null, flag)
+            firebaseStorageRepository.download(activity!!, addViewModel = null, this, storage!!, auth!!, tasks = null, flag)
         }else{
-            if (File(context.filesDir, "list").exists()){
-                val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
-                firebaseStorageRepository.download(context, addViewModel = null, this, storage, auth, lists, flag)
+            if (File(activity?.filesDir, "list").exists()){
+                val lists = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
+                firebaseStorageRepository.download(activity!!, addViewModel = null, this, storage!!, auth!!, lists, flag)
             }
         }
     }
 
-    fun delete(context: Context, storage: FirebaseStorage, auth: FirebaseAuth, position: Int, flag: Boolean){
+    fun delete(position: Int, flag: Boolean){
         if (flag){
-            firebaseStorageRepository.delete(storage, auth, task = null, flag)
+            firebaseStorageRepository.delete(storage!!, auth!!, task = null, flag)
         }else{
-            val tasks = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
-            if (File("${context.filesDir}/task/${tasks!!.split(" ")[position]}/task").exists()){
-                firebaseStorageRepository.delete(storage, auth, tasks.split(" ")[position], flag)
+            val tasks = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            if (File("${activity?.filesDir}/task/${tasks!!.split(" ")[position]}/task").exists()){
+                firebaseStorageRepository.delete(storage!!, auth!!, tasks.split(" ")[position], flag)
             }
         }
     }
 
-    fun readPreference(activity: Activity, task: String, keyName: String): Boolean{
-        return preferenceRepository.read(activity, task, keyName)
+    fun readPreference(list: String, keyName: String): Boolean{
+        return preferenceRepository.read(activity!!, list, keyName)
     }
 
-    fun deletePreference(activity: Activity, list: String){
-        preferenceRepository.delete(activity, list)
+    fun deletePreference(list: String){
+        preferenceRepository.delete(activity!!, list)
     }
 
-    fun createView(context: Context, auth: FirebaseAuth){
-        val lists = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+    fun countUnCompleteTask(list: String): Int{
+        var cnt = 0
+
+        if (File("${activity?.filesDir}/task/$list/task").length() != 0L){
+            val tasks = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+
+            val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
+            var todo: MutableMap<String, String>
+            for (task in tasks?.split(" ")!!){
+                Log.d("test", task)
+                todo = mutableMapOf("task" to task)
+                todoTask.add(todo)
+            }
+
+            for (item in todoTask){
+                if (!readPreference(list, item["task"]!!)){
+                    cnt++
+                }
+            }
+        }
+        return cnt
+    }
+
+    fun createView(){
+        val lists = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         Log.d("lists", lists!!)
 
         _todoList.value = createTodoContents(lists, "list")
     }
 
-    fun getTask(context: Context, auth: FirebaseAuth, task: String): MutableList<MutableMap<String, String>>{
-        val taskFile = File("${context.filesDir}/task/$task/task")
+    fun getTask(list: String): MutableList<MutableMap<String, String>>{
+        val taskFile = File("${activity?.filesDir}/task/$list/task")
         val tasks: String? = if (taskFile.length() != 0L){
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 1,task, aStr = null, flag = false)
+            CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
         }else{
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 2,task, aStr = null, flag = false)
+            CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 2, list, aStr = null, flag = false)
         }
 
         return createTodoContents(tasks, keyName = "task")
@@ -95,8 +125,8 @@ class TodoViewModel(
         return todoContents
     }
 
-    fun listDelete(context: Context, auth: FirebaseAuth, position: Int){
-        val listsBefore = CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+    fun listDelete(position: Int){
+        val listsBefore = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         Log.d("update_b", listsBefore!!)
         // listから該当task名を削除
         var listsAfter = listsBefore!!.replace("${listsBefore.split(" ")[position]} ", "")
@@ -104,17 +134,17 @@ class TodoViewModel(
             listsAfter = listsBefore.replace(" ${listsBefore.split(" ")[position]}", "")
             if (listsBefore == listsAfter){
                 // listの削除
-                CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 6, task = null, aStr = null, flag = true)
+                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 6, task = null, aStr = null, flag = true)
             }else{
                 // listのtask名を削除
-                CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
             }
         }else{
             // listのtask名を削除
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), listsAfter, type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+            CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), listsAfter, type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
         }
-        if (File("${context.filesDir}/task/${listsBefore.split(" ")[position]}/task").exists()){
-            CryptClass().decrypt(context, "${auth.currentUser!!.uid}0000".toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+        if (File("${activity?.filesDir}/task/${listsBefore.split(" ")[position]}/task").exists()){
+            CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
         }
         Log.d("update_a", listsAfter)
     }
@@ -125,6 +155,12 @@ class TodoViewModel(
 
     fun todoList(): MutableLiveData<MutableList<MutableMap<String, String>>>{
         return _todoList
+    }
+
+    fun setInit(auth: FirebaseAuth, context: Activity, storage: FirebaseStorage){
+        this.auth = auth
+        this.activity = context
+        this.storage = storage
     }
 
     fun setCompleteFlag(taskMap: MutableMap<String, Boolean?>){
@@ -141,5 +177,8 @@ class TodoViewModel(
             "salt_task" to null
         )
         _todoList.value = mutableListOf()
+        auth = null
+        activity = null
+        storage = null
     }
 }

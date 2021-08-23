@@ -72,11 +72,13 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         binding.navRecyclerView.layoutManager = LinearLayoutManager(this)
 
+        viewModel.setInit(auth, this, storage)
+
         /*
          FirebaseStorageからデータをダウンロード
          FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
          */
-        viewModel.download(this, storage, auth, flag = true)
+        viewModel.download(flag = true)
         /*if (File(filesDir, "list").exists()){
             viewModel.createView(this, auth)
         }*/
@@ -84,13 +86,13 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         viewModel.completeFlag().observe(this, {
             when {
                 (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == true) and (it["iv_aes_task"] == true) and (it["salt_task"] == true) -> {
-                    viewModel.createView(this, auth)
+                    viewModel.createView()
                 }
                 (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == false) and (it["iv_aes_task"] == false) and (it["salt_task"] == false) -> {
-                    viewModel.createView(this, auth)
+                    viewModel.createView()
                 }
                 (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) -> {
-                    viewModel.download(this, storage, auth, flag = false)
+                    viewModel.download(flag = false)
                 }
             }
         })
@@ -104,7 +106,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 binding.tvNoContent.visibility = View.GONE
                 binding.recyclerview.visibility = View.VISIBLE
 
-                apAdapter = RecyclerViewAdapter(it, this, viewModel, auth)
+                apAdapter = RecyclerViewAdapter(it, this, viewModel)
                 binding.recyclerview.adapter = apAdapter
 
                 apAdapter!!.setOnItemClickListener(object: OnItemClickListener{
@@ -114,7 +116,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 })
                 Log.d("test", "Called")
 
-                nvAdapter = NavRecyclerViewAdapter(it, 0)
+                nvAdapter = NavRecyclerViewAdapter(it, 0, todoViewModel = viewModel, addTodoTaskViewModel = null)
                 binding.navRecyclerView.adapter = nvAdapter
 
                 nvAdapter!!.setOnItemClickListener(object: OnItemClickListener{
@@ -136,12 +138,12 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
 
         if (apAdapter == null){
-            viewModel.createView(this, auth)
+            viewModel.createView()
         }else{
             apAdapter!!.items.add(mutableMapOf("list" to list))
             apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
         }
-        viewModel.upload(this, storage, auth)
+        viewModel.upload()
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -153,7 +155,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 Log.d("context", position.toString())
 
                 val list = apAdapter!!.items[position]["list"]
-                viewModel.deletePreference(this, list!!)
+                viewModel.deletePreference(list!!)
 
                 apAdapter!!.items.removeAt(position)
                 apAdapter!!.notifyItemRemoved(position)
@@ -167,19 +169,19 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                      FirebaseStorageからlistとtaskを完全削除
                      trueがlistでfalseがtask
                      */
-                    viewModel.delete(this, storage, auth, position, flag = true)
-                    viewModel.delete(this, storage, auth, position, flag = false)
+                    viewModel.delete(position, flag = true)
+                    viewModel.delete(position, flag = false)
                     // 内部ストレージからtaskファイルを完全削除する
-                    viewModel.listDelete(this, auth, position)
+                    viewModel.listDelete(position)
                 }else{
                     /*
                      内部ストレージのlistから該当task名を削除
                      該当taskも削除
                      */
-                    viewModel.delete(this, storage, auth, position, flag = false)
-                    viewModel.listDelete(this, auth, position)
+                    viewModel.delete(position, flag = false)
+                    viewModel.listDelete(position)
                     // FirebaseStorageのlist更新
-                    viewModel.upload(this, storage, auth)
+                    viewModel.upload()
                 }
             }else -> retValue = super.onContextItemSelected(item)
         }

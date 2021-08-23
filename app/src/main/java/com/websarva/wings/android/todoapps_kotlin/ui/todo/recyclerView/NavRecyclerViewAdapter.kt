@@ -5,10 +5,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
 class NavRecyclerViewAdapter(
     private var items: MutableList<MutableMap<String, String>>,
-    private var position: Int
+    private var position: Int,
+    private var todoViewModel: TodoViewModel?,
+    private var addTodoTaskViewModel: AddTodoTaskViewModel?
 ): RecyclerView.Adapter<NavRecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
@@ -21,9 +25,14 @@ class NavRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: NavRecyclerViewHolder, position: Int) {
         holder.title.text = items[position]["list"]
-        holder.count.text = "0"
 
-        // テスト用
+        if (todoViewModel != null){
+            holder.count.text = todoViewModel!!.countUnCompleteTask(items[position]["list"]!!).toString()
+        }else{
+            //TODO("未実装")
+            holder.count.text = "0"
+        }
+
         if (position == this.position){
             holder.view.setBackgroundColor(Color.LTGRAY)
         }else{

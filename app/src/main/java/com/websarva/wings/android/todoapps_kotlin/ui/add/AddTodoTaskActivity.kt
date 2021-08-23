@@ -84,7 +84,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             }
         })*/
 
-        nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position)
+        nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel)
         binding.navRecyclerView.adapter = nvAdapter
 
         nvAdapter!!.setOnItemClickListener(object:
