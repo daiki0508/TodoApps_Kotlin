@@ -113,7 +113,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     apAdapter = RecyclerViewAdapter(itemTouchHelper, task, this, viewModel, acAdapter)
                     binding.recyclerview.adapter = apAdapter
 
-                    binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
+                    binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items, list = null))
 
                     apAdapter?.setOnItemClickListener(object: OnItemClickListener {
                         override fun onItemClickListener(view: View, position: Int) {
@@ -126,10 +126,11 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     acAdapter?.setPreferenceListener(object: OnPreferenceListener {
                         override fun onPreferenceWriteListener(position: Int, keyName: String, checkFlag: Boolean) {
                             // checkBoxの状態を保存しUIに反映
+                            //TODO("checkBox変更時に未完了タスクが更新されない")
                             viewModel.writePreference(keyName, checkFlag)
                             acAdapter!!.notifyItemChanged(position)
 
-                            binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
+                            binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items, list = null))
                         }
 
                         override fun onPreferenceReadListener(keyName: String): Boolean {
@@ -153,6 +154,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         position: Int?
     ) {
         Log.d("dialog", list)
+        //TODO("task追加時にNavigationDrawerの未完了タスクが更新されない")
         if (type == 0){
             CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, aStr = null, flag = true)
         }else{
@@ -209,6 +211,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //TODO("checkBox変更時に未完了タスクが更新されない")
         var retValue = true
         when(item.itemId){
             R.id.allCheck -> {
@@ -217,7 +220,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 }
                 acAdapter!!.notifyDataSetChanged()
 
-                binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
+                binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items, list = null))
             }
             R.id.allUnCheck ->{
                 for (i in 0 until acAdapter!!.itemCount){
@@ -225,7 +228,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 }
                 acAdapter!!.notifyDataSetChanged()
 
-                binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
+                binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items, list = null))
             }
             else -> retValue = super.onOptionsItemSelected(item)
         }
@@ -233,6 +236,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
+        //TODO("task削除時にNavigationDrawerの未完了taskが更新されない")
         Log.d("context", "Called!")
         var retValue = true
 

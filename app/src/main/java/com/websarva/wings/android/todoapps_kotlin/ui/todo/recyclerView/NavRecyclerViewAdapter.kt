@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
@@ -29,8 +30,7 @@ class NavRecyclerViewAdapter(
         if (todoViewModel != null){
             holder.count.text = todoViewModel!!.countUnCompleteTask(items[position]["list"]!!).toString()
         }else{
-            //TODO("未実装")
-            holder.count.text = "0"
+            holder.count.text = addTodoTaskViewModel!!.countUnCompleteTask(items = null, items[position]["list"]).toString()
         }
 
         if (position == this.position){

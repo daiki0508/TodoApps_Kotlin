@@ -60,13 +60,34 @@ class AddTodoTaskViewModel(
         preferenceRepository.delete(context!!, list)
     }
 
-    fun countUnCompleteTask(items: MutableList<MutableMap<String, String>>): Int{
+    fun countUnCompleteTask(items: MutableList<MutableMap<String, String>>?, list: String?): Int{
         var cnt = 0
 
-        for (item in items){
-          if (!readPreference(item["task"]!!)){
-              cnt++
-          }
+        // trueがNavigationDrawer用
+        if (list != null){
+            if (File("${context?.filesDir}/task/$list/task").length() != 0L){
+                val tasks = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+
+                val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
+                var todo: MutableMap<String, String>
+                for (task in tasks?.split(" ")!!){
+                    Log.d("test", task)
+                    todo = mutableMapOf("task" to task)
+                    todoTask.add(todo)
+                }
+
+                for (task in todoTask){
+                    if (!preferenceRepository.read(context!!, list, task["task"]!!)){
+                        cnt++
+                    }
+                }
+            }
+        }else{
+            for (item in items!!){
+                if (!readPreference(item["task"]!!)){
+                    cnt++
+                }
+            }
         }
         return cnt
     }
