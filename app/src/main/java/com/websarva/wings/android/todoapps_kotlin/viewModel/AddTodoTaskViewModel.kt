@@ -145,31 +145,44 @@ class AddTodoTaskViewModel(
         }
     }
 
-    fun remove(items: MutableList<MutableMap<String, String>>, fromPosition: Int, toPosition: Int){
-        val toPositionItem = items[toPosition]["task"]
-        val fromPositionItem = items[fromPosition]["task"]
-        val tasks = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+    fun move(items: MutableList<MutableMap<String, String>>, fromPosition: Int, toPosition: Int, flag: Boolean){
+        // trueがNavigationDrawer
+        val toPositionItem = if (flag){
+            items[toPosition]["list"]
+        }else{
+            items[toPosition]["task"]
+        }
+        val fromPositionItem = if (flag){
+            items[fromPosition]["list"]
+        }else{
+            items[fromPosition]["task"]
+        }
+        val contents = if (flag){
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+        }else{
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+        }
 
-        Log.d("remove_b", tasks!!)
-        var newTasks = ""
-        for ((i, value) in tasks!!.split(" ").withIndex()){
+        //Log.d("remove_b", tasks!!)
+        var newContents = ""
+        for ((i, value) in contents!!.split(" ").withIndex()){
             when (i) {
                 toPosition -> {
-                    newTasks += if (i.plus(1) == items.size){
+                    newContents += if (i.plus(1) == items.size){
                         fromPositionItem
                     }else{
                         "$fromPositionItem "
                     }
                 }
                 fromPosition -> {
-                    newTasks += if (i.plus(1) == items.size){
+                    newContents += if (i.plus(1) == items.size){
                         toPositionItem
                     }else{
                         "$toPositionItem "
                     }
                 }
                 else -> {
-                    newTasks += if (i.plus(1) == items.size){
+                    newContents += if (i.plus(1) == items.size){
                         value
                     }else{
                         "$value "
@@ -177,10 +190,14 @@ class AddTodoTaskViewModel(
                 }
             }
         }
-        Log.d("remove_a", newTasks)
-        CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newTasks, type = 3, list, aStr = null, flag = true)
-
-        upload(flag = true)
+        //Log.d("remove_a", newTasks)
+        if (flag){
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newContents, type = 7, task = null, aStr = null, flag = true)
+            upload(flag = false)
+        }else{
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newContents, type = 3, list, aStr = null, flag = true)
+            upload(flag = true)
+        }
     }
 
     fun taskDelete(position: Int){

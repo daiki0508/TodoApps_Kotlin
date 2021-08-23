@@ -41,6 +41,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     private var acAdapter: ChildRecyclerViewAdapter? = null
     private var nvAdapter: NavRecyclerViewAdapter? = null
     private lateinit var itemTouchHelper: ItemTouchHelper
+    private lateinit var nvItemTouchHelper: ItemTouchHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +87,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
         nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel)
         binding.navRecyclerView.adapter = nvAdapter
+        nvItemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoRecyclerView = null))
+        nvItemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
 
         nvAdapter!!.setOnItemClickListener(object:
             com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener {

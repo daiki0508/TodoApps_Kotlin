@@ -113,7 +113,7 @@ class ChildRecyclerViewAdapter(
             val fromPosition = viewHolder.absoluteAdapterPosition
             val toPosition = target.absoluteAdapterPosition
 
-            viewModel.remove(items, fromPosition, toPosition)
+            viewModel.move(items, fromPosition, toPosition, flag = false)
 
             items.add(toPosition, items.removeAt(fromPosition))
             this@ChildRecyclerViewAdapter.notifyItemMoved(fromPosition, toPosition)

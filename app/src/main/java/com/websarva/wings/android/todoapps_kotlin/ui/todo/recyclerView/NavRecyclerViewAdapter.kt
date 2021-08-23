@@ -53,7 +53,7 @@ class NavRecyclerViewAdapter(
         this.listener = listener
     }
 
-    fun getRecyclerViewSimpleCallBack(todoRecyclerView: RecyclerViewAdapter?, addRecyclerView: com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter?) = object: ItemTouchHelper.SimpleCallback(
+    fun getRecyclerViewSimpleCallBack(todoRecyclerView: RecyclerViewAdapter?) = object: ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN,
         ItemTouchHelper.ACTION_STATE_IDLE
     ){
@@ -69,7 +69,7 @@ class NavRecyclerViewAdapter(
                 todoViewModel!!.move(items, fromPosition, toPosition)
                 todoRecyclerView?.notifyItemMoved(fromPosition, toPosition)
             }else{
-                TODO("未実装")
+                addTodoTaskViewModel!!.move(items, fromPosition, toPosition, flag = true)
             }
 
             items.add(toPosition, items.removeAt(fromPosition))

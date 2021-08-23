@@ -119,7 +119,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
                 nvAdapter = NavRecyclerViewAdapter(it, 0, todoViewModel = viewModel, addTodoTaskViewModel = null)
                 binding.navRecyclerView.adapter = nvAdapter
-                itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(apAdapter, addRecyclerView = null))
+                itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(apAdapter))
                 itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
 
                 nvAdapter!!.setOnItemClickListener(object: OnItemClickListener{
