@@ -35,11 +35,12 @@ class RecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
-        holder.title.textSize = 30F
-        holder.title.text = task
-
-        holder.title.setOnClickListener {
-            listener.onItemClickListener(it, position, list = null)
+        holder.title.apply {
+            textSize = 30F
+            text = task
+            setOnClickListener {
+                listener.onItemClickListener(it, position, list = null)
+            }
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(activity)

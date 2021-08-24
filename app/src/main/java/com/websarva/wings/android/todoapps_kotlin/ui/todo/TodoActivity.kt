@@ -66,11 +66,19 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         auth = Firebase.auth
         storage = FirebaseStorage.getInstance()
 
-        val nvTopAdapter = NavTopRecyclerViewAdapter(flag = true)
+        // タスク一覧
+        val nvTopAdapter = NavTopRecyclerViewAdapter(type = 0, flag = true)
         binding.navTopRecyclerView.adapter = nvTopAdapter
         binding.navTopRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.navTopRecyclerView.layoutManager = LinearLayoutManager(this)
 
+        // 設定
+        val nvSettingsAdapter = NavTopRecyclerViewAdapter(type = 1, flag = true)
+        binding.navFooterRecyclerView.adapter = nvSettingsAdapter
+        binding.navFooterRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        binding.navFooterRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        // メイン画面
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         binding.navRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -108,6 +116,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 binding.tvNoContent.visibility = View.GONE
                 binding.recyclerview.visibility = View.VISIBLE
 
+                // メイン画面
                 apAdapter = RecyclerViewAdapter(it, this, viewModel)
                 binding.recyclerview.adapter = apAdapter
 
@@ -118,6 +127,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 })
                 Log.d("test", "Called")
 
+                // NavigationDrawer
                 nvAdapter = NavRecyclerViewAdapter(it, -1, todoViewModel = viewModel, addTodoTaskViewModel = null)
                 binding.navRecyclerView.adapter = nvAdapter
                 itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(apAdapter))

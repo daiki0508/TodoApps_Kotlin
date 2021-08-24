@@ -88,7 +88,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             }
         })*/
 
-        val nvTopAdapter = NavTopRecyclerViewAdapter(flag = false)
+        // タスク一覧
+        val nvTopAdapter = NavTopRecyclerViewAdapter(type = 0, flag = false)
         binding.navTopRecyclerView.adapter = nvTopAdapter
         binding.navTopRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.navTopRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -99,6 +100,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             }
         })
 
+        // 設定
+        val nvSettingsAdapter = NavTopRecyclerViewAdapter(type = 1, flag = true)
+        binding.navFooterRecyclerView.adapter = nvSettingsAdapter
+        binding.navFooterRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        binding.navFooterRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        // NavigationDrawer
         nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel)
         binding.navRecyclerView.adapter = nvAdapter
         nvItemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoRecyclerView = null))
