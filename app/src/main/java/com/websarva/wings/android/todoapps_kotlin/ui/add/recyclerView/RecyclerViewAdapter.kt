@@ -13,13 +13,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
-
-interface OnItemClickListener {
-    fun onItemClickListener(view: View, position: Int)
-}
 
 class RecyclerViewAdapter(
     var itemTouchHelper: ItemTouchHelper,
@@ -42,7 +39,7 @@ class RecyclerViewAdapter(
         holder.title.text = task
 
         holder.title.setOnClickListener {
-            listener.onItemClickListener(it, position)
+            listener.onItemClickListener(it, position, list = null)
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(activity)

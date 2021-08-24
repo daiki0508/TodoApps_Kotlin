@@ -21,10 +21,10 @@ import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -66,7 +66,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         auth = Firebase.auth
         storage = FirebaseStorage.getInstance()
 
-        val nvTopAdapter = NavTopRecyclerViewAdapter()
+        val nvTopAdapter = NavTopRecyclerViewAdapter(flag = true)
         binding.navTopRecyclerView.adapter = nvTopAdapter
         binding.navTopRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.navTopRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -111,9 +111,9 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 apAdapter = RecyclerViewAdapter(it, this, viewModel)
                 binding.recyclerview.adapter = apAdapter
 
-                apAdapter!!.setOnItemClickListener(object: OnItemClickListener{
-                    override fun onItemClickListener(view: View, position: Int, list: String) {
-                        addTodoIntent(list, position)
+                apAdapter!!.setOnItemClickListener(object: OnItemClickListener {
+                    override fun onItemClickListener(view: View, position: Int, list: String?) {
+                        addTodoIntent(list!!, position)
                     }
                 })
                 Log.d("test", "Called")
@@ -124,8 +124,8 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
 
                 nvAdapter!!.setOnItemClickListener(object: OnItemClickListener{
-                    override fun onItemClickListener(view: View, position: Int, list: String) {
-                        addTodoIntent(list, position)
+                    override fun onItemClickListener(view: View, position: Int, list: String?) {
+                        addTodoIntent(list!!, position)
                     }
                 })
             }

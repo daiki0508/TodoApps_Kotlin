@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel

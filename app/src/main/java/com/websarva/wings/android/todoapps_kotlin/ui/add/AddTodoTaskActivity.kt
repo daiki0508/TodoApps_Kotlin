@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
@@ -20,10 +21,12 @@ import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -85,14 +88,24 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             }
         })*/
 
+        val nvTopAdapter = NavTopRecyclerViewAdapter(flag = false)
+        binding.navTopRecyclerView.adapter = nvTopAdapter
+        binding.navTopRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        binding.navTopRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        nvTopAdapter.setOnItemClickListener(object: OnItemClickListener{
+            override fun onItemClickListener(view: View, position: Int, list: String?) {
+                todoIntent()
+            }
+        })
+
         nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel)
         binding.navRecyclerView.adapter = nvAdapter
         nvItemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoRecyclerView = null))
         nvItemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
 
-        nvAdapter!!.setOnItemClickListener(object:
-            com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener {
-            override fun onItemClickListener(view: View, position: Int, list: String) {
+        nvAdapter!!.setOnItemClickListener(object: OnItemClickListener {
+            override fun onItemClickListener(view: View, position: Int, list: String?) {
                 Intent(intent).apply {
                     this.putExtra("list", list)
                     this.putExtra("position", position)
@@ -118,7 +131,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     binding.recyclerview.adapter = apAdapter
 
                     apAdapter?.setOnItemClickListener(object: OnItemClickListener {
-                        override fun onItemClickListener(view: View, position: Int) {
+                        override fun onItemClickListener(view: View, position: Int, list: String?) {
                             // listの更新
                             viewModel.setPosition(this@AddTodoTaskActivity.position)
                             AddListDialog(flag = false, type = 1, position = position).show(supportFragmentManager, "UpdateListDialog")
@@ -280,6 +293,10 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     }
 
     override fun onBackPressed() {
+        todoIntent()
+    }
+
+    private fun todoIntent(){
         startActivity(Intent(this, TodoActivity::class.java))
         overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
         finish()

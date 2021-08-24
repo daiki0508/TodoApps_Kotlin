@@ -11,13 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
-
-interface OnItemClickListener {
-    fun onItemClickListener(view: View, position: Int, list: String)
-}
 
 class RecyclerViewAdapter(
     var items: MutableList<MutableMap<String, String>>,

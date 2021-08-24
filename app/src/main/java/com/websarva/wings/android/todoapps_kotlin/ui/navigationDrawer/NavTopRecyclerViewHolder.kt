@@ -9,4 +9,6 @@ import com.websarva.wings.android.todoapps_kotlin.R
 class NavTopRecyclerViewHolder(var view: View): RecyclerView.ViewHolder(view) {
     val navIcon: ImageView = view.findViewById(R.id.navIcon)
     val navTitle: TextView = view.findViewById(R.id.navTitle)
+
+    val navTitleView: View = view.findViewById(R.id.navTitle)
 }
