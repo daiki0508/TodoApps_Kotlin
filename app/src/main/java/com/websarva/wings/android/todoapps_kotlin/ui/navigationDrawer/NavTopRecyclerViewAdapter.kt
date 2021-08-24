@@ -35,7 +35,7 @@ class NavTopRecyclerViewAdapter(
             }
             else{
                 holder.view.setBackgroundColor(Color.WHITE)
-                holder.navTitleView.setOnClickListener {
+                holder.view.setOnClickListener {
                     listener.onItemClickListener(it, position, list = null)
                 }
             }
@@ -49,8 +49,8 @@ class NavTopRecyclerViewAdapter(
                 textSize = 20F
             }
 
-            holder.navTitleView.setOnClickListener {
-                TODO("未実装")
+            holder.view.setOnClickListener {
+                listener.onItemClickListener(it, position, list = null)
             }
         }
     }

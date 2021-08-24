@@ -25,6 +25,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.settings.SettingsActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -77,6 +78,16 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         binding.navFooterRecyclerView.adapter = nvSettingsAdapter
         binding.navFooterRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.navFooterRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        nvSettingsAdapter.setOnItemClickListener(object: OnItemClickListener{
+            override fun onItemClickListener(view: View, position: Int, list: String?) {
+                Intent(this@TodoActivity, SettingsActivity::class.java).apply {
+                    this.putExtra("flag", true)
+                    startActivity(this)
+                    finish()
+                }
+            }
+        })
 
         // メイン画面
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)

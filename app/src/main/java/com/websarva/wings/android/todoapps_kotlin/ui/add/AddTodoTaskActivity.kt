@@ -27,6 +27,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.settings.SettingsActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -105,6 +106,18 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         binding.navFooterRecyclerView.adapter = nvSettingsAdapter
         binding.navFooterRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.navFooterRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        nvSettingsAdapter.setOnItemClickListener(object: OnItemClickListener{
+            override fun onItemClickListener(view: View, position: Int, list: String?) {
+                Intent(this@AddTodoTaskActivity, SettingsActivity::class.java).apply {
+                    this.putExtra("flag", false)
+                    this.putExtra("list", task)
+                    this.putExtra("position", this@AddTodoTaskActivity.position)
+                    startActivity(this)
+                    finish()
+                }
+            }
+        })
 
         // NavigationDrawer
         nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel)
