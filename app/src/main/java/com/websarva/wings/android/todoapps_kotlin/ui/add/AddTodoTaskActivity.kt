@@ -23,7 +23,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.NavRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File

@@ -84,6 +84,12 @@
                 <include layout="@layout/drawer_header" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/navTopRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/navRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -22,7 +22,6 @@ interface OnItemClickListener {
 }
 
 class RecyclerViewAdapter(
-    //var items: MutableList<MutableMap<String, String>>,
     var itemTouchHelper: ItemTouchHelper,
     var task: String,
     private var activity: AddTodoTaskActivity,

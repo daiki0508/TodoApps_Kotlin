@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -22,12 +22,12 @@ import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.NavRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.File
 
 class TodoActivity : AppCompatActivity(), DialogListener {
     private lateinit var binding: ActivityTodoBinding
@@ -62,13 +62,14 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         val toggle = ActionBarDrawerToggle(this, binding.drawerLayout,binding.toolbar, R.string.drawer_open, R.string.drawer_close)
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-        /*val menu = binding.navigationView.menu
-        val menuGroup = menu.addSubMenu("My Menu Group")
-        menuGroup.add("Foo")
-        menuGroup.add("Bar")*/
 
         auth = Firebase.auth
         storage = FirebaseStorage.getInstance()
+
+        val nvTopAdapter = NavTopRecyclerViewAdapter()
+        binding.navTopRecyclerView.adapter = nvTopAdapter
+        binding.navTopRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        binding.navTopRecyclerView.layoutManager = LinearLayoutManager(this)
 
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         binding.navRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -117,7 +118,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 })
                 Log.d("test", "Called")
 
-                nvAdapter = NavRecyclerViewAdapter(it, 0, todoViewModel = viewModel, addTodoTaskViewModel = null)
+                nvAdapter = NavRecyclerViewAdapter(it, -1, todoViewModel = viewModel, addTodoTaskViewModel = null)
                 binding.navRecyclerView.adapter = nvAdapter
                 itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(apAdapter))
                 itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
