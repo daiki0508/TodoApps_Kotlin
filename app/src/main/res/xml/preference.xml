@@ -1,4 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        app:key="appSettings"
+        app:title="アプリ設定">
 
+        <ListPreference
+            app:key="theme"
+            app:title="アプリのテーマ"
+            app:useSimpleSummaryProvider="true"
+            app:negativeButtonText=""
+            app:defaultValue="0"
+            app:entries="@array/themeEntries"
+            app:entryValues="@array/themeValue" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="aboutApp"
+        app:title="アプリについて">
+
+        <Preference
+            app:key="evaluation"
+            app:title="アプリを評価する" />
+        <Preference
+            app:key="form"
+            app:title="お問い合わせフォーム" />
+        <Preference
+            app:key="license"
+            app:title="ライセンス" />
+        <Preference
+            app:key="policy"
+            app:title="プライバシーポリシー" />
+    </PreferenceCategory>
 </PreferenceScreen>

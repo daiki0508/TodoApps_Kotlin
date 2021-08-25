@@ -40,4 +40,13 @@
     <string name="option_allUnCheck_title">全てのタスクを未完了にする</string>
     <string name="context_deleteTask_title">このタスクを削除する</string>
     <string name="context_deleteList_title">このリストを削除する</string>
+
+    <string-array name="themeEntries">
+        <item>ライト</item>
+        <item>ナイト</item>
+    </string-array>
+    <string-array name="themeValue">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 </resources>
