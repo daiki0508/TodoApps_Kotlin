@@ -41,6 +41,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
     private lateinit var task: String
     private var position = 0
+    private var networkStatus: Boolean? = null
     private var apAdapter: RecyclerViewAdapter? = null
     private var acAdapter: ChildRecyclerViewAdapter? = null
     private var nvAdapter: NavRecyclerViewAdapter? = null
@@ -61,17 +62,23 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        auth = Firebase.auth
-        storage = FirebaseStorage.getInstance()
-
         task = intent.getStringExtra("list")!!
         position = intent.getIntExtra("position", 0)
+        networkStatus = intent.getBooleanExtra("network", false)
+
+        // ネットワークに接続されている場合はインスタンスを取得
+        if (networkStatus == true){
+            auth = Firebase.auth
+            storage = FirebaseStorage.getInstance()
+
+            viewModel.setInit(list = task, auth, this, storage, networkStatus!!)
+        }else{
+            viewModel.setInit(list = task, auth = null, this, storage = null, networkStatus!!)
+        }
 
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
         binding.unCompleteCount.visibility = View.GONE
         binding.navRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        viewModel.setInit(list = task, auth, this, storage)
 
         /*
          FirebaseStorageからデータをダウンロード
@@ -81,13 +88,6 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         if (File(filesDir, "task/$task/task").length() != 0L){
             viewModel.createView()
         }
-
-        /*viewModel.completeFlag().observe(this, {
-            // 全てのダウンロードが終了してからRecyclerViewの生成に入る
-            if (it["task_task"]!! and it["iv_aes_task"]!! and it["salt_task"]!!){
-                viewModel.createView(this, auth, task)
-            }
-        })*/
 
         // タスク一覧
         val nvTopAdapter = NavTopRecyclerViewAdapter(type = 0, flag = false)
@@ -194,7 +194,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     ) {
         Log.d("dialog", list)
         if (type == 0){
-            CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, aStr = null, flag = true)
+            //CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, aStr = null, flag = true)
+            viewModel.add(list)
         }else{
             if (flag){
                 viewModel.update(list, flag)
@@ -221,11 +222,17 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     acAdapter!!.notifyItemInserted(acAdapter!!.itemCount - 1)
                 }
             }
-            viewModel.upload(flag)
+            // ネットワークに接続されている場合のみ、アップロード
+            if (networkStatus == true){
+                viewModel.upload(flag)
+            }
         }else{
-            /*viewModel.upload(this, storage, auth, task = null, flag)
-            viewModel.upload(this, storage, auth, list, flag = true)
-            viewModel.delete(storage, auth, task)*/
+            // ネットワークに接続されている場合のみ、アップロードや削除を行う
+            if (networkStatus == true){
+                viewModel.upload(flag)
+                viewModel.upload(flag = true)
+                viewModel.delete()
+            }
 
             // preferenceを手動でmove
             for (i in 0 until acAdapter!!.items.size){
@@ -256,14 +263,12 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     viewModel.writePreference(keyName = acAdapter!!.items[i]["task"]!!, checkFlag = true)
                     acAdapter?.notifyItemChanged(i)
                 }
-                //acAdapter!!.notifyDataSetChanged()
             }
             R.id.allUnCheck ->{
                 for (i in 0 until acAdapter!!.itemCount){
                     viewModel.writePreference(keyName = acAdapter!!.items[i]["task"]!!, checkFlag = false)
                     acAdapter?.notifyItemChanged(i)
                 }
-                //acAdapter!!.notifyDataSetChanged()
             }
             else -> retValue = super.onOptionsItemSelected(item)
         }
@@ -295,8 +300,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
                     acAdapter = null
                     apAdapter = null
-                    // FirebaseStorageからtaskを完全削除
-                    viewModel.delete()
+                    /*
+                     FirebaseStorageからtaskを完全削除
+                     ネットワークに接続されている場合のみ、削除
+                     */
+                    if (networkStatus == true){
+                        viewModel.delete()
+                    }
                     // 内部ストレージからtaskファイルを完全削除する
                     viewModel.taskDelete(position)
                 }else{
@@ -304,8 +314,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
 
                     // 内部ストレージから該当taskを削除
                     viewModel.taskDelete(position)
-                    // FirebaseStorageを更新
-                    viewModel.upload(flag = true)
+                    /*
+                     FirebaseStorageを更新
+                     ネットワークに接続されている場合のみ、アップロード
+                     */
+                    if (networkStatus == true){
+                        viewModel.upload(flag = true)
+                    }
                 }
             }
             else -> retValue = super.onContextItemSelected(item)

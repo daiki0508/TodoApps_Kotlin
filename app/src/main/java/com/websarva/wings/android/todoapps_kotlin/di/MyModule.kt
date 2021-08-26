@@ -12,7 +12,7 @@ class MyModule {
     val module: Module = module {
         viewModel { MainViewModel(get()) }
         viewModel { TodoViewModel(get(), get(), get()) }
-        viewModel { AddTodoTaskViewModel(get(), get()) }
+        viewModel { AddTodoTaskViewModel(get(), get(), get()) }
     }
     val repository: Module = module {
         factory { FirebaseTopRepositoryClient() }

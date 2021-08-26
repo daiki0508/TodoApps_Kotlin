@@ -16,7 +16,8 @@ import java.io.File
 
 class AddTodoTaskViewModel(
     private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
-    private val preferenceRepository: PreferenceRepositoryClient
+    private val preferenceRepository: PreferenceRepositoryClient,
+    private val offLineRepository: OffLineRepositoryClient
 ): ViewModel() {
     private val _todoTask = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
@@ -35,6 +36,7 @@ class AddTodoTaskViewModel(
     @SuppressLint("StaticFieldLeak")
     private var context: Activity?
     private var storage: FirebaseStorage?
+    private var networkStatus: Boolean?
 
     fun upload(flag: Boolean){
         firebaseStorageRepository.upload(context!!, storage!!, auth!!, list, flag)
@@ -66,7 +68,11 @@ class AddTodoTaskViewModel(
         // trueがNavigationDrawer用
         if (list != null){
             if (File("${context?.filesDir}/task/$list/task").length() != 0L){
-                val tasks = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+                val tasks: String? = if (networkStatus == true){
+                    CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+                }else{
+                    CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, null, flag = false)
+                }
 
                 val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
                 var todo: MutableMap<String, String>
@@ -93,7 +99,12 @@ class AddTodoTaskViewModel(
     }
 
     fun createView(){
-        val tasks = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+        // ネットワークの接続状況によって処理を分岐
+        val tasks: String? = if (networkStatus == true){
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+        }else{
+            CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, null, flag = false)
+        }
 
         val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
         var todo: MutableMap<String, String>
@@ -106,7 +117,12 @@ class AddTodoTaskViewModel(
     }
 
     fun getList(): MutableList<MutableMap<String, String>>{
-        val lists = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+        // ネットワークの接続状況によって処理を分岐
+        val lists: String? = if (networkStatus == true){
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+        }else{
+            CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+        }
 
         val todoList: MutableList<MutableMap<String, String>> = mutableListOf()
         var todo: MutableMap<String, String>
@@ -115,6 +131,14 @@ class AddTodoTaskViewModel(
             todoList.add(todo)
         }
         return todoList
+    }
+
+    fun add(list: String){
+        if (networkStatus == true){
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), list, type = 1, this.list, aStr = null, flag = true)
+        }else{
+            CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), list, type = 1, this.list, aStr = null, flag = true)
+        }
     }
 
     fun update(
@@ -128,9 +152,19 @@ class AddTodoTaskViewModel(
          aStr...listのupdate時はnewFileName, taskのupdate時は新しいtask名
          */
         val tasksBefore = if (!flag){
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, list, aStr = null, flag = false)
+            // ネットワークの接続状況によって処理を分岐
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, list, aStr = null, flag = false)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 0, list, aStr = null, flag = false)
+            }
         }else{
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+            // ネットワークの接続状況によって処理を分岐
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
+            }
         }
         Log.d("update_b", tasksBefore!!)
 
@@ -139,9 +173,19 @@ class AddTodoTaskViewModel(
         Log.d("update_a", tasksAfter)
 
         if (!flag){
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 4, list, aStr, flag = true)
+            // ネットワークの接続状況によって処理を分岐
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 4, list, aStr, flag = true)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 4, list, aStr, flag = true)
+            }
         }else{
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+            // ネットワークの接続状況によって処理を分岐
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+            }
         }
     }
 
@@ -158,9 +202,19 @@ class AddTodoTaskViewModel(
             items[fromPosition]["task"]
         }
         val contents = if (flag){
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            // ネットワークの接続状態によって処理を分岐
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            }
         }else{
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+            // ネットワークの接続状態によって処理を分岐
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
+            }
         }
 
         //Log.d("remove_b", tasks!!)
@@ -192,29 +246,60 @@ class AddTodoTaskViewModel(
         }
         //Log.d("remove_a", newTasks)
         if (flag){
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newContents, type = 7, task = null, aStr = null, flag = true)
-            upload(flag = false)
+            // ネットワークの接続状態によって処理を分岐
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newContents, type = 7, task = null, aStr = null, flag = true)
+                upload(flag = false)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), newContents, type = 7, task = null, aStr = null, flag = true)
+            }
         }else{
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newContents, type = 3, list, aStr = null, flag = true)
-            upload(flag = true)
+            // ネットワークの接続状態によって処理を分岐
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newContents, type = 3, list, aStr = null, flag = true)
+                upload(flag = true)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), newContents, type = 3, list, aStr = null, flag = true)
+            }
         }
     }
 
     fun taskDelete(position: Int){
-        val tasksBefore = CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+        // ネットワークの接続状態によって処理を分岐
+        val tasksBefore: String? = if (networkStatus == true){
+            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+        }else{
+            CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
+        }
         Log.d("update_b", tasksBefore!!)
         // taskファイルから該当タスクを削除
         var tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
         if (tasksBefore == tasksAfter){
             tasksAfter = tasksBefore.replace(" ${tasksBefore.split(" ")[position]}", "")
             if (tasksBefore == tasksAfter){
-                // listから該当task名を削除
-                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 5, list, aStr = null, flag = true)
+                /*
+                 listから該当task名を削除
+                 ネットワークの接続状態によって処理を分岐
+                 */
+                if (networkStatus == true){
+                    CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 5, list, aStr = null, flag = true)
+                }else{
+                    CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "", type = 5, list, aStr = null, flag = true)
+                }
             }else{
-                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+                // ネットワークの接続状態によって処理を分岐
+                if (networkStatus == true){
+                    CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+                }else{
+                    CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+                }
             }
         }else{
-            CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+            if (networkStatus == true){
+                CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+            }else{
+                CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
+            }
         }
         Log.d("update_a", tasksAfter)
     }
@@ -235,11 +320,12 @@ class AddTodoTaskViewModel(
         this.position = position
     }
 
-    fun setInit(list: String, auth: FirebaseAuth, context: Activity, storage: FirebaseStorage){
+    fun setInit(list: String, auth: FirebaseAuth?, context: Activity, storage: FirebaseStorage?, networkStatus: Boolean){
         this.list = list
         this.auth = auth
         this.context = context
         this.storage = storage
+        this.networkStatus = networkStatus
     }
 
     init {
@@ -251,5 +337,6 @@ class AddTodoTaskViewModel(
         auth = null
         context = null
         storage = null
+        networkStatus = null
     }
 }

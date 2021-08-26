@@ -74,7 +74,12 @@ class TodoViewModel(
         var cnt = 0
 
         if (File("${activity?.filesDir}/task/$list/task").length() != 0L){
-            val tasks = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+            // ネットワーク接続状態によって処理を分岐
+            val tasks: String? = if (networkStatus == true){
+                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+            }else{
+                CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 1, list, null, flag = false)
+            }
 
             val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
             var todo: MutableMap<String, String>

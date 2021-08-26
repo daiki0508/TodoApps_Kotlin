@@ -248,6 +248,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         Intent(this@TodoActivity, AddTodoTaskActivity::class.java).apply {
             this.putExtra("list", list)
             this.putExtra("position", position)
+            this.putExtra("network", networkStatus)
             startActivity(this)
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right,)
             finish()
