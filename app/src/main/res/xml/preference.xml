@@ -15,6 +15,10 @@
             app:entryValues="@array/themeValue" />
 
         <Preference
+            app:key="backup"
+            app:title="データのバックアップ" />
+
+        <Preference
             app:key="signout"
             app:title="サインアウト" />
     </PreferenceCategory>

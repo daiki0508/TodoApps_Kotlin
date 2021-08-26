@@ -1,5 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.settings
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,9 +15,16 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.ui.main.MainActivity
 
+interface OnClickListener{
+    fun onClickListener()
+}
+
 class ParentPreferenceFragment: PreferenceFragmentCompat() {
+    private lateinit var listener: OnClickListener
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preference, rootKey)
 
@@ -32,6 +40,13 @@ class ParentPreferenceFragment: PreferenceFragmentCompat() {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     }
                 }
+                true
+            }
+        }
+        findPreference<Preference>("backup")?.apply {
+            setOnPreferenceClickListener {
+                listener.onClickListener()
+
                 true
             }
         }
@@ -72,6 +87,20 @@ class ParentPreferenceFragment: PreferenceFragmentCompat() {
         }
         findPreference<Preference>("policy")?.apply {
             //TODO("ポリシー未作成")
+        }
+    }
+
+    fun setOnClickListener(listener: OnClickListener){
+        this.listener = listener
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        try {
+            listener = context as OnClickListener
+        }catch (e: Exception){
+            Log.e("ERROR", "CANNOT FIND LISTENER")
         }
     }
 }

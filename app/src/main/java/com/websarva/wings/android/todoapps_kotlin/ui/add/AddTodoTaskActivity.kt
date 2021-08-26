@@ -113,6 +113,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     this.putExtra("flag", false)
                     this.putExtra("list", task)
                     this.putExtra("position", this@AddTodoTaskActivity.position)
+                    this.putExtra("network", networkStatus)
                     startActivity(this)
                     finish()
                 }
@@ -194,7 +195,6 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     ) {
         Log.d("dialog", list)
         if (type == 0){
-            //CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 1, task, aStr = null, flag = true)
             viewModel.add(list)
         }else{
             if (flag){

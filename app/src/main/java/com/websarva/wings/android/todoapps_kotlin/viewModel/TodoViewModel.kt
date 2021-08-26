@@ -114,10 +114,6 @@ class TodoViewModel(
         val lists: String? = if (networkStatus == true){
             CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }else{
-            // オフライン用のパスワードをPreferenceから取得、初めての場合は作成
-            /*if (!File("${activity?.filesDir?.parent}/shared_prefs/offline").exists()){
-                offLineRepository.write(activity!!)
-            }*/
             CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }
 

@@ -100,6 +100,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
             override fun onItemClickListener(view: View, position: Int, list: String?) {
                 Intent(this@TodoActivity, SettingsActivity::class.java).apply {
                     this.putExtra("flag", true)
+                    this.putExtra("network", networkStatus)
                     startActivity(this)
                     finish()
                 }
