@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.websarva.wings.android.todoapps_kotlin">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".di.MyApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -12,10 +14,10 @@
         android:theme="@style/Theme.TodoApps_Kotlin">
         <activity
             android:name=".ui.settings.SettingsActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".ui.add.AddTodoTaskActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".ui.todo.TodoActivity"
             android:exported="false" />

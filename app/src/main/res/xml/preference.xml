@@ -13,6 +13,10 @@
             app:defaultValue="0"
             app:entries="@array/themeEntries"
             app:entryValues="@array/themeValue" />
+
+        <Preference
+            app:key="signout"
+            app:title="サインアウト" />
     </PreferenceCategory>
 
     <PreferenceCategory

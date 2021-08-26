@@ -34,6 +34,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
     private lateinit var binding: ActivityTodoBinding
     private val viewModel: TodoViewModel by viewModel()
 
+    private var networkStatus: Boolean? = null
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
     private var apAdapter: RecyclerViewAdapter? = null
@@ -43,10 +44,16 @@ class TodoActivity : AppCompatActivity(), DialogListener {
     override fun onStart() {
         super.onStart()
 
-        val currentUser = auth.currentUser
-        if (currentUser == null){
-            Log.w("test", "Error...")
-            finish()
+        // MainActivityからのintent情報を取得
+        networkStatus = intent.getBooleanExtra("network", false)
+        Log.d("network", networkStatus.toString())
+
+        if (networkStatus == true){
+            val currentUser = auth.currentUser
+            if (currentUser == null){
+                Log.w("test", "Error...")
+                finish()
+            }
         }
     }
 
@@ -96,10 +103,9 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         viewModel.setInit(auth, this, storage)
 
         /*
-         FirebaseStorageからデータをダウンロード
-         FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
+        FirebaseStoreからデータをダウンロード
          */
-        viewModel.download(flag = true)
+        //viewModel.download(flag = true)
         /*if (File(filesDir, "list").exists()){
             viewModel.createView(this, auth)
         }*/

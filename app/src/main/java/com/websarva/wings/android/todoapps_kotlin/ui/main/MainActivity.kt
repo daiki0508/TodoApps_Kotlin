@@ -1,6 +1,8 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.main
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -20,7 +22,7 @@ import com.websarva.wings.android.todoapps_kotlin.viewModel.MainViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity(), DialogListener{
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModel()
 
@@ -37,7 +39,13 @@ class MainActivity : AppCompatActivity(){
         val currentUser = auth.currentUser
         if (currentUser != null){
             Log.d("test", "CurrentUser")
-            todoIntent()
+
+            // ネットワーク状況によって処理を分岐
+            if (viewModel.connectingStatus(this) != null){
+                todoIntent(flag = true)
+            }else{
+                todoIntent(flag = false)
+            }
         }
     }
 
@@ -55,7 +63,12 @@ class MainActivity : AppCompatActivity(){
         googleSign()
 
         binding.googleLoginButton.setOnClickListener {
-            startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
+            // ネットワーク状況によって処理を分岐
+            if (viewModel.connectingStatus(this) != null){
+                startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
+            }else{
+                NetWorkFailureDialog().show(supportFragmentManager, "NetWorkFailureDialog")
+            }
         }
     }
 
@@ -87,16 +100,26 @@ class MainActivity : AppCompatActivity(){
         viewModel.firebaseAuthWithGoogle(this, auth, idToken)
             .addOnCompleteListener(this){task ->
                 if (task.isSuccessful){
-                    todoIntent()
+                    todoIntent(flag = true)
                 }else{
                     Toast.makeText(this, "認証エラー", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    private fun todoIntent(){
-        startActivity(Intent(this, TodoActivity::class.java))
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        finish()
+    private fun todoIntent(flag: Boolean){
+        // trueがNetWork接続状態
+        Intent(this, TodoActivity::class.java).apply {
+            this.putExtra("network", flag)
+            startActivity(this)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            finish()
+        }
+    }
+
+    override fun onDialogReceive(flag: Boolean) {
+        if (flag){
+            todoIntent(flag = false)
+        }
     }
 }
