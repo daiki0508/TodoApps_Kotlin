@@ -25,7 +25,6 @@ class PreferenceRepositoryClient: PreferenceRepository {
     }
 
     override fun read(activity: Activity, task: String, keyName: String): Boolean {
-        //Log.d("preference", "$keyName, ${createPreference(activity, task).getBoolean(keyName, false)}")
         return createPreference(activity, task).getBoolean(keyName, false)
     }
 
@@ -33,7 +32,7 @@ class PreferenceRepositoryClient: PreferenceRepository {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
             activity.deleteSharedPreferences(list)
         }else{
-            File("${activity.filesDir.parent}/shared_prefs/$list").delete()
+            File("${activity.filesDir.parent}/shared_prefs/$list.xml").delete()
         }
     }
 

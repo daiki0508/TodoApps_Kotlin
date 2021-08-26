@@ -29,6 +29,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.settings.SettingsActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
 
 class TodoActivity : AppCompatActivity(), DialogListener {
     private lateinit var binding: ActivityTodoBinding
@@ -44,7 +45,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
     override fun onStart() {
         super.onStart()
 
-        // MainActivityからのintent情報を取得
+       /* // MainActivityからのintent情報を取得
         networkStatus = intent.getBooleanExtra("network", false)
         Log.d("network", networkStatus.toString())
 
@@ -54,7 +55,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 Log.w("test", "Error...")
                 finish()
             }
-        }
+        }*/
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,8 +72,17 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        auth = Firebase.auth
-        storage = FirebaseStorage.getInstance()
+        // MainActivityからのintent情報を取得
+        networkStatus = intent.getBooleanExtra("network", false)
+        Log.d("network", networkStatus.toString())
+
+        if (networkStatus == true){
+            auth = Firebase.auth
+            storage = FirebaseStorage.getInstance()
+            viewModel.setInit(auth, this, storage, networkStatus!!)
+        }else{
+            viewModel.setInit(auth = null, this, storage = null, networkStatus!!)
+        }
 
         // タスク一覧
         val nvTopAdapter = NavTopRecyclerViewAdapter(type = 0, flag = true)
@@ -100,15 +110,14 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         binding.navRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        viewModel.setInit(auth, this, storage)
-
-        /*
-        FirebaseStoreからデータをダウンロード
-         */
-        //viewModel.download(flag = true)
-        /*if (File(filesDir, "list").exists()){
-            viewModel.createView(this, auth)
-        }*/
+        // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
+        if (networkStatus == true){
+            viewModel.download(flag = true)
+        }else{
+            if (File(filesDir, "list").length() != 0L){
+                viewModel.createView()
+            }
+        }
 
         viewModel.completeFlag().observe(this, {
             when {
@@ -166,7 +175,8 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         flag: Boolean,
         position: Int?
     ) {
-        CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
+        //CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
+        viewModel.update(list)
 
         if (apAdapter == null){
             viewModel.createView()
@@ -176,7 +186,10 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
             nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
         }
-        viewModel.upload()
+        // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
+        if (networkStatus == true){
+            viewModel.upload()
+        }
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -201,22 +214,30 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
                     apAdapter = null
                     /*
+                    ネットワークに接続されている場合のみ、FirebaseStoreからデータを削除
                      FirebaseStorageからlistとtaskを完全削除
                      trueがlistでfalseがtask
                      */
-                    viewModel.delete(position, flag = true)
-                    viewModel.delete(position, flag = false)
+                    if (networkStatus == true){
+                        viewModel.delete(position, flag = true)
+                        viewModel.delete(position, flag = false)
+                    }
                     // 内部ストレージからtaskファイルを完全削除する
                     viewModel.listDelete(position)
                 }else{
                     /*
                      内部ストレージのlistから該当task名を削除
                      該当taskも削除
+                     ネットワークに接続されている場合のみ、FirebaseStoreからデータを削除
                      */
-                    viewModel.delete(position, flag = false)
+                    if (networkStatus == true){
+                        viewModel.delete(position, flag = false)
+                    }
                     viewModel.listDelete(position)
-                    // FirebaseStorageのlist更新
-                    viewModel.upload()
+                    // ネットワークに接続されている場合のみ、FirebaseStorageのlist更新
+                    if (networkStatus == true){
+                        viewModel.upload()
+                    }
                 }
             }else -> retValue = super.onContextItemSelected(item)
         }
