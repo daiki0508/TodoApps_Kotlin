@@ -13,22 +13,32 @@ interface DialogListener{
     fun onDialogReceive(flag: Boolean)
 }
 
-class NetWorkFailureDialog: DialogFragment() {
+class NetWorkFailureDialog(private var flag: Boolean): DialogFragment() {
     private var listener: DialogListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = activity?.let {
-            AlertDialog.Builder(it)
+            val builder = AlertDialog.Builder(it)
                 .setTitle("注意")
                 .setMessage("この端末は現在、ネットワークに接続されていません！\nオフライン状態で続行しますか？\n(オフライン状態だと保存したデータは他の端末と共有されません)")
-                .setPositiveButton("YES"){_, _ ->
+            // trueがMainActivityからの呼び出し
+            if (flag){
+                builder.setPositiveButton("YES"){_, _ ->
                     listener?.onDialogReceive(flag = true)
                 }
-                .setNegativeButton("NO"){_, _ ->
-
+                builder.setNegativeButton("NO"){_, _ ->
                 }
-                .create()
+            }else{
+                builder.setPositiveButton("OK"){_, _ ->
+                }
+            }
+                builder.create()
+
         }
+        if (!flag){
+            this.isCancelable = false
+        }
+
         return dialog?: throw IllegalStateException("activityがnullです")
     }
 

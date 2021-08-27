@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.google.firebase.auth.FirebaseAuth
 import java.security.SecureRandom
 
 interface OffLineRepository {
     fun write(activity: Activity)
+    fun online(activity: Activity, auth: FirebaseAuth)
     fun read(activity: Activity): String?
     fun delete()
 }
@@ -24,6 +26,13 @@ class OffLineRepositoryClient: OffLineRepository {
                 buf.append(String.format("%02x", bytes[i]))
             }
             putString("pass", buf.toString())
+            apply()
+        }
+    }
+
+    override fun online(activity: Activity, auth: FirebaseAuth) {
+        with(createPreference(activity).edit()){
+            putString("pass", "${auth.currentUser!!.uid}0000")
             apply()
         }
     }

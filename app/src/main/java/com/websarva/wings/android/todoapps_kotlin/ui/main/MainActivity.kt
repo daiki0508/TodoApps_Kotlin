@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), DialogListener{
             if (viewModel.connectingStatus(this) != null){
                 startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
             }else{
-                NetWorkFailureDialog().show(supportFragmentManager, "NetWorkFailureDialog")
+                NetWorkFailureDialog(flag = true).show(supportFragmentManager, "NetWorkFailureDialog")
             }
         }
     }

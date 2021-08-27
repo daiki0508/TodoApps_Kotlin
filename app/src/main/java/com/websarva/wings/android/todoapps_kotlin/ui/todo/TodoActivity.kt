@@ -23,6 +23,7 @@ import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBindin
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.main.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.settings.SettingsActivity
@@ -76,6 +77,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         networkStatus = intent.getBooleanExtra("network", false)
         Log.d("network", networkStatus.toString())
 
+        // ネットワークの接続状態によって処理を分岐
         if (networkStatus == true){
             auth = Firebase.auth
             storage = FirebaseStorage.getInstance()
@@ -113,7 +115,16 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
         // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
         if (networkStatus == true){
-            viewModel.download(flag = true)
+            // TodoActivityで端末がoffline状態になった時の対応
+            if (viewModel.connectingStatus() != null){
+                viewModel.download(flag = true)
+            }else{
+                networkStatus = false
+                if (File(filesDir, "list").length() != 0L){
+                    NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+                    viewModel.createView()
+                }
+            }
         }else{
             if (File(filesDir, "list").length() != 0L){
                 viewModel.createView()
@@ -176,7 +187,6 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         flag: Boolean,
         position: Int?
     ) {
-        //CryptClass().decrypt(this, "${auth.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
         viewModel.update(list)
 
         if (apAdapter == null){
@@ -189,7 +199,13 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         }
         // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
         if (networkStatus == true){
-            viewModel.upload()
+            // TodoActivityで端末がoffline状態になった時の対応
+            if (viewModel.connectingStatus() != null){
+                viewModel.upload()
+            }else{
+                networkStatus = false
+                NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+            }
         }
     }
 
@@ -220,8 +236,14 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                      trueがlistでfalseがtask
                      */
                     if (networkStatus == true){
-                        viewModel.delete(position, flag = true)
-                        viewModel.delete(position, flag = false)
+                        // TodoActivityで端末がoffline状態になった時の対応
+                        if (viewModel.connectingStatus() != null){
+                            viewModel.delete(position, flag = true)
+                            viewModel.delete(position, flag = false)
+                        }else{
+                            networkStatus = false
+                            NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+                        }
                     }
                     // 内部ストレージからtaskファイルを完全削除する
                     viewModel.listDelete(position)
@@ -232,12 +254,24 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                      ネットワークに接続されている場合のみ、FirebaseStoreからデータを削除
                      */
                     if (networkStatus == true){
-                        viewModel.delete(position, flag = false)
+                        // TodoActivityで端末がoffline状態になった時の対応
+                        if (viewModel.connectingStatus() != null){
+                            viewModel.delete(position, flag = false)
+                        }else{
+                            networkStatus = false
+                            NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+                        }
                     }
                     viewModel.listDelete(position)
                     // ネットワークに接続されている場合のみ、FirebaseStorageのlist更新
                     if (networkStatus == true){
-                        viewModel.upload()
+                        // TodoActivityで端末がoffline状態になった時の対応
+                        if (viewModel.connectingStatus() != null){
+                            viewModel.upload()
+                        }else{
+                            networkStatus = false
+                            NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+                        }
                     }
                 }
             }else -> retValue = super.onContextItemSelected(item)
