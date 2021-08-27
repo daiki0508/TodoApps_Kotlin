@@ -84,7 +84,7 @@ class TodoViewModel(
 
         if (File("${activity?.filesDir}/task/$list/task").length() != 0L){
             // ネットワーク接続状態によって処理を分岐
-            val tasks: String? = if (networkStatus == true){
+            val tasks: String? = if (connectingStatus() != null){
                 CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
             }else{
                 CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 1, list, null, flag = false)

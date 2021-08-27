@@ -24,6 +24,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
+import com.websarva.wings.android.todoapps_kotlin.ui.main.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
@@ -224,14 +225,24 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             }
             // ネットワークに接続されている場合のみ、アップロード
             if (networkStatus == true){
-                viewModel.upload(flag)
+                if (viewModel.connectingStatus() != null){
+                    viewModel.upload(flag)
+                }else{
+                    networkStatus = false
+                    NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+                }
             }
         }else{
             // ネットワークに接続されている場合のみ、アップロードや削除を行う
             if (networkStatus == true){
-                viewModel.upload(flag)
-                viewModel.upload(flag = true)
-                viewModel.delete()
+                if (viewModel.connectingStatus() != null){
+                    viewModel.upload(flag)
+                    viewModel.upload(flag = true)
+                    viewModel.delete()
+                }else{
+                    networkStatus = false
+                    NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+                }
             }
 
             // preferenceを手動でmove
@@ -305,7 +316,12 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                      ネットワークに接続されている場合のみ、削除
                      */
                     if (networkStatus == true){
-                        viewModel.delete()
+                        if (viewModel.connectingStatus() != null){
+                            viewModel.delete()
+                        }else{
+                            networkStatus = false
+                            NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+                        }
                     }
                     // 内部ストレージからtaskファイルを完全削除する
                     viewModel.taskDelete(position)
@@ -319,7 +335,12 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                      ネットワークに接続されている場合のみ、アップロード
                      */
                     if (networkStatus == true){
-                        viewModel.upload(flag = true)
+                        if (viewModel.connectingStatus() != null){
+                            viewModel.upload(flag = true)
+                        }else{
+                            networkStatus = false
+                            NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
+                        }
                     }
                 }
             }

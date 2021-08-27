@@ -3,6 +3,8 @@ package com.websarva.wings.android.todoapps_kotlin.viewModel
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,13 +40,20 @@ class AddTodoTaskViewModel(
     private var storage: FirebaseStorage?
     private var networkStatus: Boolean?
 
+    fun connectingStatus(): NetworkCapabilities? {
+        val connectivityManager =
+            context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        // 戻り値がnullでなければ、ネットワークに接続されている
+        return connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    }
+
     fun upload(flag: Boolean){
         firebaseStorageRepository.upload(context!!, storage!!, auth!!, list, flag)
     }
 
-    fun download(){
+    /*fun download(){
         firebaseStorageRepository.download(context!!, this, todoViewModel = null, storage!!, auth!!, list, flag = false)
-    }
+    }*/
 
     fun delete(){
         firebaseStorageRepository.delete(storage!!, auth!!, list, flag = false)
@@ -65,10 +74,10 @@ class AddTodoTaskViewModel(
     fun countUnCompleteTask(items: MutableList<MutableMap<String, String>>?, list: String?): Int{
         var cnt = 0
 
-        // trueがNavigationDrawer用
+        // listがnullでなければ、NavigationDrawer用
         if (list != null){
             if (File("${context?.filesDir}/task/$list/task").length() != 0L){
-                val tasks: String? = if (networkStatus == true){
+                val tasks: String? = if (connectingStatus() != null){
                     CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
                 }else{
                     CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, null, flag = false)
@@ -100,7 +109,7 @@ class AddTodoTaskViewModel(
 
     fun createView(){
         // ネットワークの接続状況によって処理を分岐
-        val tasks: String? = if (networkStatus == true){
+        val tasks: String? = if (connectingStatus() != null){
             CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
         }else{
             CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, null, flag = false)
@@ -118,7 +127,7 @@ class AddTodoTaskViewModel(
 
     fun getList(): MutableList<MutableMap<String, String>>{
         // ネットワークの接続状況によって処理を分岐
-        val lists: String? = if (networkStatus == true){
+        val lists: String? = if (connectingStatus() != null){
             CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }else{
             CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
@@ -134,7 +143,7 @@ class AddTodoTaskViewModel(
     }
 
     fun add(list: String){
-        if (networkStatus == true){
+        if (connectingStatus() != null){
             CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), list, type = 1, this.list, aStr = null, flag = true)
         }else{
             CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), list, type = 1, this.list, aStr = null, flag = true)
@@ -153,14 +162,14 @@ class AddTodoTaskViewModel(
          */
         val tasksBefore = if (!flag){
             // ネットワークの接続状況によって処理を分岐
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, list, aStr = null, flag = false)
             }else{
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 0, list, aStr = null, flag = false)
             }
         }else{
             // ネットワークの接続状況によって処理を分岐
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
             }else{
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
@@ -174,14 +183,14 @@ class AddTodoTaskViewModel(
 
         if (!flag){
             // ネットワークの接続状況によって処理を分岐
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 4, list, aStr, flag = true)
             }else{
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 4, list, aStr, flag = true)
             }
         }else{
             // ネットワークの接続状況によって処理を分岐
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
             }else{
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
@@ -203,14 +212,14 @@ class AddTodoTaskViewModel(
         }
         val contents = if (flag){
             // ネットワークの接続状態によって処理を分岐
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
             }else{
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
             }
         }else{
             // ネットワークの接続状態によって処理を分岐
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
             }else{
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
@@ -247,7 +256,7 @@ class AddTodoTaskViewModel(
         //Log.d("remove_a", newTasks)
         if (flag){
             // ネットワークの接続状態によって処理を分岐
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newContents, type = 7, task = null, aStr = null, flag = true)
                 upload(flag = false)
             }else{
@@ -255,7 +264,7 @@ class AddTodoTaskViewModel(
             }
         }else{
             // ネットワークの接続状態によって処理を分岐
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newContents, type = 3, list, aStr = null, flag = true)
                 upload(flag = true)
             }else{
@@ -266,7 +275,7 @@ class AddTodoTaskViewModel(
 
     fun taskDelete(position: Int){
         // ネットワークの接続状態によって処理を分岐
-        val tasksBefore: String? = if (networkStatus == true){
+        val tasksBefore: String? = if (connectingStatus() != null){
             CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
         }else{
             CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
@@ -281,21 +290,21 @@ class AddTodoTaskViewModel(
                  listから該当task名を削除
                  ネットワークの接続状態によって処理を分岐
                  */
-                if (networkStatus == true){
+                if (connectingStatus() != null){
                     CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 5, list, aStr = null, flag = true)
                 }else{
                     CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "", type = 5, list, aStr = null, flag = true)
                 }
             }else{
                 // ネットワークの接続状態によって処理を分岐
-                if (networkStatus == true){
+                if (connectingStatus() != null){
                     CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
                 }else{
                     CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
                 }
             }
         }else{
-            if (networkStatus == true){
+            if (connectingStatus() != null){
                 CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
             }else{
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
