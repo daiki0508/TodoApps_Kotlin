@@ -72,20 +72,43 @@ class ParentPreferenceFragment: PreferenceFragmentCompat() {
         }
 
         findPreference<Preference>("evaluation")?.apply {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://play.google.com/store/apps/details?id=com.websarva.wings.android.todoapps")
-            this.intent = intent
+            val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.websarva.wings.android.todoapps")
+
+            if (uri.scheme == "https" && uri.host == "play.google.com"){
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = uri
+                this.intent = intent
+            }else{
+                Log.e("evaluation", "不正な操作です")
+                activity?.finish()
+            }
         }
         findPreference<Preference>("form")?.apply {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://forms.gle/q52d6a6a19aJ3eB78")
-            this.intent = intent
+            val uri = Uri.parse("https://forms.gle/q52d6a6a19aJ3eB78")
+
+            if (uri.scheme == "https" && uri.host == "forms.gle"){
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = uri
+                this.intent = intent
+            }else{
+                Log.e("evaluation", "不正な操作です")
+                activity?.finish()
+            }
         }
         findPreference<Preference>("license")?.apply {
             //TODO("ライセンス未発行")
         }
         findPreference<Preference>("policy")?.apply {
-            //TODO("ポリシー未作成")
+            val uri = Uri.parse("https://gist.github.com/daiki0508/0b7648b2a789ace45518c4cc2ad0c1cb")
+
+            if (uri.scheme == "https" && uri.host == "gist.github.com"){
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = uri
+                this.intent = intent
+            }else{
+                Log.e("evaluation", "不正な操作です")
+                activity?.finish()
+            }
         }
     }
 
