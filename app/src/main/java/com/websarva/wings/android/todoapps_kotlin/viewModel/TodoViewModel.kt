@@ -67,7 +67,7 @@ class TodoViewModel(
             firebaseStorageRepository.delete(storage!!, auth!!, task = null, flag)
         }else{
             val tasks = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
-            if (File("${activity?.filesDir}/task/${tasks!!.split(" ")[position]}/task").exists()){
+            if (File("${activity?.filesDir}/task/${tasks!!.split(" ")[position]}/${FileName().task}").exists()){
                 firebaseStorageRepository.delete(storage!!, auth!!, tasks.split(" ")[position], flag)
             }
         }
@@ -84,7 +84,7 @@ class TodoViewModel(
     fun countUnCompleteTask(list: String): Int{
         var cnt = 0
 
-        if (File("${activity?.filesDir}/task/$list/task").length() != 0L){
+        if (File("${activity?.filesDir}/task/$list/${FileName().task}").length() != 0L){
             // ネットワーク接続状態によって処理を分岐
             val tasks: String? = if (connectingStatus() != null){
                 CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
@@ -141,7 +141,7 @@ class TodoViewModel(
     }
 
     fun getTask(list: String): MutableList<MutableMap<String, String>>{
-        val taskFile = File("${activity?.filesDir}/task/$list/task")
+        val taskFile = File("${activity?.filesDir}/task/$list/${FileName().task}")
         val tasks: String? = if (taskFile.length() != 0L){
             // ネットワーク接続状態によって処理を分岐
             if (networkStatus == true){
@@ -267,7 +267,7 @@ class TodoViewModel(
                 CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), listsAfter, type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
             }
         }
-        if (File("${activity?.filesDir}/task/${listsBefore.split(" ")[position]}/task").exists()){
+        if (File("${activity?.filesDir}/task/${listsBefore.split(" ")[position]}/${FileName().task}").exists()){
             if (connectingStatus() != null){
                 CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
             }else{

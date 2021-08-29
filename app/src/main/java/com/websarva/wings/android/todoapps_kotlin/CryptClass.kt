@@ -32,7 +32,7 @@ class CryptClass {
         }
 
         val iv: File = if (type == 0 || type == 4 || type == 7){
-            File(context.filesDir, "iv_aes")
+            File(context.filesDir, FileName().iv_aes)
         }else{
             File("${context.filesDir}/task/$task", FileName().iv_aes)
         }
@@ -88,9 +88,9 @@ class CryptClass {
                 File("${context.filesDir}/task/$task").deleteRecursively()
                 return null
             }else if (type == 6){
-                File("${context.filesDir}/list").deleteRecursively()
-                File("${context.filesDir}/iv_aes").deleteRecursively()
-                File("${context.filesDir}/salt").deleteRecursively()
+                File("${context.filesDir}/${FileName().list}").deleteRecursively()
+                File("${context.filesDir}/${FileName().iv_aes}").deleteRecursively()
+                File("${context.filesDir}/${FileName().salt}").deleteRecursively()
                 return null
             }
         }
@@ -99,7 +99,7 @@ class CryptClass {
             context.openFileInput(FileName().iv_aes)
         }else{
             // ネストされたディレクトリの場合はFileInputStreamでないとエラーが発生
-            FileInputStream("${context.filesDir}/task/$task/iv_aes")
+            FileInputStream("${context.filesDir}/task/$task/${FileName().iv_aes}")
         }
 
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
@@ -153,7 +153,7 @@ class CryptClass {
                 context.openFileInput(FileName().salt)
             }else{
                 // ネストされたディレクトリの場合はFileInputStreamでないとエラーが発生
-                FileInputStream("${context.filesDir}/task/$task/salt")
+                FileInputStream("${context.filesDir}/task/$task/${FileName().salt}")
             }
             saltFile.read(salt)
         }

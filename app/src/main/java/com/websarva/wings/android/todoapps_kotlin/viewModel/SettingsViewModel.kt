@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseTopRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryClient
@@ -42,7 +43,7 @@ class SettingsViewModel(
     }
 
     fun backup(auth: FirebaseAuth, storage: FirebaseStorage){
-        if (File(activity?.filesDir, "list").length() != 0L){
+        if (File(activity?.filesDir, FileName().list).length() != 0L){
             // onlineに変更されたことによってpassを永続的に変更している
             val lists = CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
             CryptClass().decrypt(activity!!, "${auth.currentUser!!.uid}0000".toCharArray(), lists!!, type = 7, task = null, aStr = null, flag = true)
@@ -72,7 +73,7 @@ class SettingsViewModel(
         if (flag){
             firebaseStorageRepository.restore(activity!!, this, auth, storage, list = null, flag)
         }else{
-            if (File(activity?.filesDir, "list").length() != 0L){
+            if (File(activity?.filesDir, FileName().list).length() != 0L){
                 val lists = CryptClass().decrypt(activity!!, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
 
                 for (list in lists!!.split(" ")){

@@ -32,14 +32,14 @@ class RecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
-        holder.title.text = items[position]["list"]
+        holder.title.text = items[position][FileName().list]
 
         holder.titleView.setOnClickListener {
-            listener.onItemClickListener(it, position, items[position]["list"]!!)
+            listener.onItemClickListener(it, position, items[position][FileName().list]!!)
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(activity)
-        val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(items[position]["list"]!!), this, position)
+        val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(items[position][FileName().list]!!), this, position)
         holder.rvContents.adapter = adapter
 
         holder.titleView.setOnCreateContextMenuListener(holder)

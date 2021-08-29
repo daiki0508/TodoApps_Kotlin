@@ -74,7 +74,7 @@ class AddTodoTaskViewModel(
 
         // listがnullでなければ、NavigationDrawer用
         if (list != null){
-            if (File("${context?.filesDir}/task/$list/task").length() != 0L){
+            if (File("${context?.filesDir}/task/$list/${FileName().task}").length() != 0L){
                 val tasks: String? = if (connectingStatus() != null){
                     CryptClass().decrypt(context!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
                 }else{

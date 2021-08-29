@@ -61,7 +61,6 @@ class ChildRecyclerViewAdapter(
 
         // taskが長押しされた時
         holder.content.setOnLongClickListener(View.OnLongClickListener {
-            //viewModel.setPosition(position)
             setPosition(holder.absoluteAdapterPosition)
             return@OnLongClickListener false
         })

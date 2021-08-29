@@ -53,9 +53,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             uploadTask(context, FileName().iv_aes, storageRef, uid, null, flag)
             uploadTask(context, FileName().salt, storageRef, uid, null, flag)
         }else{
-            uploadTask(context, "task/$task/task", storageRef, uid, task, flag)
-            uploadTask(context, "task/$task/iv_aes", storageRef, uid, task, flag)
-            uploadTask(context, "task/$task/salt", storageRef, uid, task, flag)
+            uploadTask(context, "task/$task/${FileName().task}", storageRef, uid, task, flag)
+            uploadTask(context, "task/$task/${FileName().iv_aes}", storageRef, uid, task, flag)
+            uploadTask(context, "task/$task/${FileName().salt}", storageRef, uid, task, flag)
         }
     }
 
@@ -76,16 +76,16 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             this.tasks = tasks!!
             val cnt = this.tasks.split(" ").size
             if (cnt == 1){
-                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/task", storageRef, uid, flag, cnt)
-                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/iv_aes", storageRef, uid, flag, cnt)
-                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/salt", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/${FileName().task}", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/${FileName().iv_aes}", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$tasks/${FileName().salt}", storageRef, uid, flag, cnt)
             }else{
                 this.auth = auth
                 this.storage = storage
                 val task = this.tasks.split(" ")[position]
-                downloadTask(context, addViewModel, todoViewModel, "task/$task/task", storageRef, uid, flag, cnt)
-                downloadTask(context, addViewModel, todoViewModel, "task/$task/iv_aes", storageRef, uid, flag, cnt)
-                downloadTask(context, addViewModel, todoViewModel, "task/$task/salt", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$task/${FileName().task}", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$task/${FileName().iv_aes}", storageRef, uid, flag, cnt)
+                downloadTask(context, addViewModel, todoViewModel, "task/$task/${FileName().salt}", storageRef, uid, flag, cnt)
             }
         }else{
             downloadTask(context, addViewModel, todoViewModel, FileName().list, storageRef, uid, flag, cnt = null)
@@ -106,9 +106,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             deleteTask(FileName().iv_aes, storageRef, uid, flag)
             deleteTask(FileName().salt, storageRef, uid, flag)
         }else{
-            deleteTask("task/$task/task", storageRef, uid, flag)
-            deleteTask("task/$task/iv_aes", storageRef, uid, flag)
-            deleteTask("task/$task/salt", storageRef, uid, flag)
+            deleteTask("task/$task/${FileName().task}", storageRef, uid, flag)
+            deleteTask("task/$task/${FileName().iv_aes}", storageRef, uid, flag)
+            deleteTask("task/$task/${FileName().salt}", storageRef, uid, flag)
         }
     }
 
@@ -129,9 +129,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             restoreTask(context, settingsViewModel, storageRef, uid, FileName().iv_aes, flag)
             restoreTask(context, settingsViewModel, storageRef, uid, FileName().salt, flag)
         }else{
-            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/task", flag)
-            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/iv_aes", flag)
-            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/salt", flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/${FileName().task}", flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/${FileName().iv_aes}", flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/${FileName().salt}", flag)
         }
     }
 

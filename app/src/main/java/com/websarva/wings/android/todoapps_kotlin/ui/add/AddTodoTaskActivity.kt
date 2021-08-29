@@ -86,7 +86,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
          FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
          */
         //viewModel.download(this, storage, auth, task)
-        if (File(filesDir, "task/$task/task").length() != 0L){
+        if (File(filesDir, "task/$task/${FileName().task}").length() != 0L){
             viewModel.createView()
         }
 
