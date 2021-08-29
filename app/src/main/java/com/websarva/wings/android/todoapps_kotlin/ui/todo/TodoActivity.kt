@@ -42,22 +42,6 @@ class TodoActivity : AppCompatActivity(), DialogListener {
     private var nvAdapter: NavRecyclerViewAdapter? = null
     private lateinit var itemTouchHelper: ItemTouchHelper
 
-    override fun onStart() {
-        super.onStart()
-
-       /* // MainActivityからのintent情報を取得
-        networkStatus = intent.getBooleanExtra("network", false)
-        Log.d("network", networkStatus.toString())
-
-        if (networkStatus == true){
-            val currentUser = auth.currentUser
-            if (currentUser == null){
-                Log.w("test", "Error...")
-                finish()
-            }
-        }*/
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

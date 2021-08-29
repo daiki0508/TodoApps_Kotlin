@@ -53,6 +53,15 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
             list = intent.getStringExtra("list")!!
             position = intent.getIntExtra("position", 0)
         }
+
+        // observer通知
+        viewModel.completeFlag().observe(this, {
+            if ((it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true)){
+                viewModel.restore(auth, storage, flag = false)
+                Toast.makeText(this, "復元が完了しました！", Toast.LENGTH_LONG).show()
+                this.networkStatus = true
+            }
+        })
     }
 
     override fun onBackPressed() {
@@ -136,7 +145,8 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
         if (flag){
             viewModel.backup(auth, storage)
         }else{
-            TODO("未実装")
+            // trueがlist処理
+            viewModel.restore(auth, storage, flag = true)
         }
     }
 }

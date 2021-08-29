@@ -16,7 +16,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
@@ -24,7 +23,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
-import com.websarva.wings.android.todoapps_kotlin.ui.main.NetWorkFailureDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
@@ -258,6 +257,10 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             apAdapter!!.notifyItemChanged(position!!)
             task = list
         }
+    }
+
+    override fun onDialogReceive(flag: Boolean) {
+        return
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

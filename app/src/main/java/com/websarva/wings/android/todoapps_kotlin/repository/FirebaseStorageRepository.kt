@@ -10,6 +10,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.SettingsViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import java.io.File
 import java.io.IOException
@@ -26,6 +27,7 @@ interface FirebaseStorageRepository {
         flag: Boolean
     ): Boolean
     fun delete(storage: FirebaseStorage, auth: FirebaseAuth, task: String?, flag: Boolean)
+    fun restore(context: Context, settingsViewModel: SettingsViewModel, auth: FirebaseAuth, storage: FirebaseStorage, list: String?, flag: Boolean)
 }
 
 class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
@@ -72,7 +74,6 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         if (!flag){
             this.tasks = tasks!!
             val cnt = this.tasks.split(" ").size
-            //Log.d("cnt", cnt.toString())
             if (cnt == 1){
                 downloadTask(context, addViewModel, todoViewModel, "task/$tasks/task", storageRef, uid, flag, cnt)
                 downloadTask(context, addViewModel, todoViewModel, "task/$tasks/iv_aes", storageRef, uid, flag, cnt)
@@ -81,7 +82,6 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                 this.auth = auth
                 this.storage = storage
                 val task = this.tasks.split(" ")[position]
-                //Log.d("task", task)
                 downloadTask(context, addViewModel, todoViewModel, "task/$task/task", storageRef, uid, flag, cnt)
                 downloadTask(context, addViewModel, todoViewModel, "task/$task/iv_aes", storageRef, uid, flag, cnt)
                 downloadTask(context, addViewModel, todoViewModel, "task/$task/salt", storageRef, uid, flag, cnt)
@@ -108,6 +108,29 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             deleteTask("task/$task/task", storageRef, uid, flag)
             deleteTask("task/$task/iv_aes", storageRef, uid, flag)
             deleteTask("task/$task/salt", storageRef, uid, flag)
+        }
+    }
+
+    override fun restore(
+        context: Context,
+        settingsViewModel: SettingsViewModel,
+        auth: FirebaseAuth,
+        storage: FirebaseStorage,
+        list: String?,
+        flag: Boolean
+    ) {
+        val uid = auth.currentUser!!.uid
+        val storageRef = storage.reference
+
+        // trueがlist処理
+        if (flag){
+            restoreTask(context, settingsViewModel, storageRef, uid, "list", flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, "iv_aes", flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, "salt", flag)
+        }else{
+            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/task", flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/iv_aes", flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/salt", flag)
         }
     }
 
@@ -146,7 +169,6 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         cnt: Int?
     ){
         val file = File(context.filesDir, child)
-        //val file = File.createTempFile(child, null)
         if (!flag){
             if (!file.exists()){
                 try {
@@ -233,6 +255,43 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             Log.d("test2", "Success!!")
         }.addOnFailureListener {
             Log.w("test2", it)
+        }
+    }
+
+    private fun restoreTask(context: Context, settingsViewModel: SettingsViewModel, storageRef: StorageReference, uid: String, child: String, flag: Boolean){
+        val file = File(context.filesDir, child)
+        // falseがtaskの処理
+        if (!flag){
+            if (!file.exists()){
+                try {
+                    file.createNewFile()
+                }catch (e: IOException){
+                    File(File(context.filesDir, child).parent!!).mkdirs()
+                    try {
+                        file.createNewFile()
+                    }catch (e: IOException){
+                        Log.e("ERROR", e.toString())
+                    }
+                }
+            }
+        }else{
+            file.createNewFile()
+        }
+
+        val fileRef = if (!flag){
+            storageRef.child("users/$uid/todo/$child")
+        }else{
+            storageRef.child("users/$uid/todo/list/$child")
+        }
+        fileRef.getFile(file).addOnSuccessListener {
+            Log.d("restore", "success!!")
+            val completeFlag: MutableMap<String, Boolean?> = settingsViewModel.completeFlag().value!!
+            if (flag){
+                completeFlag["${Uri.fromFile(file).lastPathSegment!!}_list"] = true
+                settingsViewModel.setFlag(completeFlag)
+            }
+        }.addOnFailureListener {
+            Log.e("restore", "ERROR!!")
         }
     }
 }

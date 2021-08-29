@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -21,6 +22,10 @@ class SettingsViewModel(
     private val offLineRepository: OffLineRepositoryClient,
     private val firebaseStorageRepository: FirebaseStorageRepositoryClient
 ): ViewModel() {
+    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>().apply {
+        MutableLiveData<MutableMap<String, Boolean?>>()
+    }
+
     @SuppressLint("StaticFieldLeak")
     private var activity: Activity? = null
 
@@ -61,7 +66,38 @@ class SettingsViewModel(
         firebaseStorageRepository.upload(activity!!, storage, auth, list, flag)
     }
 
+    fun restore(auth: FirebaseAuth, storage: FirebaseStorage, flag: Boolean){
+        // trueがlistの処理
+        if (flag){
+            firebaseStorageRepository.restore(activity!!, this, auth, storage, list = null, flag)
+        }else{
+            if (File(activity?.filesDir, "list").length() != 0L){
+                val lists = CryptClass().decrypt(activity!!, "${auth.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+
+                for (list in lists!!.split(" ")){
+                    firebaseStorageRepository.restore(activity!!, this, auth, storage, list, flag)
+                }
+            }
+            offLineRepository.online(activity!!, auth)
+        }
+    }
+
     fun setInit(activity: Activity){
         this.activity = activity
+    }
+    fun setFlag(taskMap: MutableMap<String, Boolean?>){
+        _completeFlag.value = taskMap
+    }
+
+    fun completeFlag(): MutableLiveData<MutableMap<String, Boolean?>>{
+        return _completeFlag
+    }
+
+    init {
+        _completeFlag.value = mutableMapOf(
+            "list_list" to null,
+            "iv_aes_list" to null,
+            "salt_list" to null,
+        )
     }
 }

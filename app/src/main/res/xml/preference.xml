@@ -16,7 +16,7 @@
 
         <Preference
             app:key="backup"
-            app:title="データのバックアップ" />
+            app:title="データのバックアップと復元" />
 
         <Preference
             app:key="signout"
