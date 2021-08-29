@@ -110,7 +110,6 @@ class TodoViewModel(
     fun update(list: String){
         if (networkStatus == true){
             if (connectingStatus() != null){
-                //offLineRepository.online(activity!!, auth!!)
                 CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
             }else{
                 if (!File("${activity?.filesDir?.parent}/shared_prefs/offline.xml").exists()){
@@ -273,7 +272,7 @@ class TodoViewModel(
                 CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
             }
         }
-        Log.d("update_a", CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)!!)
+        //Log.d("update_a", CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)!!)
     }
 
     fun completeFlag(): MutableLiveData<MutableMap<String, Boolean?>>{

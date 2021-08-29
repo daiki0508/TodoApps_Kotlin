@@ -49,4 +49,9 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+
+    <string-array name="select_mode">
+        <item>バックアップ</item>
+        <item>復元</item>
+    </string-array>
 </resources>

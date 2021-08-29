@@ -16,14 +16,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.main.NetWorkFailureDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.settings.SettingsActivity
@@ -207,6 +206,10 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
             }
         }
+    }
+
+    override fun onDialogReceive(flag: Boolean) {
+        return
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {

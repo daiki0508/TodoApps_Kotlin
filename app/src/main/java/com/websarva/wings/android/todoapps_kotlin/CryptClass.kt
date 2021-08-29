@@ -114,7 +114,7 @@ class CryptClass {
 
             cipher.init(Cipher.DECRYPT_MODE, key, ips)
 
-            Log.d("test", "${String(cipher.doFinal(enc))} $pStr")
+            //Log.d("test", "${String(cipher.doFinal(enc))} $pStr")
             if (flag){
                 // typeが3の場合は更新
                 if (type == 3 || type == 4 || type == 7){

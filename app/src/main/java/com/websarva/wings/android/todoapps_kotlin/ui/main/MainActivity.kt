@@ -1,28 +1,27 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.main
 
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityMainBinding
+import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
+import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.MainViewModel
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity(), DialogListener{
+class MainActivity : AppCompatActivity(), DialogListener {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModel()
 
@@ -115,6 +114,16 @@ class MainActivity : AppCompatActivity(), DialogListener{
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }
+    }
+
+    override fun onDialogFlagReceive(
+        dialog: DialogFragment,
+        list: String,
+        type: Int,
+        flag: Boolean,
+        position: Int?
+    ) {
+        return
     }
 
     override fun onDialogReceive(flag: Boolean) {

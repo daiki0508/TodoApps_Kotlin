@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.main
+package com.websarva.wings.android.todoapps_kotlin.ui
 
 import android.app.Dialog
 import android.content.Context
@@ -8,10 +8,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import java.lang.Exception
 import java.lang.IllegalStateException
-
-interface DialogListener{
-    fun onDialogReceive(flag: Boolean)
-}
 
 class NetWorkFailureDialog(private var flag: Boolean): DialogFragment() {
     private var listener: DialogListener? = null

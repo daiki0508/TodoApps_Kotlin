@@ -12,4 +12,6 @@ interface DialogListener {
         flag: Boolean,
         position: Int?
     )
+
+    fun onDialogReceive(flag: Boolean)
 }
