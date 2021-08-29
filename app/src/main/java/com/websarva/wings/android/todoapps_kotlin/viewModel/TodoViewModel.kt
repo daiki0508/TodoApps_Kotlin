@@ -93,7 +93,7 @@ class TodoViewModel(
             val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
             var todo: MutableMap<String, String>
             for (task in tasks?.split(" ")!!){
-                Log.d("test", task)
+                //Log.d("test", task)
                 todo = mutableMapOf("task" to task)
                 todoTask.add(todo)
             }
@@ -134,7 +134,7 @@ class TodoViewModel(
             CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }
 
-        Log.d("lists", lists!!)
+        //Log.d("lists", lists!!)
         _todoList.value = createTodoContents(lists, "list")
     }
 
@@ -184,7 +184,7 @@ class TodoViewModel(
             CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }
 
-        Log.d("remove_b", lists!!)
+        //Log.d("remove_b", lists!!)
         var newLists = ""
         for ((i, value) in lists!!.split(" ").withIndex()){
             when (i) {
@@ -211,7 +211,7 @@ class TodoViewModel(
                 }
             }
         }
-        Log.d("remove_a", newLists)
+        //Log.d("remove_a", newLists)
         // ネットワーク接続状態によって処理を分岐
         if (connectingStatus() != null){
             CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newLists, type = 7, task = null, aStr = null, flag = true)
@@ -228,7 +228,7 @@ class TodoViewModel(
         }else{
             CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }
-        Log.d("update_b", listsBefore!!)
+        //Log.d("update_b", listsBefore!!)
         // listから該当task名を削除
         var listsAfter = listsBefore!!.replace("${listsBefore.split(" ")[position]} ", "")
         if (listsBefore == listsAfter){

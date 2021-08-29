@@ -110,7 +110,7 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                Log.d("setting", account.idToken!!)
+                //Log.d("setting", account.idToken!!)
                 firebaseAuthWithGoogle(account.idToken!!)
             }catch (e: ApiException){
                 Log.w("setting", "Google sign in failed", e)

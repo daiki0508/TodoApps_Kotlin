@@ -193,7 +193,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         flag: Boolean,
         position: Int?
     ) {
-        Log.d("dialog", list)
+        //Log.d("dialog", list)
         if (type == 0){
             viewModel.add(list)
         }else{

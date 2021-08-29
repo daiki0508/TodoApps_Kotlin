@@ -1,5 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.main
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,6 +12,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
+import com.google.android.play.core.install.model.ActivityResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -30,21 +32,24 @@ class MainActivity : AppCompatActivity(), DialogListener {
 
     companion object{
         const val RC_SIGN_IN = 9001
+        const val RC_IMMEDIATE_UPDATE = 100
     }
 
     override fun onStart() {
         super.onStart()
 
-        val currentUser = auth.currentUser
-        if (currentUser != null){
-            Log.d("test", "CurrentUser")
+        // アプリのアップデート開始
+        if (viewModel.connectingStatus(this) != null){
+            viewModel.appUpdate(this)
+        }
+    }
 
-            // ネットワーク状況によって処理を分岐
-            if (viewModel.connectingStatus(this) != null){
-                todoIntent(flag = true)
-            }else{
-                todoIntent(flag = false)
-            }
+    override fun onResume() {
+        super.onResume()
+
+        // アプリのアップデートの再開
+        if (viewModel.connectingStatus(this) != null){
+            viewModel.restartUpdate(this)
         }
     }
 
@@ -55,15 +60,13 @@ class MainActivity : AppCompatActivity(), DialogListener {
             setContentView(this.root)
         }
 
-        auth = Firebase.auth
-
         binding.googleLoginButton.setSize(SignInButton.SIZE_WIDE)
-
-        googleSign()
 
         binding.googleLoginButton.setOnClickListener {
             // ネットワーク状況によって処理を分岐
             if (viewModel.connectingStatus(this) != null){
+                auth = Firebase.auth
+                googleSign()
                 startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
             }else{
                 NetWorkFailureDialog(flag = true).show(supportFragmentManager, "NetWorkFailureDialog")
@@ -83,14 +86,26 @@ class MainActivity : AppCompatActivity(), DialogListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        // RC_SIGN_INはGoogle認証
         if (requestCode == RC_SIGN_IN){
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                Log.d("test", account.idToken!!)
+                //Log.d("test", account.idToken!!)
                 firebaseAuthWithGoogle(account.idToken!!)
             }catch (e: ApiException){
-                Log.w("test", "Google sign in failed", e)
+                Log.e("GoogleSignIn", "Google sign in failed", e)
+            }
+        // RC_IMMEDIATE_UPDATEはアプリのアップデート
+        }else if (requestCode == RC_IMMEDIATE_UPDATE){
+            when(resultCode){
+                // アップデート同意前に×ボタンまたはバックキー押下で案内画面が閉じられた時
+                Activity.RESULT_CANCELED -> finish()
+                // 何らかのエラーによってアップデートが行えない時
+                ActivityResult.RESULT_IN_APP_UPDATE_FAILED ->{
+                }
+                // アップデート同意後、バックキー押下で更新画面が閉じられた時
+                Activity.RESULT_OK -> finish()
             }
         }
     }
@@ -106,7 +121,7 @@ class MainActivity : AppCompatActivity(), DialogListener {
             }
     }
 
-    private fun todoIntent(flag: Boolean){
+    fun todoIntent(flag: Boolean){
         // trueがNetWork接続状態
         Intent(this, TodoActivity::class.java).apply {
             this.putExtra("network", flag)

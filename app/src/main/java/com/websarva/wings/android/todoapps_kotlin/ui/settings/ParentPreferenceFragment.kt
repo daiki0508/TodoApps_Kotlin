@@ -99,7 +99,7 @@ class ParentPreferenceFragment: PreferenceFragmentCompat() {
         try {
             listener = context as OnClickListener
         }catch (e: Exception){
-            Log.e("ERROR", "CANNOT FIND LISTENER")
+            Log.wtf("ERROR", "CANNOT FIND LISTENER")
         }
     }
 }

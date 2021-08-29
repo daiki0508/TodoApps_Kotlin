@@ -11,12 +11,13 @@ import org.koin.dsl.module
 
 class MyModule {
     val module: Module = module {
-        viewModel { MainViewModel(get()) }
+        viewModel { MainViewModel(get(), get()) }
         viewModel { TodoViewModel(get(), get(), get()) }
         viewModel { AddTodoTaskViewModel(get(), get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get()) }
     }
     val repository: Module = module {
+        factory { AppUpdateRepositoryClient() }
         factory { FirebaseTopRepositoryClient() }
         factory { FirebaseStorageRepositoryClient() }
         factory { PreferenceRepositoryClient() }

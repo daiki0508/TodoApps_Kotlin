@@ -61,7 +61,7 @@ class AddListDialog(
         try {
             listener = context as DialogListener
         }catch (e: Exception){
-            Log.e("ERROR", "CANNOT FIND LISTENER")
+            Log.wtf("ERROR", "CANNOT FIND LISTENER")
         }
     }
 }

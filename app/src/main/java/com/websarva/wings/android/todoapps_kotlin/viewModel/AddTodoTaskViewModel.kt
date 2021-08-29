@@ -51,10 +51,6 @@ class AddTodoTaskViewModel(
         firebaseStorageRepository.upload(context!!, storage!!, auth!!, list, flag)
     }
 
-    /*fun download(){
-        firebaseStorageRepository.download(context!!, this, todoViewModel = null, storage!!, auth!!, list, flag = false)
-    }*/
-
     fun delete(){
         firebaseStorageRepository.delete(storage!!, auth!!, list, flag = false)
     }
@@ -86,7 +82,7 @@ class AddTodoTaskViewModel(
                 val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
                 var todo: MutableMap<String, String>
                 for (task in tasks?.split(" ")!!){
-                    Log.d("test", task)
+                    //Log.d("test", task)
                     todo = mutableMapOf("task" to task)
                     todoTask.add(todo)
                 }
@@ -118,7 +114,7 @@ class AddTodoTaskViewModel(
         val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
         var todo: MutableMap<String, String>
         for (list in tasks?.split(" ")!!){
-            Log.d("test", list)
+            //Log.d("test", list)
             todo = mutableMapOf("task" to list)
             todoTask.add(todo)
         }
@@ -175,11 +171,11 @@ class AddTodoTaskViewModel(
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
             }
         }
-        Log.d("update_b", tasksBefore!!)
+        //Log.d("update_b", tasksBefore!!)
 
-        val tasksAfter = tasksBefore.replace(tasksBefore.split(" ")[position], aStr)
+        val tasksAfter = tasksBefore!!.replace(tasksBefore.split(" ")[position], aStr)
 
-        Log.d("update_a", tasksAfter)
+        //Log.d("update_a", tasksAfter)
 
         if (!flag){
             // ネットワークの接続状況によって処理を分岐
@@ -280,7 +276,7 @@ class AddTodoTaskViewModel(
         }else{
             CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
         }
-        Log.d("update_b", tasksBefore!!)
+        //Log.d("update_b", tasksBefore!!)
         // taskファイルから該当タスクを削除
         var tasksAfter = tasksBefore!!.replace("${tasksBefore.split(" ")[position]} ", "")
         if (tasksBefore == tasksAfter){
@@ -310,7 +306,7 @@ class AddTodoTaskViewModel(
                 CryptClass().decrypt(context!!, offLineRepository.read(context!!)!!.toCharArray(), tasksAfter, type = 3, list, aStr = null, flag = true)
             }
         }
-        Log.d("update_a", tasksAfter)
+        //Log.d("update_a", tasksAfter)
     }
 
     fun completeFlag(): MutableLiveData<MutableMap<String, Boolean?>>{
