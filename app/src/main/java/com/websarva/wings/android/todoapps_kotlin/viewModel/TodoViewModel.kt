@@ -14,6 +14,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
+import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
@@ -53,7 +55,7 @@ class TodoViewModel(
         if (flag){
             firebaseStorageRepository.download(activity!!, addViewModel = null, this, storage!!, auth!!, tasks = null, flag)
         }else{
-            if (File(activity?.filesDir, "list").exists()){
+            if (File(activity?.filesDir, FileName().list).exists()){
                 val lists = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
                 firebaseStorageRepository.download(activity!!, addViewModel = null, this, storage!!, auth!!, lists, flag)
             }
@@ -94,12 +96,12 @@ class TodoViewModel(
             var todo: MutableMap<String, String>
             for (task in tasks?.split(" ")!!){
                 //Log.d("test", task)
-                todo = mutableMapOf("task" to task)
+                todo = mutableMapOf(FileName().task to task)
                 todoTask.add(todo)
             }
 
             for (item in todoTask){
-                if (!readPreference(list, item["task"]!!)){
+                if (!readPreference(list, item[FileName().task]!!)){
                     cnt++
                 }
             }
@@ -135,7 +137,7 @@ class TodoViewModel(
         }
 
         //Log.d("lists", lists!!)
-        _todoList.value = createTodoContents(lists, "list")
+        _todoList.value = createTodoContents(lists, FileName().list)
     }
 
     fun getTask(list: String): MutableList<MutableMap<String, String>>{
@@ -155,7 +157,7 @@ class TodoViewModel(
             }
         }
 
-        return createTodoContents(tasks, keyName = "task")
+        return createTodoContents(tasks, keyName = FileName().task)
     }
 
     private fun createTodoContents(contents: String?, keyName: String): MutableList<MutableMap<String, String>>{
@@ -175,8 +177,8 @@ class TodoViewModel(
     }
 
     fun move(items: MutableList<MutableMap<String, String>>, fromPosition: Int, toPosition: Int){
-        val toPositionItem = items[toPosition]["list"]
-        val fromPositionItem = items[fromPosition]["list"]
+        val toPositionItem = items[toPosition][FileName().list]
+        val fromPositionItem = items[fromPosition][FileName().list]
         // ネットワーク接続状態によって処理を分岐
         val lists: String? = if (connectingStatus() != null){
             CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
@@ -296,12 +298,12 @@ class TodoViewModel(
 
     init {
         _completeFlag.value = mutableMapOf(
-            "list_list" to null,
-            "iv_aes_list" to null,
-            "salt_list" to null,
-            "task_task" to null,
-            "iv_aes_task" to null,
-            "salt_task" to null
+            DownloadStatus().list to null,
+            DownloadStatus().iv_aes_list to null,
+            DownloadStatus().salt_list to null,
+            DownloadStatus().task to null,
+            DownloadStatus().iv_aes_task to null,
+            DownloadStatus().salt_task to null
         )
         _todoList.value = mutableListOf()
         auth = null

@@ -16,6 +16,7 @@ import com.google.android.play.core.install.model.ActivityResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.websarva.wings.android.todoapps_kotlin.BuildConfig
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityMainBinding
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity(), DialogListener {
         super.onStart()
 
         // アプリのアップデート開始
-        if (viewModel.connectingStatus(this) != null){
+        if (viewModel.connectingStatus(this) != null && !BuildConfig.DEBUG){
             viewModel.appUpdate(this)
         }
     }
@@ -48,7 +49,7 @@ class MainActivity : AppCompatActivity(), DialogListener {
         super.onResume()
 
         // アプリのアップデートの再開
-        if (viewModel.connectingStatus(this) != null){
+        if (viewModel.connectingStatus(this) != null && !BuildConfig.DEBUG){
             viewModel.restartUpdate(this)
         }
     }
@@ -94,7 +95,7 @@ class MainActivity : AppCompatActivity(), DialogListener {
                 //Log.d("test", account.idToken!!)
                 firebaseAuthWithGoogle(account.idToken!!)
             }catch (e: ApiException){
-                Log.e("GoogleSignIn", "Google sign in failed", e)
+                Log.w("GoogleSignIn", "Google sign in failed", e)
             }
         // RC_IMMEDIATE_UPDATEはアプリのアップデート
         }else if (requestCode == RC_IMMEDIATE_UPDATE){

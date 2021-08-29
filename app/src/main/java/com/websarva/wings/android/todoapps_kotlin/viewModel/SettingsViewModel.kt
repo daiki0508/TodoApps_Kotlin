@@ -12,6 +12,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
+import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseTopRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryClient
@@ -95,9 +96,9 @@ class SettingsViewModel(
 
     init {
         _completeFlag.value = mutableMapOf(
-            "list_list" to null,
-            "iv_aes_list" to null,
-            "salt_list" to null,
+            DownloadStatus().list to null,
+            DownloadStatus().iv_aes_list to null,
+            DownloadStatus().salt_list to null,
         )
     }
 }

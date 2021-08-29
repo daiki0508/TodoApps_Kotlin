@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
@@ -50,7 +51,7 @@ class RecyclerViewAdapter(
 
         adapter.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
-                activity.addTodoIntent(items[position]["list"]!!, position)
+                activity.addTodoIntent(items[position][FileName().list]!!, position)
             }
         })
 

@@ -19,6 +19,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
@@ -62,7 +63,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        task = intent.getStringExtra("list")!!
+        task = intent.getStringExtra(FileName().list)!!
         position = intent.getIntExtra("position", 0)
         networkStatus = intent.getBooleanExtra("network", false)
 
@@ -111,7 +112,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             override fun onItemClickListener(view: View, position: Int, list: String?) {
                 Intent(this@AddTodoTaskActivity, SettingsActivity::class.java).apply {
                     this.putExtra("flag", false)
-                    this.putExtra("list", task)
+                    this.putExtra(FileName().list, task)
                     this.putExtra("position", this@AddTodoTaskActivity.position)
                     this.putExtra("network", networkStatus)
                     startActivity(this)
@@ -129,7 +130,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         nvAdapter!!.setOnItemClickListener(object: OnItemClickListener {
             override fun onItemClickListener(view: View, position: Int, list: String?) {
                 Intent(intent).apply {
-                    this.putExtra("list", list)
+                    this.putExtra(FileName().list, list)
                     this.putExtra("position", position)
                     startActivity(this)
                     overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
@@ -208,8 +209,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             when {
                 // taskの更新
                 type == 1 -> {
-                    viewModel.writePreference(keyName = acAdapter!!.items[position!!]["task"]!!, checkFlag = false)
-                    acAdapter!!.items[position]["task"] = list
+                    viewModel.writePreference(keyName = acAdapter!!.items[position!!][FileName().task]!!, checkFlag = false)
+                    acAdapter!!.items[position][FileName().task] = list
                     acAdapter!!.notifyItemChanged(position)
                 }
                 acAdapter == null -> {
@@ -218,7 +219,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                 }
                 else -> {
                     // taskの追加
-                    acAdapter!!.items.add(mutableMapOf("task" to list))
+                    acAdapter!!.items.add(mutableMapOf(FileName().task to list))
                     acAdapter!!.notifyItemInserted(acAdapter!!.itemCount - 1)
                 }
             }
@@ -247,8 +248,8 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             // preferenceを手動でmove
             for (i in 0 until acAdapter!!.items.size){
                 viewModel.writePreference(
-                    keyName = acAdapter!!.items[i]["task"]!!,
-                    checkFlag = viewModel.readPreference(acAdapter!!.items[i]["task"]!!))
+                    keyName = acAdapter!!.items[i][FileName().task]!!,
+                    checkFlag = viewModel.readPreference(acAdapter!!.items[i][FileName().task]!!))
             }
             // 旧preferenceを削除
             viewModel.deletePreference(task)
@@ -274,13 +275,13 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         when(item.itemId){
             R.id.allCheck -> {
                 for (i in 0 until acAdapter!!.itemCount){
-                    viewModel.writePreference(keyName = acAdapter!!.items[i]["task"]!!, checkFlag = true)
+                    viewModel.writePreference(keyName = acAdapter!!.items[i][FileName().task]!!, checkFlag = true)
                     acAdapter?.notifyItemChanged(i)
                 }
             }
             R.id.allUnCheck ->{
                 for (i in 0 until acAdapter!!.itemCount){
-                    viewModel.writePreference(keyName = acAdapter!!.items[i]["task"]!!, checkFlag = false)
+                    viewModel.writePreference(keyName = acAdapter!!.items[i][FileName().task]!!, checkFlag = false)
                     acAdapter?.notifyItemChanged(i)
                 }
             }

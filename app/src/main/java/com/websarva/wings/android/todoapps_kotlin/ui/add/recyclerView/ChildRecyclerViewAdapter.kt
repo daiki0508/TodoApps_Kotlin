@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
@@ -38,7 +39,7 @@ class ChildRecyclerViewAdapter(
         holder.content.apply {
             textSize = 22F
             isSingleLine = false
-            text = items[position]["task"]
+            text = items[position][FileName().task]
 
             if (pListener.onPreferenceReadListener(holder.content.text.toString())){
                 setTextColor(Color.LTGRAY)

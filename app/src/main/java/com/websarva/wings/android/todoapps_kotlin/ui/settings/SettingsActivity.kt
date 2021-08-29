@@ -13,6 +13,8 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivitySettingsBinding
+import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.main.MainActivity
@@ -50,13 +52,13 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
         flag = intent.getBooleanExtra("flag", true)
         networkStatus = intent.getBooleanExtra("network", false)
         if (!flag!!){
-            list = intent.getStringExtra("list")!!
+            list = intent.getStringExtra(FileName().list)!!
             position = intent.getIntExtra("position", 0)
         }
 
         // observer通知
         viewModel.completeFlag().observe(this, {
-            if ((it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true)){
+            if ((it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true)){
                 viewModel.restore(auth, storage, flag = false)
                 Toast.makeText(this, "復元が完了しました！", Toast.LENGTH_LONG).show()
                 this.networkStatus = true
@@ -75,7 +77,7 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
         }else{
             Intent(this, AddTodoTaskActivity::class.java).apply {
                 this.putExtra("network", networkStatus)
-                this.putExtra("list", list)
+                this.putExtra(FileName().list, list)
                 this.putExtra("position", position)
                 startActivity(this)
                 finish()

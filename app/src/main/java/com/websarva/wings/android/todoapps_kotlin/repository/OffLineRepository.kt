@@ -11,7 +11,6 @@ interface OffLineRepository {
     fun write(activity: Activity)
     fun online(activity: Activity, auth: FirebaseAuth)
     fun read(activity: Activity): String?
-    fun delete()
 }
 
 class OffLineRepositoryClient: OffLineRepository {
@@ -39,10 +38,6 @@ class OffLineRepositoryClient: OffLineRepository {
 
     override fun read(activity: Activity): String? {
         return createPreference(activity).getString("pass", "")
-    }
-
-    override fun delete() {
-        TODO("Not yet implemented")
     }
 
     private fun createPreference(activity: Activity): SharedPreferences {

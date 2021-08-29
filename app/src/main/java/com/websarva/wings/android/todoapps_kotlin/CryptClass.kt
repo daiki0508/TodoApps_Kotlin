@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.FileUtils
 import android.util.Base64
 import android.util.Log
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
@@ -25,15 +26,15 @@ class CryptClass {
     private fun encrypt(context: Context, pass: CharArray, pStr: String, type: Int, task: String?){
         val key = generateStrongAESKey(context, pass, 256, true, type, task)
         val list: File = if (type == 0 || type == 4 || type == 7){
-            File(context.filesDir, "list")
+            File(context.filesDir, FileName().list)
         }else{
-            File("${context.filesDir}/task/$task", "task")
+            File("${context.filesDir}/task/$task", FileName().task)
         }
 
         val iv: File = if (type == 0 || type == 4 || type == 7){
             File(context.filesDir, "iv_aes")
         }else{
-            File("${context.filesDir}/task/$task", "iv_aes")
+            File("${context.filesDir}/task/$task", FileName().iv_aes)
         }
 
         try {
@@ -51,13 +52,13 @@ class CryptClass {
     fun decrypt(context: Context, pass: CharArray, pStr: String, type: Int, task: String?, aStr: String?, flag: Boolean): String?{
         val encFile: File = when (type) {
             0, 6, 7 -> {
-                File(context.filesDir, "list")
+                File(context.filesDir, FileName().list)
             }
             4 -> {
-                File("${context.filesDir}/task/$aStr", "task")
+                File("${context.filesDir}/task/$aStr", FileName().task)
             }
             else -> {
-                File("${context.filesDir}/task/$task", "task")
+                File("${context.filesDir}/task/$task", FileName().task)
             }
         }
         if ((!encFile.exists() || encFile.length() == 0L) && type != 5){
@@ -87,7 +88,6 @@ class CryptClass {
                 File("${context.filesDir}/task/$task").deleteRecursively()
                 return null
             }else if (type == 6){
-                //File("${context.filesDir}/task/$task").deleteRecursively()
                 File("${context.filesDir}/list").deleteRecursively()
                 File("${context.filesDir}/iv_aes").deleteRecursively()
                 File("${context.filesDir}/salt").deleteRecursively()
@@ -96,7 +96,7 @@ class CryptClass {
         }
         val key = generateStrongAESKey(context, pass, 256, false, type, task)
         val ivFile: FileInputStream = if (type == 0 || type == 4 || type == 7){
-            context.openFileInput("iv_aes")
+            context.openFileInput(FileName().iv_aes)
         }else{
             // ネストされたディレクトリの場合はFileInputStreamでないとエラーが発生
             FileInputStream("${context.filesDir}/task/$task/iv_aes")
@@ -114,7 +114,6 @@ class CryptClass {
 
             cipher.init(Cipher.DECRYPT_MODE, key, ips)
 
-            //Log.d("test", "${String(cipher.doFinal(enc))} $pStr")
             if (flag){
                 // typeが3の場合は更新
                 if (type == 3 || type == 4 || type == 7){
@@ -139,20 +138,19 @@ class CryptClass {
 
         val salt = ByteArray(saltLength)
         if (flag){
-            //random.nextBytes(salt)
             for (i in salt.indices) {
                 salt[i] = password[i].code.toByte()
             }
 
             val saltFile: File = if (type == 0 || type == 4 || type == 7){
-                File(context.filesDir, "salt")
+                File(context.filesDir, FileName().salt)
             }else{
-                File("${context.filesDir}/task/$task", "salt")
+                File("${context.filesDir}/task/$task", FileName().salt)
             }
             saltFile.writeBytes(salt)
         }else{
             val saltFile: FileInputStream = if (type == 0 || type == 4 || type == 7){
-                context.openFileInput("salt")
+                context.openFileInput(FileName().salt)
             }else{
                 // ネストされたディレクトリの場合はFileInputStreamでないとエラーが発生
                 FileInputStream("${context.filesDir}/task/$task/salt")

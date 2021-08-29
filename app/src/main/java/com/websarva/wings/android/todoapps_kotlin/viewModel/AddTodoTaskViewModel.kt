@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
+import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.repository.*
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
@@ -83,19 +85,19 @@ class AddTodoTaskViewModel(
                 var todo: MutableMap<String, String>
                 for (task in tasks?.split(" ")!!){
                     //Log.d("test", task)
-                    todo = mutableMapOf("task" to task)
+                    todo = mutableMapOf(FileName().task to task)
                     todoTask.add(todo)
                 }
 
                 for (task in todoTask){
-                    if (!preferenceRepository.read(context!!, list, task["task"]!!)){
+                    if (!preferenceRepository.read(context!!, list, task[FileName().task]!!)){
                         cnt++
                     }
                 }
             }
         }else{
             for (item in items!!){
-                if (!readPreference(item["task"]!!)){
+                if (!readPreference(item[FileName().task]!!)){
                     cnt++
                 }
             }
@@ -115,7 +117,7 @@ class AddTodoTaskViewModel(
         var todo: MutableMap<String, String>
         for (list in tasks?.split(" ")!!){
             //Log.d("test", list)
-            todo = mutableMapOf("task" to list)
+            todo = mutableMapOf(FileName().task to list)
             todoTask.add(todo)
         }
         _todoTask.value = todoTask
@@ -132,7 +134,7 @@ class AddTodoTaskViewModel(
         val todoList: MutableList<MutableMap<String, String>> = mutableListOf()
         var todo: MutableMap<String, String>
         for (list in lists!!.split(" ")){
-            todo = mutableMapOf("list" to list)
+            todo = mutableMapOf(FileName().list to list)
             todoList.add(todo)
         }
         return todoList
@@ -197,14 +199,14 @@ class AddTodoTaskViewModel(
     fun move(items: MutableList<MutableMap<String, String>>, fromPosition: Int, toPosition: Int, flag: Boolean){
         // trueがNavigationDrawer
         val toPositionItem = if (flag){
-            items[toPosition]["list"]
+            items[toPosition][FileName().list]
         }else{
-            items[toPosition]["task"]
+            items[toPosition][FileName().task]
         }
         val fromPositionItem = if (flag){
-            items[fromPosition]["list"]
+            items[fromPosition][FileName().list]
         }else{
-            items[fromPosition]["task"]
+            items[fromPosition][FileName().task]
         }
         val contents = if (flag){
             // ネットワークの接続状態によって処理を分岐
@@ -334,7 +336,10 @@ class AddTodoTaskViewModel(
     }
 
     init {
-        _completeFlag.value = mutableMapOf("task_task" to false, "iv_aes_task" to false, "salt_task" to false)
+        _completeFlag.value = mutableMapOf(
+            DownloadStatus().task to false,
+            DownloadStatus().iv_aes_task to false,
+            DownloadStatus().salt_task to false)
         _todoTask.value = mutableListOf()
         _updateName.value = ""
         position = 0

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
@@ -28,12 +29,12 @@ class NavRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: NavRecyclerViewHolder, position: Int) {
-            holder.title.text = items[position]["list"]
+            holder.title.text = items[position][FileName().list]
 
             if (todoViewModel != null){
-                holder.count.text = todoViewModel!!.countUnCompleteTask(items[position]["list"]!!).toString()
+                holder.count.text = todoViewModel!!.countUnCompleteTask(items[position][FileName().list]!!).toString()
             }else{
-                holder.count.text = addTodoTaskViewModel!!.countUnCompleteTask(items = null, items[position]["list"]).toString()
+                holder.count.text = addTodoTaskViewModel!!.countUnCompleteTask(items = null, items[position][FileName().list]).toString()
             }
 
             if (position == this.position){
@@ -43,7 +44,7 @@ class NavRecyclerViewAdapter(
             }
 
             holder.view.setOnClickListener {
-                listener.onItemClickListener(it, position, items[position]["list"]!!)
+                listener.onItemClickListener(it, position, items[position][FileName().list]!!)
             }
         }
 

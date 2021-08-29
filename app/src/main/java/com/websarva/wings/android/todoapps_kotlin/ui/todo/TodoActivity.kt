@@ -19,6 +19,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityTodoBinding
+import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
@@ -103,26 +105,26 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 viewModel.download(flag = true)
             }else{
                 networkStatus = false
-                if (File(filesDir, "list").length() != 0L){
+                if (File(filesDir, FileName().list).length() != 0L){
                     NetWorkFailureDialog(flag = false).show(supportFragmentManager, "NetWorkFailureDialog")
                     viewModel.createView()
                 }
             }
         }else{
-            if (File(filesDir, "list").length() != 0L){
+            if (File(filesDir, FileName().list).length() != 0L){
                 viewModel.createView()
             }
         }
 
         viewModel.completeFlag().observe(this, {
             when {
-                (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == true) and (it["iv_aes_task"] == true) and (it["salt_task"] == true) -> {
+                (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) and (it[DownloadStatus().task] == true) and (it[DownloadStatus().iv_aes_task] == true) and (it[DownloadStatus().salt_task] == true) -> {
                     viewModel.createView()
                 }
-                (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) and (it["task_task"] == false) and (it["iv_aes_task"] == false) and (it["salt_task"] == false) -> {
+                (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) and (it[DownloadStatus().task] == false) and (it[DownloadStatus().iv_aes_task] == false) and (it[DownloadStatus().salt_task] == false) -> {
                     viewModel.createView()
                 }
-                (it["list_list"] == true) and (it["iv_aes_list"] == true) and (it["salt_list"] == true) -> {
+                (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) -> {
                     viewModel.download(flag = false)
                 }
             }
@@ -175,7 +177,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         if (apAdapter == null){
             viewModel.createView()
         }else{
-            apAdapter!!.items.add(mutableMapOf("list" to list))
+            apAdapter!!.items.add(mutableMapOf(FileName().list to list))
             apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
 
             nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
@@ -204,7 +206,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
                 val position = apAdapter!!.getPosition()
                 Log.d("context", position.toString())
 
-                val list = apAdapter!!.items[position]["list"]
+                val list = apAdapter!!.items[position][FileName().list]
                 viewModel.deletePreference(list!!)
 
                 apAdapter!!.items.removeAt(position)
@@ -268,7 +270,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
 
     fun addTodoIntent(list: String, position: Int){
         Intent(this@TodoActivity, AddTodoTaskActivity::class.java).apply {
-            this.putExtra("list", list)
+            this.putExtra(FileName().list, list)
             this.putExtra("position", position)
             this.putExtra("network", networkStatus)
             startActivity(this)

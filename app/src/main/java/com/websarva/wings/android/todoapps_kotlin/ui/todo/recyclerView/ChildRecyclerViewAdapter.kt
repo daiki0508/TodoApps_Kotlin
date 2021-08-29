@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 
@@ -29,7 +30,7 @@ class ChildRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ChildRecyclerViewHolder, position: Int) {
         holder.content.apply {
             ellipsize = TextUtils.TruncateAt.END
-            text = items[position]["task"]
+            text = items[position][FileName().task]
 
             if (pListener.onPreferenceReadListener(holder.content.text.toString())){
                 setTextColor(Color.LTGRAY)

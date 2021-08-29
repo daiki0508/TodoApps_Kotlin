@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.SettingsViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
@@ -48,9 +49,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         val storageRef = storage.reference
 
         if (!flag){
-            uploadTask(context, "list", storageRef, uid, null, flag)
-            uploadTask(context, "iv_aes", storageRef, uid, null, flag)
-            uploadTask(context, "salt", storageRef, uid, null, flag)
+            uploadTask(context, FileName().list, storageRef, uid, null, flag)
+            uploadTask(context, FileName().iv_aes, storageRef, uid, null, flag)
+            uploadTask(context, FileName().salt, storageRef, uid, null, flag)
         }else{
             uploadTask(context, "task/$task/task", storageRef, uid, task, flag)
             uploadTask(context, "task/$task/iv_aes", storageRef, uid, task, flag)
@@ -87,9 +88,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                 downloadTask(context, addViewModel, todoViewModel, "task/$task/salt", storageRef, uid, flag, cnt)
             }
         }else{
-            downloadTask(context, addViewModel, todoViewModel, "list", storageRef, uid, flag, cnt = null)
-            downloadTask(context, addViewModel, todoViewModel, "iv_aes", storageRef, uid, flag, cnt = null)
-            downloadTask(context, addViewModel, todoViewModel, "salt", storageRef, uid, flag, cnt = null)
+            downloadTask(context, addViewModel, todoViewModel, FileName().list, storageRef, uid, flag, cnt = null)
+            downloadTask(context, addViewModel, todoViewModel, FileName().iv_aes, storageRef, uid, flag, cnt = null)
+            downloadTask(context, addViewModel, todoViewModel, FileName().salt, storageRef, uid, flag, cnt = null)
         }
 
         return true
@@ -101,9 +102,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
         val storageRef = storage.reference
 
         if (flag){
-            deleteTask("list", storageRef, uid, flag)
-            deleteTask("iv_aes", storageRef, uid, flag)
-            deleteTask("salt", storageRef, uid, flag)
+            deleteTask(FileName().list, storageRef, uid, flag)
+            deleteTask(FileName().iv_aes, storageRef, uid, flag)
+            deleteTask(FileName().salt, storageRef, uid, flag)
         }else{
             deleteTask("task/$task/task", storageRef, uid, flag)
             deleteTask("task/$task/iv_aes", storageRef, uid, flag)
@@ -124,9 +125,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
 
         // trueがlist処理
         if (flag){
-            restoreTask(context, settingsViewModel, storageRef, uid, "list", flag)
-            restoreTask(context, settingsViewModel, storageRef, uid, "iv_aes", flag)
-            restoreTask(context, settingsViewModel, storageRef, uid, "salt", flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, FileName().list, flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, FileName().iv_aes, flag)
+            restoreTask(context, settingsViewModel, storageRef, uid, FileName().salt, flag)
         }else{
             restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/task", flag)
             restoreTask(context, settingsViewModel, storageRef, uid, "task/${list}/iv_aes", flag)
@@ -152,9 +153,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
 
         val uploadTask = fileRef.putFile(file)
         uploadTask.addOnFailureListener {
-            Log.w("test", it)
+            Log.w("upload", it)
         }.addOnSuccessListener {
-            Log.d("test", "success!!")
+            Log.i("upload", "success!!")
         }
     }
 
@@ -178,7 +179,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                     try {
                         file.createNewFile()
                     }catch (e: IOException){
-                        Log.e("ERROR", e.toString())
+                        Log.wtf("ERROR", e.toString())
                     }
                 }
             }
@@ -192,7 +193,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             storageRef.child("users/$uid/todo/list/$child")
         }
         fileRef.getFile(file).addOnSuccessListener {
-            Log.d("test2", "Success!!")
+            Log.i("download", "Success!!")
             val completeFlag: MutableMap<String, Boolean?> = if ((!flag && todoViewModel != null) or (flag && todoViewModel != null)){
                 todoViewModel!!.completeFlag().value!!
             }else{
@@ -215,7 +216,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                 todoViewModel!!.setCompleteFlag(completeFlag)
             }
         }.addOnFailureListener {
-            Log.w("test2", it)
+            Log.w("download", it)
             val completeFlag: MutableMap<String, Boolean?> = if ((!flag && todoViewModel != null) or (flag && todoViewModel != null)){
                 todoViewModel!!.completeFlag().value!!
             }else{
@@ -252,9 +253,9 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             storageRef.child("users/$uid/todo/$child")
         }
         fileRef.delete().addOnSuccessListener {
-            Log.d("test2", "Success!!")
+            Log.i("delete", "Success!!")
         }.addOnFailureListener {
-            Log.w("test2", it)
+            Log.w("delete", it)
         }
     }
 
@@ -270,7 +271,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
                     try {
                         file.createNewFile()
                     }catch (e: IOException){
-                        Log.e("ERROR", e.toString())
+                        Log.wtf("ERROR", e.toString())
                     }
                 }
             }
@@ -284,14 +285,14 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
             storageRef.child("users/$uid/todo/list/$child")
         }
         fileRef.getFile(file).addOnSuccessListener {
-            Log.d("restore", "success!!")
+            Log.i("restore", "success!!")
             val completeFlag: MutableMap<String, Boolean?> = settingsViewModel.completeFlag().value!!
             if (flag){
                 completeFlag["${Uri.fromFile(file).lastPathSegment!!}_list"] = true
                 settingsViewModel.setFlag(completeFlag)
             }
         }.addOnFailureListener {
-            Log.e("restore", "ERROR!!")
+            Log.w("restore", "ERROR!!")
         }
     }
 }
