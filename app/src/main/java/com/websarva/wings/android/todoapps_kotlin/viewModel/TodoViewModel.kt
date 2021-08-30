@@ -81,6 +81,18 @@ class TodoViewModel(
         preferenceRepository.delete(activity!!, list)
     }
 
+    fun deleteAll(){
+        if (auth?.currentUser!!.uid != offLineRepository.read(activity!!)){
+            if (File(activity?.filesDir, FileName().list).length() != 0L){
+                File("${activity?.filesDir}/${FileName().list}").deleteRecursively()
+                File("${activity?.filesDir}/${FileName().iv_aes}").deleteRecursively()
+                File("${activity?.filesDir}/${FileName().salt}").deleteRecursively()
+
+                File("${activity?.filesDir}/task").deleteRecursively()
+            }
+        }
+    }
+
     fun countUnCompleteTask(list: String): Int{
         var cnt = 0
 

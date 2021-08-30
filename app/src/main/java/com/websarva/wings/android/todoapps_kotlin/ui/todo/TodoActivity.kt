@@ -67,6 +67,7 @@ class TodoActivity : AppCompatActivity(), DialogListener {
             auth = Firebase.auth
             storage = FirebaseStorage.getInstance()
             viewModel.setInit(auth, this, storage, networkStatus!!)
+            viewModel.deleteAll()
         }else{
             viewModel.setInit(auth = null, this, storage = null, networkStatus!!)
         }
