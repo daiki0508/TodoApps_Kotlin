@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -50,6 +51,8 @@ class TodoActivity : AppCompatActivity(), DialogListener {
         binding = ActivityTodoBinding.inflate(layoutInflater).apply {
             setContentView(this.root)
         }
+
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)

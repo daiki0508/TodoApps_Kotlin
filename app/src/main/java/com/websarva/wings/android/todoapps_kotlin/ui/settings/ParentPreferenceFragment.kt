@@ -15,6 +15,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
+import com.websarva.wings.android.todoapps_kotlin.ui.licenses.LicensesActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.main.MainActivity
 
 interface OnClickListener{
@@ -97,6 +98,15 @@ class ParentPreferenceFragment: PreferenceFragmentCompat() {
         }
         findPreference<Preference>("license")?.apply {
             //TODO("ライセンス未発行")
+            setOnPreferenceClickListener {
+                activity.let {
+                    Intent(it, LicensesActivity::class.java).apply {
+                        startActivity(this)
+                        it!!.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    }
+                }
+                true
+            }
         }
         findPreference<Preference>("policy")?.apply {
             val uri = Uri.parse("https://gist.github.com/daiki0508/0b7648b2a789ace45518c4cc2ad0c1cb")

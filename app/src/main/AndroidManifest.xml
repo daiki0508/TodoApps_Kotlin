@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoApps_Kotlin">
         <activity
+            android:name=".ui.licenses.LicensesActivity"
+            android:exported="true" />
+        <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
         <activity
