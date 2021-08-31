@@ -94,7 +94,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         }
 
         // タスク一覧
-        val nvTopAdapter = NavTopRecyclerViewAdapter(type = 0, flag = false)
+        val nvTopAdapter = NavTopRecyclerViewAdapter(type = 0, flag = false, this)
         binding.navTopRecyclerView.adapter = nvTopAdapter
         binding.navTopRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.navTopRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -106,7 +106,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         })
 
         // 設定
-        val nvSettingsAdapter = NavTopRecyclerViewAdapter(type = 1, flag = true)
+        val nvSettingsAdapter = NavTopRecyclerViewAdapter(type = 1, flag = true, this)
         binding.navFooterRecyclerView.adapter = nvSettingsAdapter
         binding.navFooterRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.navFooterRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -125,7 +125,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         })
 
         // NavigationDrawer
-        nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel)
+        nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel, this)
         binding.navRecyclerView.adapter = nvAdapter
         nvItemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoRecyclerView = null))
         nvItemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
@@ -361,8 +361,11 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     }
 
     private fun todoIntent(){
-        startActivity(Intent(this, TodoActivity::class.java))
-        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-        finish()
+        Intent(this, TodoActivity::class.java).apply {
+            this.putExtra("network", networkStatus)
+            startActivity(this)
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+            finish()
+        }
     }
 }

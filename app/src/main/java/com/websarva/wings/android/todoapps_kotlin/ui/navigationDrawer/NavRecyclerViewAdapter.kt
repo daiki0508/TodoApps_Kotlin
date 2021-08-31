@@ -1,9 +1,11 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer
 
+import android.app.Activity
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
@@ -18,6 +20,7 @@ class NavRecyclerViewAdapter(
     private var position: Int,
     private var todoViewModel: TodoViewModel?,
     private var addTodoTaskViewModel: AddTodoTaskViewModel?,
+    private var activity: Activity
 ): RecyclerView.Adapter<NavRecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
@@ -29,24 +32,37 @@ class NavRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: NavRecyclerViewHolder, position: Int) {
-            holder.title.text = items[position][FileName().list]
+        // theme情報を取得
+        val preference = PreferenceManager.getDefaultSharedPreferences(activity)
+        val themeId = preference.getString("theme", "0")
 
-            if (todoViewModel != null){
-                holder.count.text = todoViewModel!!.countUnCompleteTask(items[position][FileName().list]!!).toString()
-            }else{
-                holder.count.text = addTodoTaskViewModel!!.countUnCompleteTask(items = null, items[position][FileName().list]).toString()
-            }
+        holder.title.text = items[position][FileName().list]
 
-            if (position == this.position){
-                holder.view.setBackgroundColor(Color.LTGRAY)
-            }else{
+        if (todoViewModel != null) {
+            holder.count.text =
+                todoViewModel!!.countUnCompleteTask(items[position][FileName().list]!!).toString()
+        } else {
+            holder.count.text = addTodoTaskViewModel!!.countUnCompleteTask(
+                items = null,
+                items[position][FileName().list]
+            ).toString()
+        }
+
+        if (position == this.position) {
+            holder.view.setBackgroundColor(Color.LTGRAY)
+        } else {
+            // nightModeかlightModeかで処理をわける
+            if (themeId == "0"){
                 holder.view.setBackgroundColor(Color.WHITE)
-            }
-
-            holder.view.setOnClickListener {
-                listener.onItemClickListener(it, position, items[position][FileName().list]!!)
+            }else{
+                holder.view.setBackgroundColor(Color.parseColor("#696969"))
             }
         }
+
+        holder.view.setOnClickListener {
+            listener.onItemClickListener(it, position, items[position][FileName().list]!!)
+        }
+    }
 
     override fun getItemCount(): Int {
         return items.size

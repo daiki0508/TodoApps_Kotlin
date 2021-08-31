@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.DialogFragment
+import androidx.preference.PreferenceManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -59,6 +61,12 @@ class MainActivity : AppCompatActivity(), DialogListener {
 
         binding = ActivityMainBinding.inflate(layoutInflater).apply {
             setContentView(this.root)
+        }
+
+        val preference = PreferenceManager.getDefaultSharedPreferences(this)
+        val themeId = preference.getString("theme", "0")
+        if (themeId == "1"){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
 
         binding.googleLoginButton.setSize(SignInButton.SIZE_WIDE)

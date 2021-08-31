@@ -1,15 +1,18 @@
 package com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer
 
+import android.app.Activity
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 
 class NavTopRecyclerViewAdapter(
     private var type: Int,
-    private var flag: Boolean
+    private var flag: Boolean,
+    private var activity: Activity
 ): RecyclerView.Adapter<NavTopRecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
@@ -21,6 +24,10 @@ class NavTopRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: NavTopRecyclerViewHolder, position: Int) {
+        // theme情報を取得
+        val preference = PreferenceManager.getDefaultSharedPreferences(activity)
+        val themeId = preference.getString("theme", "0")
+
         // 0がタスク一覧
         if (type == 0){
             holder.navIcon.setImageResource(R.drawable.ic_baseline_all_inbox_24)
@@ -32,9 +39,13 @@ class NavTopRecyclerViewAdapter(
             // trueがtodoActivity
             if (flag){
                 holder.view.setBackgroundColor(Color.LTGRAY)
-            }
-            else{
-                holder.view.setBackgroundColor(Color.WHITE)
+            }else{
+                // nightModeかlightModeかで処理をわける
+                if (themeId == "0"){
+                    holder.view.setBackgroundColor(Color.WHITE)
+                }else{
+                    holder.view.setBackgroundColor(Color.parseColor("#696969"))
+                }
                 holder.view.setOnClickListener {
                     listener.onItemClickListener(it, position, list = null)
                 }

@@ -32,11 +32,11 @@ class ParentPreferenceFragment: PreferenceFragmentCompat() {
             setOnPreferenceChangeListener { _, newValue ->
                 when(newValue.toString()){
                     "0" -> {
-                        Log.d("theme", newValue.toString())
+                        Log.i("theme", newValue.toString())
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     }
                     "1" ->{
-                        Log.d("theme", newValue.toString())
+                        Log.i("theme", newValue.toString())
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     }
                 }
@@ -97,7 +97,6 @@ class ParentPreferenceFragment: PreferenceFragmentCompat() {
             }
         }
         findPreference<Preference>("license")?.apply {
-            //TODO("ライセンス未発行")
             setOnPreferenceClickListener {
                 activity.let {
                     Intent(it, LicensesActivity::class.java).apply {
