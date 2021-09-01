@@ -1,36 +1,8 @@
 <resources>
     <string name="app_name">ToDoApps</string>
+    <string name="nav_header">ToDoApps\nVersion2.1</string>
     <string name="hello">Welcome to ToDoApps!</string>
     <string name="description">Google、もしくはメールアドレスとパスワードを用いてログインできます。</string>
-    <string name="mail_pass_login">メールアドレスとパスワードでログインする。</string>
-    <string name="mail_pass_signin">サインインする</string>
-    <string name="mail_pass_signup">サインアップする</string>
-    <string name="signup">SignUp</string>
-    <string name="description2">メールアドレスとパスワードを入力して、サインインしてください。\n
-    アカウントが無い場合は、サインアップしてください。</string>
-    <string name="mail">Mail:</string>
-    <string name="sample_mail">hogehoge@example.com</string>
-    <string name="sample_pass">password</string>
-    <string name="back">戻る</string>
-    <string name="signout">サインアウト</string>
-    <string name="description3">タイトルと内容を入力して追加するボタンをタップしてください。</string>
-    <string name="title">タイトル</string>
-    <string name="note">メモ</string>
-    <string name="add">追加する</string>
-    <string name="clear">クリア</string>
-    <string name="title_hint">こんにちは</string>
-    <string name="note_hint">これはテストです。</string>
-    <string name="todolist">ToDoLists</string>
-    <string name="delete">削除する</string>
-    <string name="date_d">更新日時：</string>
-    <string name="update_d">更新する</string>
-    <string name="unsubscribe">よければ退会する理由を教えて下さい。\nこれからの開発の参考にさせて頂きます。</string>
-    <string name="Reason">退会理由</string>
-    <string name="send">退会する</string>
-    <string name="description4">パスワードの再設定を行います。\n
-    アカウントのメールアドレスを入力してください。</string>
-    <string name="repassword">パスワード再設定メールを送信する</string>
-    <string name="reset">パスワードを忘れた</string>
 
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>

@@ -112,6 +112,7 @@ class MainActivity : AppCompatActivity(), DialogListener {
                 Activity.RESULT_CANCELED -> finish()
                 // 何らかのエラーによってアップデートが行えない時
                 ActivityResult.RESULT_IN_APP_UPDATE_FAILED ->{
+                    Log.wtf("update", "Occurrence of a fatal error")
                 }
                 // アップデート同意後、バックキー押下で更新画面が閉じられた時
                 Activity.RESULT_OK -> finish()
