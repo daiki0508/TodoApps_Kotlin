@@ -8,12 +8,11 @@ import com.google.firebase.auth.*
 import com.websarva.wings.android.todoapps_kotlin.ui.main.MainActivity
 
 interface FirebaseTopRepository {
-    fun firebaseAuthWithGoogle(activity: Activity ,auth: FirebaseAuth, idToken: String): Task<AuthResult>
+    fun firebaseAuthWithGoogle(auth: FirebaseAuth, idToken: String): Task<AuthResult>
 }
 
 class FirebaseTopRepositoryClient: FirebaseTopRepository {
     override fun firebaseAuthWithGoogle(
-        activity: Activity,
         auth: FirebaseAuth,
         idToken: String
     ): Task<AuthResult>{

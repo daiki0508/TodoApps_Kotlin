@@ -20,9 +20,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.websarva.wings.android.todoapps_kotlin.BuildConfig
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityMainBinding
+import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.afterlogin.AfterLoginActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -121,20 +122,20 @@ class MainActivity : AppCompatActivity(), DialogListener {
     }
 
     private fun firebaseAuthWithGoogle(idToken: String){
-        viewModel.firebaseAuthWithGoogle(this, auth, idToken)
+        viewModel.firebaseAuthWithGoogle(auth, idToken)
             .addOnCompleteListener(this){task ->
                 if (task.isSuccessful){
-                    todoIntent(flag = true)
+                    afterLoginIntent(flag = true)
                 }else{
                     Toast.makeText(this, "認証エラー", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    fun todoIntent(flag: Boolean){
+    private fun afterLoginIntent(flag: Boolean){
         // trueがNetWork接続状態
-        Intent(this, TodoActivity::class.java).apply {
-            this.putExtra("network", flag)
+        Intent(this, AfterLoginActivity::class.java).apply {
+            this.putExtra(IntentBundle.NetworkStatus.name, flag)
             startActivity(this)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
@@ -153,7 +154,7 @@ class MainActivity : AppCompatActivity(), DialogListener {
 
     override fun onDialogReceive(flag: Boolean) {
         if (flag){
-            todoIntent(flag = false)
+            afterLoginIntent(flag = false)
         }
     }
 }

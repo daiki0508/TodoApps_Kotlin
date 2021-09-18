@@ -21,8 +21,8 @@ class MainViewModel(
     private val firebaseTopRepository: FirebaseTopRepositoryClient,
     private val appUpdateRepository: AppUpdateRepositoryClient
 ): ViewModel() {
-    fun firebaseAuthWithGoogle(activity: Activity, auth: FirebaseAuth, idToken: String): Task<AuthResult>{
-        return firebaseTopRepository.firebaseAuthWithGoogle(activity, auth, idToken)
+    fun firebaseAuthWithGoogle(auth: FirebaseAuth, idToken: String): Task<AuthResult>{
+        return firebaseTopRepository.firebaseAuthWithGoogle(auth, idToken)
     }
 
     fun connectingStatus(activity: Activity): NetworkCapabilities? {

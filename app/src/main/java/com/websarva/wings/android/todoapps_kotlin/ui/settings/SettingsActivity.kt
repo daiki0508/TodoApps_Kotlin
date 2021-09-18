@@ -17,8 +17,7 @@ import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.main.MainActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.viewModel.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -69,7 +68,7 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
     override fun onBackPressed() {
         // trueがTodoActivity
         if (flag!!){
-            Intent(this, TodoActivity::class.java).apply {
+            Intent(this, TodoFragment::class.java).apply {
                 this.putExtra("network", networkStatus)
                 startActivity(this)
                 finish()

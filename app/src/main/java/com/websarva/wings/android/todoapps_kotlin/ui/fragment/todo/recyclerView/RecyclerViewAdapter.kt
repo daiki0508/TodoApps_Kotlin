@@ -1,25 +1,21 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView
 
-import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
 class RecyclerViewAdapter(
     var items: MutableList<MutableMap<String, String>>,
-    private var activity: TodoActivity,
+    private var fragment: TodoFragment,
     private var viewModel: TodoViewModel
     ): RecyclerView.Adapter<RecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
@@ -38,7 +34,7 @@ class RecyclerViewAdapter(
             listener.onItemClickListener(it, position, items[position][FileName().list]!!)
         }
 
-        holder.rvContents.layoutManager = LinearLayoutManager(activity)
+        holder.rvContents.layoutManager = LinearLayoutManager(fragment.requireActivity())
         val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(items[position][FileName().list]!!), this, position)
         holder.rvContents.adapter = adapter
 
@@ -51,7 +47,8 @@ class RecyclerViewAdapter(
 
         adapter.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
-                activity.addTodoIntent(items[position][FileName().list]!!, position)
+                // TODO("未実装")
+                //fragment.addTodoIntent(items[position][FileName().list]!!, position)
             }
         })
 

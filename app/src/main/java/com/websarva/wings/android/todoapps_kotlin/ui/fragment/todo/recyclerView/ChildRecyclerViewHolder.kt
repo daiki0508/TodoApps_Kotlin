@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.todo.recyclerView
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView
 
 import android.view.ContextMenu
 import android.view.Menu

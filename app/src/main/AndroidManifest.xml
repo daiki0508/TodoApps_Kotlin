@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoApps_Kotlin">
         <activity
+            android:name=".ui.afterlogin.AfterLoginActivity"
+            android:exported="true" />
+        <activity
             android:name=".ui.licenses.LicensesActivity"
             android:exported="true" />
         <activity
@@ -22,7 +25,7 @@
             android:name=".ui.add.AddTodoTaskActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.todo.TodoActivity"
+            android:name="com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment"
             android:exported="false" />
         <activity
             android:name=".ui.main.MainActivity"

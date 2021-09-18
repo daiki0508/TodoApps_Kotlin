@@ -2,16 +2,20 @@ package com.websarva.wings.android.todoapps_kotlin.viewModel
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
@@ -22,73 +26,80 @@ import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositor
 import kotlinx.coroutines.*
 import java.io.File
 
-@SuppressLint("StaticFieldLeak")
 class TodoViewModel(
     private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
     private val preferenceRepository: PreferenceRepositoryClient,
-    private val offLineRepository: OffLineRepositoryClient
-): ViewModel() {
+    private val offLineRepository: OffLineRepositoryClient,
+    application: Application
+): AndroidViewModel(application) {
+    private val _context = MutableLiveData<Context>().apply {
+        MutableLiveData<Context>()
+    }
     private val _todoList = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
     }
     private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>().apply {
         MutableLiveData<MutableMap<String, Boolean?>>()
     }
-
-    private var activity: Activity?
-    private var storage: FirebaseStorage?
-    private var auth: FirebaseAuth?
-    private var networkStatus: Boolean?
+    private val _storage = MutableLiveData<FirebaseStorage>().apply {
+        MutableLiveData<FirebaseStorage>()
+    }
+    private val _auth = MutableLiveData<FirebaseAuth>().apply {
+        MutableLiveData<FirebaseAuth>()
+    }
+    private val _networkStatus = MutableLiveData<Boolean>().apply {
+        MutableLiveData<Boolean>()
+    }
 
     fun connectingStatus(): NetworkCapabilities? {
         val connectivityManager =
-            activity?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            getApplication<Application>().applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         // 戻り値がnullでなければ、ネットワークに接続されている
         return connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     }
 
     fun upload(){
-        firebaseStorageRepository.upload(activity!!, storage!!, auth!!, task = null, flag = false)
+        firebaseStorageRepository.upload(_context.value!!, _storage.value!!, _auth.value!!, task = null, flag = false)
     }
 
     fun download(flag: Boolean){
         if (flag){
-            firebaseStorageRepository.download(activity!!, addViewModel = null, this, storage!!, auth!!, tasks = null, flag)
+            firebaseStorageRepository.download(_context.value!!, addViewModel = null, this, _storage.value!!, _auth.value!!, tasks = null, flag)
         }else{
-            if (File(activity?.filesDir, FileName().list).exists()){
-                val lists = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
-                firebaseStorageRepository.download(activity!!, addViewModel = null, this, storage!!, auth!!, lists, flag)
+            if (File(_context.value?.filesDir, FileName().list).exists()){
+                val lists = CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
+                firebaseStorageRepository.download(_context.value!!, addViewModel = null, this, _storage.value!!, _auth.value!!, lists, flag)
             }
         }
     }
 
     fun delete(position: Int, flag: Boolean){
         if (flag){
-            firebaseStorageRepository.delete(storage!!, auth!!, task = null, flag)
+            firebaseStorageRepository.delete(_storage.value!!, _auth.value!!, task = null, flag)
         }else{
-            val tasks = CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
-            if (File("${activity?.filesDir}/task/${tasks!!.split(" ")[position]}/${FileName().task}").exists()){
-                firebaseStorageRepository.delete(storage!!, auth!!, tasks.split(" ")[position], flag)
+            val tasks = CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            if (File("${_context.value?.filesDir}/task/${tasks!!.split(" ")[position]}/${FileName().task}").exists()){
+                firebaseStorageRepository.delete(_storage.value!!, _auth.value!!, tasks.split(" ")[position], flag)
             }
         }
     }
 
     fun readPreference(list: String, keyName: String): Boolean{
-        return preferenceRepository.read(activity!!, list, keyName)
+        return preferenceRepository.read(_context.value!!, list, keyName)
     }
 
     fun deletePreference(list: String){
-        preferenceRepository.delete(activity!!, list)
+        preferenceRepository.delete(_context.value!!, list)
     }
 
     fun deleteAll(){
-        if (auth?.currentUser!!.uid != offLineRepository.read(activity!!)){
-            if (File(activity?.filesDir, FileName().list).length() != 0L){
-                File("${activity?.filesDir}/${FileName().list}").deleteRecursively()
-                File("${activity?.filesDir}/${FileName().iv_aes}").deleteRecursively()
-                File("${activity?.filesDir}/${FileName().salt}").deleteRecursively()
+        if (_auth.value?.currentUser!!.uid != offLineRepository.read(_context.value!!)){
+            if (File(_context.value?.filesDir, FileName().list).length() != 0L){
+                File("${_context.value?.filesDir}/${FileName().list}").deleteRecursively()
+                File("${_context.value?.filesDir}/${FileName().iv_aes}").deleteRecursively()
+                File("${_context.value?.filesDir}/${FileName().salt}").deleteRecursively()
 
-                File("${activity?.filesDir}/task").deleteRecursively()
+                File("${_context.value?.filesDir}/task").deleteRecursively()
             }
         }
     }
@@ -96,12 +107,12 @@ class TodoViewModel(
     fun countUnCompleteTask(list: String): Int{
         var cnt = 0
 
-        if (File("${activity?.filesDir}/task/$list/${FileName().task}").length() != 0L){
+        if (File("${_context.value?.filesDir}/task/$list/${FileName().task}").length() != 0L){
             // ネットワーク接続状態によって処理を分岐
             val tasks: String? = if (connectingStatus() != null){
-                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
+                CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
             }else{
-                CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 1, list, null, flag = false)
+                CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "",type = 1, list, null, flag = false)
             }
 
             val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
@@ -122,30 +133,30 @@ class TodoViewModel(
     }
 
     fun update(list: String){
-        if (networkStatus == true){
+        if (_networkStatus.value == true){
             if (connectingStatus() != null){
-                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
+                CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
             }else{
-                if (!File("${activity?.filesDir?.parent}/shared_prefs/offline.xml").exists()){
-                    offLineRepository.write(activity!!)
+                if (!File("${_context.value?.filesDir?.parent}/shared_prefs/offline.xml").exists()){
+                    offLineRepository.write(_context.value!!)
                 }
-                CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
+                CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
             }
         }else{
-            if (!File("${activity?.filesDir?.parent}/shared_prefs/offline.xml").exists()){
-                offLineRepository.write(activity!!)
+            if (!File("${_context.value?.filesDir?.parent}/shared_prefs/offline.xml").exists()){
+                offLineRepository.write(_context.value!!)
             }
-            CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
+            CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), list, type = 0, task = null, aStr = null, flag = true)
         }
     }
 
     fun createView(){
         // ネットワークの接続状況によって処理を分割
-        val lists: String? = if (networkStatus == true){
-            offLineRepository.online(activity!!, auth!!)
-            CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+        val lists: String? = if (_networkStatus.value == true){
+            offLineRepository.online(_context.value!!, _auth.value!!)
+            CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }else{
-            CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }
 
         //Log.d("lists", lists!!)
@@ -153,19 +164,19 @@ class TodoViewModel(
     }
 
     fun getTask(list: String): MutableList<MutableMap<String, String>>{
-        val taskFile = File("${activity?.filesDir}/task/$list/${FileName().task}")
+        val taskFile = File("${_context.value?.filesDir}/task/$list/${FileName().task}")
         val tasks: String? = if (taskFile.length() != 0L){
             // ネットワーク接続状態によって処理を分岐
-            if (networkStatus == true){
-                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
+            if (_networkStatus.value == true){
+                CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, aStr = null, flag = false)
             }else{
-                CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
+                CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "",type = 1, list, aStr = null, flag = false)
             }
         }else{
-            if (networkStatus == true){
-                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 2, list, aStr = null, flag = false)
+            if (_networkStatus.value == true){
+                CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 2, list, aStr = null, flag = false)
             }else{
-                CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 2, list, aStr = null, flag = false)
+                CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "",type = 2, list, aStr = null, flag = false)
             }
         }
 
@@ -193,9 +204,9 @@ class TodoViewModel(
         val fromPositionItem = items[fromPosition][FileName().list]
         // ネットワーク接続状態によって処理を分岐
         val lists: String? = if (connectingStatus() != null){
-            CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }else{
-            CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }
 
         //Log.d("remove_b", lists!!)
@@ -228,19 +239,19 @@ class TodoViewModel(
         //Log.d("remove_a", newLists)
         // ネットワーク接続状態によって処理を分岐
         if (connectingStatus() != null){
-            CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), newLists, type = 7, task = null, aStr = null, flag = true)
+            CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), newLists, type = 7, task = null, aStr = null, flag = true)
             upload()
         }else{
-            CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), newLists, type = 7, task = null, aStr = null, flag = true)
+            CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), newLists, type = 7, task = null, aStr = null, flag = true)
         }
     }
 
     fun listDelete(position: Int){
         // ネットワーク接続状態によって処理を分岐
         val listsBefore: String? = if (connectingStatus() != null){
-            CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }else{
-            CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
+            CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
         }
         //Log.d("update_b", listsBefore!!)
         // listから該当task名を削除
@@ -253,9 +264,9 @@ class TodoViewModel(
                  ネットワーク接続状態によって処理を分岐
                  */
                 if (connectingStatus() != null){
-                    CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 6, task = null, aStr = null, flag = true)
+                    CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "", type = 6, task = null, aStr = null, flag = true)
                 }else{
-                    CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "", type = 6, task = null, aStr = null, flag = true)
+                    CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "", type = 6, task = null, aStr = null, flag = true)
                 }
             }else{
                 /*
@@ -263,9 +274,9 @@ class TodoViewModel(
                  ネットワーク接続状態によって処理を分岐
                  */
                 if (connectingStatus() != null){
-                    CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+                    CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "", type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
                 }else{
-                    CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "", type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+                    CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "", type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
                 }
             }
         }else{
@@ -274,16 +285,16 @@ class TodoViewModel(
              ネットワーク接続状態によって処理を分岐
              */
             if (connectingStatus() != null){
-                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), listsAfter, type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+                CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), listsAfter, type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
             }else{
-                CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), listsAfter, type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+                CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), listsAfter, type = 7, task = listsBefore.split(" ")[position], aStr = null, flag = true)
             }
         }
-        if (File("${activity?.filesDir}/task/${listsBefore.split(" ")[position]}/${FileName().task}").exists()){
+        if (File("${_context.value?.filesDir}/task/${listsBefore.split(" ")[position]}/${FileName().task}").exists()){
             if (connectingStatus() != null){
-                CryptClass().decrypt(activity!!, "${auth?.currentUser!!.uid}0000".toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+                CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
             }else{
-                CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
+                CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "", type = 5, task = listsBefore.split(" ")[position], aStr = null, flag = true)
             }
         }
         //Log.d("update_a", CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)!!)
@@ -297,11 +308,10 @@ class TodoViewModel(
         return _todoList
     }
 
-    fun setInit(auth: FirebaseAuth?, context: Activity, storage: FirebaseStorage?, networkStatus: Boolean){
-        this.auth = auth
-        this.activity = context
-        this.storage = storage
-        this.networkStatus = networkStatus
+    fun setInit(auth: FirebaseAuth?, storage: FirebaseStorage?, networkStatus: Boolean){
+        _auth.value = auth
+        _storage.value = storage
+        _networkStatus.value = networkStatus
     }
 
     fun setCompleteFlag(taskMap: MutableMap<String, Boolean?>){
@@ -309,6 +319,7 @@ class TodoViewModel(
     }
 
     init {
+        _context.value = getApplication<Application>().applicationContext
         _completeFlag.value = mutableMapOf(
             DownloadStatus().list to null,
             DownloadStatus().iv_aes_list to null,
@@ -318,9 +329,5 @@ class TodoViewModel(
             DownloadStatus().salt_task to null
         )
         _todoList.value = mutableListOf()
-        auth = null
-        activity = null
-        storage = null
-        networkStatus = null
     }
 }

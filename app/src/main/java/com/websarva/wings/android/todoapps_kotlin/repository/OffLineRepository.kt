@@ -1,6 +1,7 @@
 package com.websarva.wings.android.todoapps_kotlin.repository
 
 import android.app.Activity
+import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -8,19 +9,19 @@ import com.google.firebase.auth.FirebaseAuth
 import java.security.SecureRandom
 
 interface OffLineRepository {
-    fun write(activity: Activity)
-    fun online(activity: Activity, auth: FirebaseAuth)
-    fun read(activity: Activity): String?
+    fun write(context: Context)
+    fun online(context: Context, auth: FirebaseAuth)
+    fun read(context: Context): String?
 }
 
 class OffLineRepositoryClient: OffLineRepository {
-    override fun write(activity: Activity) {
+    override fun write(context: Context) {
         val random = SecureRandom()
         val bytes = ByteArray(16)
         random.nextBytes(bytes)
         val buf = StringBuffer()
 
-        with(createPreference(activity).edit()){
+        with(createPreference(context).edit()){
             for (i in bytes.indices){
                 buf.append(String.format("%02x", bytes[i]))
             }
@@ -29,23 +30,23 @@ class OffLineRepositoryClient: OffLineRepository {
         }
     }
 
-    override fun online(activity: Activity, auth: FirebaseAuth) {
-        with(createPreference(activity).edit()){
+    override fun online(context: Context, auth: FirebaseAuth) {
+        with(createPreference(context).edit()){
             putString("pass", "${auth.currentUser!!.uid}0000")
             apply()
         }
     }
 
-    override fun read(activity: Activity): String? {
-        return createPreference(activity).getString("pass", "")
+    override fun read(context: Context): String? {
+        return createPreference(context).getString("pass", "")
     }
 
-    private fun createPreference(activity: Activity): SharedPreferences {
-        val mainKey = MasterKey.Builder(activity)
+    private fun createPreference(context: Context): SharedPreferences {
+        val mainKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
         return EncryptedSharedPreferences.create(
-            activity,
+            context,
             "offline",
             mainKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,

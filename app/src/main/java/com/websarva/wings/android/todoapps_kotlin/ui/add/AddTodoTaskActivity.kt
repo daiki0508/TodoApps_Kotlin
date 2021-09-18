@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.websarva.wings.android.todoapps_kotlin.BuildConfig
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAddTodoListBinding
@@ -26,7 +27,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
-import com.websarva.wings.android.todoapps_kotlin.ui.todo.TodoActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.settings.SettingsActivity
@@ -57,7 +58,9 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
             setContentView(this.root)
         }
 
-        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        if (!BuildConfig.DEBUG){
+            window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        }
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -361,7 +364,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
     }
 
     private fun todoIntent(){
-        Intent(this, TodoActivity::class.java).apply {
+        Intent(this, TodoFragment::class.java).apply {
             this.putExtra("network", networkStatus)
             startActivity(this)
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)

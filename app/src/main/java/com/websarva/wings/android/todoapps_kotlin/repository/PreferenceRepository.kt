@@ -11,37 +11,37 @@ import androidx.security.crypto.MasterKey
 import java.io.File
 
 interface PreferenceRepository {
-    fun write(activity: Activity, task: String, keyName: String, checkFlag: Boolean)
-    fun read(activity: Activity, task: String, keyName: String): Boolean
-    fun delete(activity: Activity, list: String)
+    fun write(context: Context, task: String, keyName: String, checkFlag: Boolean)
+    fun read(context: Context, task: String, keyName: String): Boolean
+    fun delete(context: Context, list: String)
 }
 
 class PreferenceRepositoryClient: PreferenceRepository {
-    override fun write(activity: Activity, task: String, keyName: String, checkFlag: Boolean) {
-        with(createPreference(activity, task).edit()){
+    override fun write(context: Context, task: String, keyName: String, checkFlag: Boolean) {
+        with(createPreference(context, task).edit()){
             putBoolean(keyName, checkFlag)
             apply()
         }
     }
 
-    override fun read(activity: Activity, task: String, keyName: String): Boolean {
-        return createPreference(activity, task).getBoolean(keyName, false)
+    override fun read(context: Context, task: String, keyName: String): Boolean {
+        return createPreference(context, task).getBoolean(keyName, false)
     }
 
-    override fun delete(activity: Activity, list: String) {
+    override fun delete(context: Context, list: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            activity.deleteSharedPreferences(list)
+            context.deleteSharedPreferences(list)
         }else{
-            File("${activity.filesDir.parent}/shared_prefs/$list.xml").delete()
+            File("${context.filesDir.parent}/shared_prefs/$list.xml").delete()
         }
     }
 
-    private fun createPreference(activity: Activity, task: String): SharedPreferences{
-        val mainKey = MasterKey.Builder(activity)
+    private fun createPreference(context: Context, task: String): SharedPreferences{
+        val mainKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
         return EncryptedSharedPreferences.create(
-            activity,
+            context,
             task,
             mainKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
