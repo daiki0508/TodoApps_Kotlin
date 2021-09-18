@@ -1,9 +1,9 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer
 
-import android.app.Activity
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -12,14 +12,16 @@ import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.NavigationViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
 class NavRecyclerViewAdapter(
     private var items: MutableList<MutableMap<String, String>>,
     private var position: Int,
     private var todoViewModel: TodoViewModel?,
+    private val navViewModel: NavigationViewModel?,
     private var addTodoTaskViewModel: AddTodoTaskViewModel?,
-    private var activity: Activity
+    private var activity: FragmentActivity
 ): RecyclerView.Adapter<NavRecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
@@ -37,9 +39,9 @@ class NavRecyclerViewAdapter(
 
         holder.title.text = items[position][FileName().list]
 
-        if (todoViewModel != null) {
+        if (navViewModel != null) {
             holder.count.text =
-                todoViewModel!!.countUnCompleteTask(items[position][FileName().list]!!).toString()
+                navViewModel.countUnCompleteTask(items[position][FileName().list]!!, todoViewModel!!).toString()
         } else {
             holder.count.text = addTodoTaskViewModel!!.countUnCompleteTask(
                 items = null,
@@ -83,8 +85,8 @@ class NavRecyclerViewAdapter(
             val fromPosition = viewHolder.absoluteAdapterPosition
             val toPosition = target.absoluteAdapterPosition
 
-            if (todoViewModel != null){
-                todoViewModel!!.move(items, fromPosition, toPosition)
+            if (navViewModel != null){
+                navViewModel.move(items, fromPosition, toPosition, todoViewModel!!)
                 todoRecyclerView?.notifyItemMoved(fromPosition, toPosition)
             }else{
                 addTodoTaskViewModel!!.move(items, fromPosition, toPosition, flag = true)

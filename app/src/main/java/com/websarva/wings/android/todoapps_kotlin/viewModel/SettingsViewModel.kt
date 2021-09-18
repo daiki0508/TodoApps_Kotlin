@@ -39,7 +39,7 @@ class SettingsViewModel(
     }
 
     fun firebaseAuthWithGoogle(auth: FirebaseAuth, idToken: String): Task<AuthResult> {
-        return firebaseTopRepository.firebaseAuthWithGoogle(activity!!, auth, idToken)
+        return firebaseTopRepository.firebaseAuthWithGoogle(auth, idToken)
     }
 
     fun backup(auth: FirebaseAuth, storage: FirebaseStorage){

@@ -46,7 +46,7 @@ class MainViewModel(
                 val currentUser = FirebaseAuth.getInstance().currentUser
                 if (currentUser != null) {
                     Log.i("test", "CurrentUser")
-                    activity.todoIntent(flag = true)
+                    activity.afterLoginIntent(flag = true)
                 }
             }
         }

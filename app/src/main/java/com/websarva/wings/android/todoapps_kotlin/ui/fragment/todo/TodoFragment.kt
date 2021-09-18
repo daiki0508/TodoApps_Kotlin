@@ -5,7 +5,7 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -19,9 +19,11 @@ import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
-import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateTodoViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -30,14 +32,16 @@ class TodoFragment : Fragment(), DialogListener {
     private val binding
     get() = _binding!!
 
-    private val viewModel: TodoViewModel by viewModel()
+    private val viewModel: TodoViewModel by sharedViewModel()
+    private val afterLoginViewModel by activityViewModels<AfterLoginViewModel>()
+    private val privateViewModel: PrivateTodoViewModel by viewModel()
 
     private var networkStatus: Boolean? = null
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
     private var apAdapter: RecyclerViewAdapter? = null
-    private var nvAdapter: NavRecyclerViewAdapter? = null
-    private lateinit var itemTouchHelper: ItemTouchHelper
+    //private var nvAdapter: NavRecyclerViewAdapter? = null
+    //private lateinit var itemTouchHelper: ItemTouchHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,7 +61,7 @@ class TodoFragment : Fragment(), DialogListener {
         }
 
         // MainActivityからのintent情報を取得
-        networkStatus = arguments?.getBoolean("network", false)
+        networkStatus = afterLoginViewModel.networkStatus().value
         Log.d("network", networkStatus.toString())
 
         // ネットワークの接続状態によって処理を分岐
@@ -65,21 +69,22 @@ class TodoFragment : Fragment(), DialogListener {
             auth = Firebase.auth
             storage = FirebaseStorage.getInstance()
             viewModel.setInit(auth, storage, networkStatus!!)
-            viewModel.deleteAll()
+            privateViewModel.setInit(auth, storage, networkStatus!!)
+            privateViewModel.deleteAll()
         }else{
             viewModel.setInit(auth = null, storage = null, networkStatus!!)
+            privateViewModel.setInit(auth = null, storage = null, networkStatus!!)
         }
 
         activity?.let {
             // メイン画面
             binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-            //binding.navRecyclerView.layoutManager = LinearLayoutManager(it)
 
             // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
             if (networkStatus == true){
                 // TodoActivityで端末がoffline状態になった時の対応
                 if (viewModel.connectingStatus() != null){
-                    viewModel.download(flag = true)
+                    privateViewModel.download(flag = true)
                 }else{
                     networkStatus = false
                     if (File(it.filesDir, FileName().list).length() != 0L){
@@ -94,7 +99,7 @@ class TodoFragment : Fragment(), DialogListener {
             }
         }
 
-        viewModel.completeFlag().observe(this.viewLifecycleOwner, {
+        privateViewModel.completeFlag().observe(this.viewLifecycleOwner, {
             when {
                 (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) and (it[DownloadStatus().task] == true) and (it[DownloadStatus().iv_aes_task] == true) and (it[DownloadStatus().salt_task] == true) -> {
                     viewModel.createView()
@@ -103,7 +108,7 @@ class TodoFragment : Fragment(), DialogListener {
                     viewModel.createView()
                 }
                 (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) -> {
-                    viewModel.download(flag = false)
+                    privateViewModel.download(flag = false)
                 }
             }
         })
@@ -118,8 +123,9 @@ class TodoFragment : Fragment(), DialogListener {
                 binding.recyclerview.visibility = View.VISIBLE
 
                 // メイン画面
-                apAdapter = RecyclerViewAdapter(it, this, viewModel)
+                apAdapter = RecyclerViewAdapter(it, this, privateViewModel, viewModel)
                 binding.recyclerview.adapter = apAdapter
+                viewModel.setAdapter(apAdapter!!)
 
                 apAdapter!!.setOnItemClickListener(object: OnItemClickListener {
                     override fun onItemClickListener(view: View, position: Int, list: String?) {
@@ -128,54 +134,8 @@ class TodoFragment : Fragment(), DialogListener {
                     }
                 })
                 Log.d("test", "Called")
-
-                // NavigationDrawer
-                /*nvAdapter = NavRecyclerViewAdapter(it, -1, todoViewModel = viewModel, addTodoTaskViewModel = null, this)
-                binding.navRecyclerView.adapter = nvAdapter
-                itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(apAdapter))
-                itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
-
-                nvAdapter!!.setOnItemClickListener(object: OnItemClickListener{
-                    override fun onItemClickListener(view: View, position: Int, list: String?) {
-                        //addTodoIntent(list!!, position)
-                    }
-                })*/
             }
         })
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        //setSupportActionBar(binding.toolbar)
-        //supportActionBar?.setDisplayShowTitleEnabled(false)
-
-        /*val toggle = ActionBarDrawerToggle(this, binding.drawerLayout,binding.toolbar, R.string.drawer_open, R.string.drawer_close)
-        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()*/
-
-        // タスク一覧
-        /*val nvTopAdapter = NavTopRecyclerViewAdapter(type = 0, flag = true, this)
-        binding.navTopRecyclerView.adapter = nvTopAdapter
-        binding.navTopRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        binding.navTopRecyclerView.layoutManager = LinearLayoutManager(this)*/
-
-        // 設定
-        /*val nvSettingsAdapter = NavTopRecyclerViewAdapter(type = 1, flag = true, this)
-        binding.navFooterRecyclerView.adapter = nvSettingsAdapter
-        binding.navFooterRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        binding.navFooterRecyclerView.layoutManager = LinearLayoutManager(this)*/
-
-        /*nvSettingsAdapter.setOnItemClickListener(object: OnItemClickListener{
-            override fun onItemClickListener(view: View, position: Int, list: String?) {
-                Intent(this@TodoFragment, SettingsActivity::class.java).apply {
-                    this.putExtra("flag", true)
-                    this.putExtra("network", networkStatus)
-                    startActivity(this)
-                    finish()
-                }
-            }
-        })*/
     }
 
     override fun onDialogFlagReceive(
@@ -185,7 +145,7 @@ class TodoFragment : Fragment(), DialogListener {
         flag: Boolean,
         position: Int?
     ) {
-        viewModel.update(list)
+        privateViewModel.update(list)
 
         if (apAdapter == null){
             viewModel.createView()
@@ -193,7 +153,7 @@ class TodoFragment : Fragment(), DialogListener {
             apAdapter!!.items.add(mutableMapOf(FileName().list to list))
             apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
 
-            nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
+            //nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
         }
         // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
         if (networkStatus == true){
@@ -220,12 +180,12 @@ class TodoFragment : Fragment(), DialogListener {
                 Log.d("context", position.toString())
 
                 val list = apAdapter!!.items[position][FileName().list]
-                viewModel.deletePreference(list!!)
+                privateViewModel.deletePreference(list!!)
 
                 apAdapter!!.items.removeAt(position)
                 apAdapter?.notifyItemRemoved(position)
 
-                nvAdapter?.notifyItemRemoved(position)
+                //nvAdapter?.notifyItemRemoved(position)
 
                 if (apAdapter!!.itemCount == 0){
                     binding.recyclerview.visibility = View.GONE
@@ -240,15 +200,15 @@ class TodoFragment : Fragment(), DialogListener {
                     if (networkStatus == true){
                         // TodoActivityで端末がoffline状態になった時の対応
                         if (viewModel.connectingStatus() != null){
-                            viewModel.delete(position, flag = true)
-                            viewModel.delete(position, flag = false)
+                            privateViewModel.delete(position, flag = true)
+                            privateViewModel.delete(position, flag = false)
                         }else{
                             networkStatus = false
                             NetWorkFailureDialog(flag = false).show(requireActivity().supportFragmentManager, "NetWorkFailureDialog")
                         }
                     }
                     // 内部ストレージからtaskファイルを完全削除する
-                    viewModel.listDelete(position)
+                    privateViewModel.listDelete(position)
                 }else{
                     /*
                      内部ストレージのlistから該当task名を削除
@@ -258,13 +218,13 @@ class TodoFragment : Fragment(), DialogListener {
                     if (networkStatus == true){
                         // TodoActivityで端末がoffline状態になった時の対応
                         if (viewModel.connectingStatus() != null){
-                            viewModel.delete(position, flag = false)
+                            privateViewModel.delete(position, flag = false)
                         }else{
                             networkStatus = false
                             NetWorkFailureDialog(flag = false).show(requireActivity().supportFragmentManager, "NetWorkFailureDialog")
                         }
                     }
-                    viewModel.listDelete(position)
+                    privateViewModel.listDelete(position)
                     // ネットワークに接続されている場合のみ、FirebaseStorageのlist更新
                     if (networkStatus == true){
                         // TodoActivityで端末がoffline状態になった時の対応

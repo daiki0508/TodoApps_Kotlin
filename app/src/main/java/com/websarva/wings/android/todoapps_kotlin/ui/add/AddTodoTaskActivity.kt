@@ -28,8 +28,8 @@ import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
-import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavRecyclerViewAdapter
-import com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer.NavTopRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavRecyclerViewAdapter
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavTopRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.settings.SettingsActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -128,7 +128,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
         })
 
         // NavigationDrawer
-        nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel, this)
+        /*nvAdapter = NavRecyclerViewAdapter(viewModel.getList(), this.position, todoViewModel = null, addTodoTaskViewModel = viewModel, this)
         binding.navRecyclerView.adapter = nvAdapter
         nvItemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoRecyclerView = null))
         nvItemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
@@ -143,7 +143,7 @@ class AddTodoTaskActivity : AppCompatActivity(), DialogListener {
                     finish()
                 }
             }
-        })
+        })*/
 
         viewModel.todoTask().observe(this, {
             if (it.isNotEmpty()){

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer
 
 import android.view.View
 import android.widget.TextView

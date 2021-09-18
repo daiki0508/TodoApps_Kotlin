@@ -1,9 +1,9 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.navigationDrawer
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer
 
-import android.app.Activity
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
@@ -12,7 +12,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 class NavTopRecyclerViewAdapter(
     private var type: Int,
     private var flag: Boolean,
-    private var activity: Activity
+    private var activity: FragmentActivity
 ): RecyclerView.Adapter<NavTopRecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 

@@ -11,6 +11,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateTodoViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.SettingsViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import java.io.File
@@ -21,7 +22,7 @@ interface FirebaseStorageRepository {
     fun download(
         context: Context,
         addViewModel: AddTodoTaskViewModel?,
-        todoViewModel: TodoViewModel?,
+        todoViewModel: PrivateTodoViewModel?,
         storage: FirebaseStorage,
         auth: FirebaseAuth,
         tasks: String?,
@@ -62,7 +63,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
     override fun download(
         context: Context,
         addViewModel: AddTodoTaskViewModel?,
-        todoViewModel: TodoViewModel?,
+        todoViewModel: PrivateTodoViewModel?,
         storage: FirebaseStorage,
         auth: FirebaseAuth,
         tasks: String?,
@@ -162,7 +163,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
     private fun downloadTask(
         context: Context,
         addViewModel: AddTodoTaskViewModel?,
-        todoViewModel: TodoViewModel?,
+        todoViewModel: PrivateTodoViewModel?,
         child: String,
         storageRef: StorageReference,
         uid: String,

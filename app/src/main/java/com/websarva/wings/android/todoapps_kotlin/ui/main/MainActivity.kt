@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity(), DialogListener {
             }
     }
 
-    private fun afterLoginIntent(flag: Boolean){
+    fun afterLoginIntent(flag: Boolean){
         // trueがNetWork接続状態
         Intent(this, AfterLoginActivity::class.java).apply {
             this.putExtra(IntentBundle.NetworkStatus.name, flag)

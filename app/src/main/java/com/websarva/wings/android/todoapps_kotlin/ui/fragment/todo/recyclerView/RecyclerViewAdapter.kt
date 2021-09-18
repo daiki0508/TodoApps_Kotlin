@@ -11,12 +11,14 @@ import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
+import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateTodoViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
 class RecyclerViewAdapter(
     var items: MutableList<MutableMap<String, String>>,
     private var fragment: TodoFragment,
-    private var viewModel: TodoViewModel
+    private var todoViewModel: PrivateTodoViewModel,
+    private val viewModel: TodoViewModel
     ): RecyclerView.Adapter<RecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
@@ -35,7 +37,7 @@ class RecyclerViewAdapter(
         }
 
         holder.rvContents.layoutManager = LinearLayoutManager(fragment.requireActivity())
-        val adapter =  ChildRecyclerViewAdapter(viewModel.getTask(items[position][FileName().list]!!), this, position)
+        val adapter =  ChildRecyclerViewAdapter(todoViewModel.getTask(items[position][FileName().list]!!, viewModel), this, position)
         holder.rvContents.adapter = adapter
 
         holder.titleView.setOnCreateContextMenuListener(holder)
