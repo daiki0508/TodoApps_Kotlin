@@ -22,7 +22,7 @@
             android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.add.AddTodoTaskActivity"
+            android:name="com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment"
             android:exported="false" />
         <activity
             android:name="com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment"

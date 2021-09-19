@@ -1,11 +1,8 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.recyclerView
 
-import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,14 +11,13 @@ import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
-import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
 class RecyclerViewAdapter(
     var itemTouchHelper: ItemTouchHelper,
     var task: String,
-    private var activity: AddTodoTaskActivity,
+    private var fragment: AddTodoTaskFragment,
     private var viewModel: AddTodoTaskViewModel,
     var ACAdapter: ChildRecyclerViewAdapter?
     ): RecyclerView.Adapter<RecyclerViewHolder>() {
@@ -43,17 +39,19 @@ class RecyclerViewAdapter(
             }
         }
 
-        holder.rvContents.layoutManager = LinearLayoutManager(activity)
-        holder.rvContents.adapter = ACAdapter
-        holder.rvContents.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
+        fragment.activity?.let {
+            holder.rvContents.layoutManager = LinearLayoutManager(it)
+            holder.rvContents.adapter = ACAdapter
+            holder.rvContents.addItemDecoration(DividerItemDecoration(it, DividerItemDecoration.VERTICAL))
 
-        ACAdapter!!.setOnItemClickListener(object: OnChildItemClickListener{
-            override fun onItemClickListener(view: View, position: Int) {
-                // taskの更新
-                viewModel.setPosition(position)
-                AddListDialog(flag = true, type = 1, position).show(activity.supportFragmentManager, "UpdateTaskDialog")
-            }
-        })
+            ACAdapter!!.setOnItemClickListener(object: OnChildItemClickListener{
+                override fun onItemClickListener(view: View, position: Int) {
+                    // taskの更新
+                    viewModel.setPosition(position)
+                    AddListDialog(flag = true, type = 1, position).show(it.supportFragmentManager, "UpdateTaskDialog")
+                }
+            })
+        }
 
         itemTouchHelper.attachToRecyclerView(holder.rvContents)
     }

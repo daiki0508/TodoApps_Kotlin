@@ -20,7 +20,6 @@ class NavRecyclerViewAdapter(
     private var position: Int,
     private var todoViewModel: TodoViewModel?,
     private val navViewModel: NavigationViewModel?,
-    private var addTodoTaskViewModel: AddTodoTaskViewModel?,
     private var activity: FragmentActivity
 ): RecyclerView.Adapter<NavRecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
@@ -42,11 +41,6 @@ class NavRecyclerViewAdapter(
         if (navViewModel != null) {
             holder.count.text =
                 navViewModel.countUnCompleteTask(items[position][FileName().list]!!, todoViewModel!!).toString()
-        } else {
-            holder.count.text = addTodoTaskViewModel!!.countUnCompleteTask(
-                items = null,
-                items[position][FileName().list]
-            ).toString()
         }
 
         if (position == this.position) {
@@ -88,8 +82,6 @@ class NavRecyclerViewAdapter(
             if (navViewModel != null){
                 navViewModel.move(items, fromPosition, toPosition, todoViewModel!!)
                 todoRecyclerView?.notifyItemMoved(fromPosition, toPosition)
-            }else{
-                addTodoTaskViewModel!!.move(items, fromPosition, toPosition, flag = true)
             }
 
             items.add(toPosition, items.removeAt(fromPosition))

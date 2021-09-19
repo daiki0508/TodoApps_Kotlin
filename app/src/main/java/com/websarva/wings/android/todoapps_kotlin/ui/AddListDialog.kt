@@ -14,13 +14,14 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.websarva.wings.android.todoapps_kotlin.R
+import com.websarva.wings.android.todoapps_kotlin.model.DialogBundle
 
 class AddListDialog(
     private var flag: Boolean,
     private var type: Int,
     private var position: Int?
     ): DialogFragment() {
-    private var listener: DialogListener? = null
+    //private var listener: DialogListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = Dialog(requireActivity())
@@ -42,7 +43,28 @@ class AddListDialog(
             }
             findViewById<View>(R.id.positive_button).setOnClickListener {
                 val list = Editable.Factory.getInstance().newEditable(findViewById<EditText>(R.id.edList).text)
-                listener?.onDialogFlagReceive(this@AddListDialog, list.toString(), type, flag, position)
+
+                // 結果を送信
+                parentFragmentManager.setFragmentResult(DialogBundle.Result.name, Bundle().apply {
+                    // bundleに値をセット
+                    if (type == 0 && !flag){
+                        // listの追加
+                        this.putString(DialogBundle.List.name, list.toString())
+                    }else if (type == 1){
+                        // task・listの更新
+                        this.putString(DialogBundle.List.name, list.toString())
+                        this.putInt(DialogBundle.Type.name, type)
+                        this.putBoolean(DialogBundle.Flag.name, flag)
+                        this.putInt(DialogBundle.Position.name, position!!)
+                    }else{
+                        // taskの追加
+                        this.putString(DialogBundle.List.name, list.toString())
+                        this.putInt(DialogBundle.Type.name, type)
+                        this.putBoolean(DialogBundle.Flag.name, flag)
+                    }
+                })
+
+                // listの削除
                 list.clear()
                 dismiss()
             }
@@ -55,13 +77,13 @@ class AddListDialog(
         return builder
     }
 
-    override fun onAttach(context: Context) {
+    /*override fun onAttach(context: Context) {
         super.onAttach(context)
 
         try {
-            listener = context as DialogListener
+            listener = targetFragment as DialogListener
         }catch (e: Exception){
             Log.wtf("ERROR", "CANNOT FIND LISTENER")
         }
-    }
+    }*/
 }

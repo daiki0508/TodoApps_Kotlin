@@ -36,9 +36,6 @@ class TodoViewModel(
     private val _todoList = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
         MutableLiveData<MutableList<MutableMap<String, String>>>()
     }
-    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>().apply {
-        MutableLiveData<MutableMap<String, Boolean?>>()
-    }
     private val _storage = MutableLiveData<FirebaseStorage>().apply {
         MutableLiveData<FirebaseStorage>()
     }

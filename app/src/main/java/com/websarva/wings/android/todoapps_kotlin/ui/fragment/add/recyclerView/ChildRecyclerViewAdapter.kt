@@ -1,21 +1,16 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.recyclerView
 
 import android.graphics.Color
 import android.graphics.Paint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.marginTop
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
-import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
-import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 
 class ChildRecyclerViewAdapter(

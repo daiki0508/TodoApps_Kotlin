@@ -16,7 +16,7 @@ import com.websarva.wings.android.todoapps_kotlin.databinding.ActivitySettingsBi
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
-import com.websarva.wings.android.todoapps_kotlin.ui.add.AddTodoTaskActivity
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.viewModel.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -74,7 +74,7 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
                 finish()
             }
         }else{
-            Intent(this, AddTodoTaskActivity::class.java).apply {
+            Intent(this, AddTodoTaskFragment::class.java).apply {
                 this.putExtra("network", networkStatus)
                 this.putExtra(FileName().list, list)
                 this.putExtra("position", position)

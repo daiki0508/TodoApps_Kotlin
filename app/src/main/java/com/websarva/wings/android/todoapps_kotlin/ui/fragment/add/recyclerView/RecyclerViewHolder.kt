@@ -1,8 +1,7 @@
-package com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.recyclerView
 
 import android.view.View
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 

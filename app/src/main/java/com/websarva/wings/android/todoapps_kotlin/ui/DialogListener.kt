@@ -1,8 +1,6 @@
 package com.websarva.wings.android.todoapps_kotlin.ui
 
 import androidx.fragment.app.DialogFragment
-import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.ChildRecyclerViewAdapter
-import com.websarva.wings.android.todoapps_kotlin.ui.add.recyclerView.RecyclerViewAdapter
 
 interface DialogListener {
     fun onDialogFlagReceive(

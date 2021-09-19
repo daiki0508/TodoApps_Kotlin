@@ -3,22 +3,22 @@ package com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.*
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.BuildConfig
-import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
+import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.FragmentTodoBinding
+import com.websarva.wings.android.todoapps_kotlin.model.DialogBundle
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateTodoViewModel
@@ -27,7 +27,7 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
-class TodoFragment : Fragment(), DialogListener {
+class TodoFragment : Fragment(){
     private var _binding: FragmentTodoBinding? = null
     private val binding
     get() = _binding!!
@@ -40,8 +40,17 @@ class TodoFragment : Fragment(), DialogListener {
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
     private var apAdapter: RecyclerViewAdapter? = null
-    //private var nvAdapter: NavRecyclerViewAdapter? = null
-    //private lateinit var itemTouchHelper: ItemTouchHelper
+
+    private lateinit var transaction: FragmentTransaction
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // AddListDialogからの結果を取得
+        setFragmentResultListener(DialogBundle.Result.name){ _, data ->
+            privateViewModel.setList(data.getString(DialogBundle.List.name, ""))
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +72,8 @@ class TodoFragment : Fragment(), DialogListener {
         // MainActivityからのintent情報を取得
         networkStatus = afterLoginViewModel.networkStatus().value
         Log.d("network", networkStatus.toString())
+
+        transaction = requireActivity().supportFragmentManager.beginTransaction()
 
         // ネットワークの接続状態によって処理を分岐
         if (networkStatus == true){
@@ -129,46 +140,47 @@ class TodoFragment : Fragment(), DialogListener {
 
                 apAdapter!!.setOnItemClickListener(object: OnItemClickListener {
                     override fun onItemClickListener(view: View, position: Int, list: String?) {
-                        // TODO("未実装")
-                        //addTodoIntent(list!!, position)
+                        privateViewModel.setBundle(list!!, position)
                     }
                 })
                 Log.d("test", "Called")
             }
         })
-    }
 
-    override fun onDialogFlagReceive(
-        dialog: DialogFragment,
-        list: String,
-        type: Int,
-        flag: Boolean,
-        position: Int?
-    ) {
-        privateViewModel.update(list)
+        privateViewModel.bundle().observe(this.viewLifecycleOwner, {
+            AddTodoTaskFragment().apply {
+                // bundleに値をセット
+                this.arguments = it
 
-        if (apAdapter == null){
-            viewModel.createView()
-        }else{
-            apAdapter!!.items.add(mutableMapOf(FileName().list to list))
-            apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
-
-            //nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
-        }
-        // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
-        if (networkStatus == true){
-            // TodoActivityで端末がoffline状態になった時の対応
-            if (viewModel.connectingStatus() != null){
-                viewModel.upload()
-            }else{
-                networkStatus = false
-                NetWorkFailureDialog(flag = false).show(requireActivity().supportFragmentManager, "NetWorkFailureDialog")
+                // AddTodoTaskFragmentへ遷移
+                transaction.replace(R.id.container, this).commit()
             }
-        }
-    }
+        })
 
-    override fun onDialogReceive(flag: Boolean) {
-        return
+        privateViewModel.list().observe(this.viewLifecycleOwner, {
+            if (it.isNotEmpty()){
+                privateViewModel.update(it)
+
+                if (apAdapter == null){
+                    viewModel.createView()
+                }else{
+                    apAdapter!!.items.add(mutableMapOf(FileName().list to it))
+                    apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
+
+                    //nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
+                }
+                // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
+                if (networkStatus == true){
+                    // TodoActivityで端末がoffline状態になった時の対応
+                    if (viewModel.connectingStatus() != null){
+                        viewModel.upload()
+                    }else{
+                        networkStatus = false
+                        NetWorkFailureDialog(flag = false).show(requireActivity().supportFragmentManager, "NetWorkFailureDialog")
+                    }
+                }
+            }
+        })
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -241,14 +253,9 @@ class TodoFragment : Fragment(), DialogListener {
         return retValue
     }
 
-    /*fun addTodoIntent(list: String, position: Int){
-        Intent(this@TodoFragment, AddTodoTaskActivity::class.java).apply {
-            this.putExtra(FileName().list, list)
-            this.putExtra("position", position)
-            this.putExtra("network", networkStatus)
-            startActivity(this)
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right,)
-            finish()
-        }
-    }*/
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
+    }
 }

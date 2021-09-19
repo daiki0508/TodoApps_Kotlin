@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -11,6 +12,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
+import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
@@ -36,6 +38,12 @@ class PrivateTodoViewModel(
     }
     private val _networkStatus = MutableLiveData<Boolean>().apply {
         MutableLiveData<Boolean>()
+    }
+    private val _bundle = MutableLiveData<Bundle>().apply {
+        MutableLiveData<Bundle>()
+    }
+    private val _list = MutableLiveData<String>().apply {
+        MutableLiveData<String>()
     }
 
     fun connectingStatus(): NetworkCapabilities? {
@@ -171,6 +179,13 @@ class PrivateTodoViewModel(
     fun completeFlag(): MutableLiveData<MutableMap<String, Boolean?>>{
         return _completeFlag
     }
+    fun bundle(): MutableLiveData<Bundle>{
+        return _bundle
+    }
+    fun list(): MutableLiveData<String>{
+        return _list
+    }
+
     fun setInit(auth: FirebaseAuth?, storage: FirebaseStorage?, networkStatus: Boolean){
         _auth.value = auth
         _storage.value = storage
@@ -178,6 +193,15 @@ class PrivateTodoViewModel(
     }
     fun setCompleteFlag(taskMap: MutableMap<String, Boolean?>){
         _completeFlag.value = taskMap
+    }
+    fun setBundle(list: String, position: Int){
+        _bundle.value = Bundle().apply {
+            this.putString(FileName().list, list)
+            this.putInt(IntentBundle.Position.name, position)
+        }
+    }
+    fun setList(list: String){
+        _list.value = list
     }
 
     init {
