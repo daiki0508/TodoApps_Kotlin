@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -15,7 +16,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivitySettingsBinding
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
+import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
+import com.websarva.wings.android.todoapps_kotlin.ui.afterlogin.AfterLoginActivity
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.viewModel.SettingsViewModel
@@ -23,11 +26,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
     private lateinit var binding: ActivitySettingsBinding
+
     private val viewModel: SettingsViewModel by viewModel()
 
-    private lateinit var list: String
-    private var position: Int? = null
-    private var flag: Boolean? = null
     private var networkStatus: Boolean? = null
 
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -45,15 +46,7 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
             setContentView(this.root)
         }
 
-        viewModel.setInit(this)
-
-        // falseがAddTodoTaskActivity
-        flag = intent.getBooleanExtra("flag", true)
-        networkStatus = intent.getBooleanExtra("network", false)
-        if (!flag!!){
-            list = intent.getStringExtra(FileName().list)!!
-            position = intent.getIntExtra("position", 0)
-        }
+        networkStatus = intent.getBooleanExtra(IntentBundle.NetworkStatus.name, false)
 
         // observer通知
         viewModel.completeFlag().observe(this, {
@@ -66,7 +59,7 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
     }
 
     override fun onBackPressed() {
-        // trueがTodoActivity
+        /*// trueがTodoActivity
         if (flag!!){
             Intent(this, TodoFragment::class.java).apply {
                 this.putExtra("network", networkStatus)
@@ -81,6 +74,13 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
                 startActivity(this)
                 finish()
             }
+        }*/
+
+        // AfterLoginActivityに戻る
+        Intent(this, AfterLoginActivity::class.java).apply {
+            this.putExtra(IntentBundle.NetworkStatus.name, networkStatus)
+            startActivity(this)
+            finish()
         }
     }
 

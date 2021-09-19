@@ -90,10 +90,6 @@ class TodoViewModel(
     fun readPreference(list: String, keyName: String): Boolean{
         return PreferenceRepositoryClient().read(_context.value!!, list, keyName)
     }
-
-    /*fun todoList(): MutableLiveData<MutableList<MutableMap<String, String>>>{
-        return _todoList
-    }*/
     fun apAdapter(): MutableLiveData<RecyclerViewAdapter>{
         return _apAdapter
     }
@@ -115,7 +111,6 @@ class TodoViewModel(
 
     init {
         _context.value = getApplication<Application>().applicationContext
-        //_todoList.value = mutableListOf()
 
         _completeFlag.value = mutableMapOf(
             DownloadStatus().list to null,
