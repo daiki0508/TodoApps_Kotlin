@@ -69,8 +69,8 @@ class NavigationFragment: Fragment() {
         }
 
         // NavigationDrawer
-        todoViewModel.todoList().observe(this.viewLifecycleOwner, {
-            nvAdapter = NavRecyclerViewAdapter(it, -1, todoViewModel = todoViewModel, navViewModel = viewModel, requireActivity())
+        todoViewModel.todoList.observe(this.viewLifecycleOwner, { event ->
+            nvAdapter = NavRecyclerViewAdapter(event.peekContent, -1, todoViewModel = todoViewModel, navViewModel = viewModel, requireActivity())
             binding.navRecyclerView.adapter = nvAdapter
             itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoViewModel.apAdapter().value))
             itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)

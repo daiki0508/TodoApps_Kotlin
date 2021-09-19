@@ -27,9 +27,6 @@ class PrivateTodoViewModel(
     private val _context = MutableLiveData<Context>().apply {
         MutableLiveData<Context>()
     }
-    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>().apply {
-        MutableLiveData<MutableMap<String, Boolean?>>()
-    }
     private val _storage = MutableLiveData<FirebaseStorage>().apply {
         MutableLiveData<FirebaseStorage>()
     }
@@ -52,13 +49,13 @@ class PrivateTodoViewModel(
         // 戻り値がnullでなければ、ネットワークに接続されている
         return connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     }
-    fun download(flag: Boolean){
+    fun download(flag: Boolean, todoViewModel: TodoViewModel){
         if (flag){
-            firebaseStorageRepository.download(_context.value!!, addViewModel = null, this, _storage.value!!, _auth.value!!, tasks = null, flag)
+            firebaseStorageRepository.download(_context.value!!, addViewModel = null, todoViewModel, _storage.value!!, _auth.value!!, tasks = null, flag)
         }else{
             if (File(_context.value?.filesDir, FileName().list).exists()){
                 val lists = CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
-                firebaseStorageRepository.download(_context.value!!, addViewModel = null, this, _storage.value!!, _auth.value!!, lists, flag)
+                firebaseStorageRepository.download(_context.value!!, addViewModel = null, todoViewModel, _storage.value!!, _auth.value!!, lists, flag)
             }
         }
     }
@@ -176,9 +173,6 @@ class PrivateTodoViewModel(
         //Log.d("update_a", CryptClass().decrypt(activity!!, offLineRepository.read(activity!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)!!)
     }
 
-    fun completeFlag(): MutableLiveData<MutableMap<String, Boolean?>>{
-        return _completeFlag
-    }
     fun bundle(): MutableLiveData<Bundle>{
         return _bundle
     }
@@ -190,9 +184,6 @@ class PrivateTodoViewModel(
         _auth.value = auth
         _storage.value = storage
         _networkStatus.value = networkStatus
-    }
-    fun setCompleteFlag(taskMap: MutableMap<String, Boolean?>){
-        _completeFlag.value = taskMap
     }
     fun setBundle(list: String, position: Int){
         _bundle.value = Bundle().apply {
@@ -206,14 +197,5 @@ class PrivateTodoViewModel(
 
     init {
         _context.value = getApplication<Application>().applicationContext
-
-        _completeFlag.value = mutableMapOf(
-            DownloadStatus().list to null,
-            DownloadStatus().iv_aes_list to null,
-            DownloadStatus().salt_list to null,
-            DownloadStatus().task to null,
-            DownloadStatus().iv_aes_task to null,
-            DownloadStatus().salt_task to null
-        )
     }
 }

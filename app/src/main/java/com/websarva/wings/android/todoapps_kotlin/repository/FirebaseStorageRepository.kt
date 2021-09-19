@@ -22,7 +22,7 @@ interface FirebaseStorageRepository {
     fun download(
         context: Context,
         addViewModel: AddTodoTaskViewModel?,
-        todoViewModel: PrivateTodoViewModel?,
+        todoViewModel: TodoViewModel?,
         storage: FirebaseStorage,
         auth: FirebaseAuth,
         tasks: String?,
@@ -63,7 +63,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
     override fun download(
         context: Context,
         addViewModel: AddTodoTaskViewModel?,
-        todoViewModel: PrivateTodoViewModel?,
+        todoViewModel: TodoViewModel?,
         storage: FirebaseStorage,
         auth: FirebaseAuth,
         tasks: String?,
@@ -163,7 +163,7 @@ class FirebaseStorageRepositoryClient: FirebaseStorageRepository {
     private fun downloadTask(
         context: Context,
         addViewModel: AddTodoTaskViewModel?,
-        todoViewModel: PrivateTodoViewModel?,
+        todoViewModel: TodoViewModel?,
         child: String,
         storageRef: StorageReference,
         uid: String,

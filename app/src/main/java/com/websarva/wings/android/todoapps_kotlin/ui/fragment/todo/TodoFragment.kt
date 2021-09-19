@@ -15,7 +15,7 @@ import com.websarva.wings.android.todoapps_kotlin.databinding.FragmentTodoBindin
 import com.websarva.wings.android.todoapps_kotlin.model.DialogBundle
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
-import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
@@ -95,7 +95,7 @@ class TodoFragment : Fragment(){
             if (networkStatus == true){
                 // TodoActivityで端末がoffline状態になった時の対応
                 if (viewModel.connectingStatus() != null){
-                    privateViewModel.download(flag = true)
+                    privateViewModel.download(flag = true, viewModel)
                 }else{
                     networkStatus = false
                     if (File(it.filesDir, FileName().list).length() != 0L){
@@ -110,7 +110,7 @@ class TodoFragment : Fragment(){
             }
         }
 
-        privateViewModel.completeFlag().observe(this.viewLifecycleOwner, {
+        viewModel.completeFlag().observe(this.viewLifecycleOwner, {
             when {
                 (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) and (it[DownloadStatus().task] == true) and (it[DownloadStatus().iv_aes_task] == true) and (it[DownloadStatus().salt_task] == true) -> {
                     viewModel.createView()
@@ -119,7 +119,7 @@ class TodoFragment : Fragment(){
                     viewModel.createView()
                 }
                 (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) -> {
-                    privateViewModel.download(flag = false)
+                    privateViewModel.download(flag = false, viewModel)
                 }
             }
         })
@@ -128,22 +128,26 @@ class TodoFragment : Fragment(){
             AddListDialog(flag = false, type = 0, position = null).show(requireActivity().supportFragmentManager, "AddListDialog")
         }
 
-        viewModel.todoList().observe(this.viewLifecycleOwner, {
-            if (it.isNotEmpty() && apAdapter == null){
-                binding.tvNoContent.visibility = View.GONE
-                binding.recyclerview.visibility = View.VISIBLE
+        viewModel.todoList.observe(this.viewLifecycleOwner, { event ->
+            event.contentIfNotHandled.let {
+                if (it != null){
+                    if (/*it.isNotEmpty() && */apAdapter == null){
+                        binding.tvNoContent.visibility = View.GONE
+                        binding.recyclerview.visibility = View.VISIBLE
 
-                // メイン画面
-                apAdapter = RecyclerViewAdapter(it, this, privateViewModel, viewModel)
-                binding.recyclerview.adapter = apAdapter
-                viewModel.setAdapter(apAdapter!!)
+                        // メイン画面
+                        apAdapter = RecyclerViewAdapter(it, this, privateViewModel, viewModel)
+                        binding.recyclerview.adapter = apAdapter
+                        viewModel.setAdapter(apAdapter!!)
 
-                apAdapter!!.setOnItemClickListener(object: OnItemClickListener {
-                    override fun onItemClickListener(view: View, position: Int, list: String?) {
-                        privateViewModel.setBundle(list!!, position)
+                        apAdapter!!.setOnItemClickListener(object: OnItemClickListener {
+                            override fun onItemClickListener(view: View, position: Int, list: String?) {
+                                privateViewModel.setBundle(list!!, position)
+                            }
+                        })
+                        Log.d("test", "Called")
                     }
-                })
-                Log.d("test", "Called")
+                }
             }
         })
 

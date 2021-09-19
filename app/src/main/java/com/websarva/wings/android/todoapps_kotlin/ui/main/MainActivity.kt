@@ -142,16 +142,6 @@ class MainActivity : AppCompatActivity(), DialogListener {
         }
     }
 
-    override fun onDialogFlagReceive(
-        dialog: DialogFragment,
-        list: String,
-        type: Int,
-        flag: Boolean,
-        position: Int?
-    ) {
-        return
-    }
-
     override fun onDialogReceive(flag: Boolean) {
         if (flag){
             afterLoginIntent(flag = false)

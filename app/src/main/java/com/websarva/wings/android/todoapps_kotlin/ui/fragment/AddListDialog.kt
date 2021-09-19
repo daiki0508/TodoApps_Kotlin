@@ -1,12 +1,10 @@
-package com.websarva.wings.android.todoapps_kotlin.ui
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment
 
 import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager

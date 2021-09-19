@@ -10,10 +10,7 @@ import android.util.Log
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -23,6 +20,7 @@ import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoListEvent
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
 import kotlinx.coroutines.*
 import java.io.File
@@ -33,9 +31,10 @@ class TodoViewModel(
     private val _context = MutableLiveData<Context>().apply {
         MutableLiveData<Context>()
     }
-    private val _todoList = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
-        MutableLiveData<MutableList<MutableMap<String, String>>>()
+    private val _todoList = MutableLiveData<TodoListEvent<MutableList<MutableMap<String, String>>>>().apply {
+        MutableLiveData<TodoListEvent<MutableList<MutableMap<String, String>>>>()
     }
+    val todoList: LiveData<TodoListEvent<MutableList<MutableMap<String, String>>>> = _todoList
     private val _storage = MutableLiveData<FirebaseStorage>().apply {
         MutableLiveData<FirebaseStorage>()
     }
@@ -44,6 +43,9 @@ class TodoViewModel(
     }
     private val _networkStatus = MutableLiveData<Boolean>().apply {
         MutableLiveData<Boolean>()
+    }
+    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>().apply {
+        MutableLiveData<MutableMap<String, Boolean?>>()
     }
     private val _apAdapter = MutableLiveData<RecyclerViewAdapter>().apply {
         MutableLiveData<RecyclerViewAdapter>()
@@ -65,7 +67,7 @@ class TodoViewModel(
         }
 
         //Log.d("lists", lists!!)
-        _todoList.value = createTodoContents(lists, FileName().list)
+        _todoList.value = TodoListEvent(createTodoContents(lists, FileName().list))
     }
     fun createTodoContents(contents: String?, keyName: String): MutableList<MutableMap<String, String>>{
         val todoContents: MutableList<MutableMap<String, String>> = mutableListOf()
@@ -89,11 +91,14 @@ class TodoViewModel(
         return PreferenceRepositoryClient().read(_context.value!!, list, keyName)
     }
 
-    fun todoList(): MutableLiveData<MutableList<MutableMap<String, String>>>{
+    /*fun todoList(): MutableLiveData<MutableList<MutableMap<String, String>>>{
         return _todoList
-    }
+    }*/
     fun apAdapter(): MutableLiveData<RecyclerViewAdapter>{
         return _apAdapter
+    }
+    fun completeFlag(): MutableLiveData<MutableMap<String, Boolean?>>{
+        return _completeFlag
     }
 
     fun setInit(auth: FirebaseAuth?, storage: FirebaseStorage?, networkStatus: Boolean){
@@ -104,9 +109,21 @@ class TodoViewModel(
     fun setAdapter(adapter: RecyclerViewAdapter){
         _apAdapter.value = adapter
     }
+    fun setCompleteFlag(taskMap: MutableMap<String, Boolean?>){
+        _completeFlag.value = taskMap
+    }
 
     init {
         _context.value = getApplication<Application>().applicationContext
-        _todoList.value = mutableListOf()
+        //_todoList.value = mutableListOf()
+
+        _completeFlag.value = mutableMapOf(
+            DownloadStatus().list to null,
+            DownloadStatus().iv_aes_list to null,
+            DownloadStatus().salt_list to null,
+            DownloadStatus().task to null,
+            DownloadStatus().iv_aes_task to null,
+            DownloadStatus().salt_task to null
+        )
     }
 }

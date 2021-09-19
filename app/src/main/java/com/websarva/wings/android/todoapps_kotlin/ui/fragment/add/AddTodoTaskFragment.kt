@@ -17,9 +17,10 @@ import com.websarva.wings.android.todoapps_kotlin.BuildConfig
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.FragmentAddTodoListBinding
 import com.websarva.wings.android.todoapps_kotlin.model.DialogBundle
+import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
-import com.websarva.wings.android.todoapps_kotlin.ui.AddListDialog
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.recyclerView.*
@@ -28,6 +29,8 @@ import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -38,6 +41,7 @@ class AddTodoTaskFragment : Fragment(){
 
     private val viewModel: AddTodoTaskViewModel by viewModel()
     private val afterLoginViewModel by activityViewModels<AfterLoginViewModel>()
+    private val todoViewModel: TodoViewModel by sharedViewModel()
 
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
@@ -57,6 +61,16 @@ class AddTodoTaskFragment : Fragment(){
         setFragmentResultListener(DialogBundle.Result.name){ _, data ->
             viewModel.setData(data)
         }
+
+        // completeFlagのリセット
+        todoViewModel.setCompleteFlag(mutableMapOf(
+            DownloadStatus().list to null,
+            DownloadStatus().iv_aes_list to null,
+            DownloadStatus().salt_list to null,
+            DownloadStatus().task to null,
+            DownloadStatus().iv_aes_task to null,
+            DownloadStatus().salt_task to null
+        ))
 
         requireActivity().onBackPressedDispatcher.addCallback(this){
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
