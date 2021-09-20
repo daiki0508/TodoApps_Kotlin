@@ -14,5 +14,5 @@ class TodoListEvent<out: MutableList<MutableMap<String, String>>>(private val co
             }
         }
 
-    val peekContent: MutableList<MutableMap<String, String>> = content
+    var peekContent: MutableList<MutableMap<String, String>> = content
 }

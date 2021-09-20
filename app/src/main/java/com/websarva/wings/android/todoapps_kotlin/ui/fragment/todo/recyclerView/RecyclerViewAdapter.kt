@@ -49,9 +49,7 @@ class RecyclerViewAdapter(
 
         adapter.setOnItemClickListener(object: OnChildItemClickListener{
             override fun onItemClickListener(view: View, position: Int) {
-                // TODO("未実装")
                 todoViewModel.setBundle(items[position][FileName().list]!!, position)
-                //fragment.addTodoIntent(items[position][FileName().list]!!, position)
             }
         })
 

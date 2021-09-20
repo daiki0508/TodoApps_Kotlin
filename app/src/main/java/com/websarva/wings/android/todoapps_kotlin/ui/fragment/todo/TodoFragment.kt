@@ -55,7 +55,6 @@ class TodoFragment : Fragment(){
 
         // navigationに通知
         navigationViewModel.setFlag(flag = true)
-        navigationViewModel.setPosition(-1)
     }
 
     override fun onCreateView(
@@ -137,7 +136,7 @@ class TodoFragment : Fragment(){
         viewModel.todoList.observe(this.viewLifecycleOwner, { event ->
             event.contentIfNotHandled.let {
                 if (it != null){
-                    if (/*it.isNotEmpty() && */apAdapter == null){
+                    if (apAdapter == null){
                         binding.tvNoContent.visibility = View.GONE
                         binding.recyclerview.visibility = View.VISIBLE
 
@@ -145,6 +144,8 @@ class TodoFragment : Fragment(){
                         apAdapter = RecyclerViewAdapter(it, this, privateViewModel, viewModel)
                         binding.recyclerview.adapter = apAdapter
                         viewModel.setAdapter(apAdapter!!)
+
+                        navigationViewModel.setPosition(-1)
 
                         apAdapter!!.setOnItemClickListener(object: OnItemClickListener {
                             override fun onItemClickListener(view: View, position: Int, list: String?) {
@@ -179,7 +180,8 @@ class TodoFragment : Fragment(){
                     apAdapter!!.items.add(mutableMapOf(FileName().list to it))
                     apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
 
-                    //nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
+                    // addListによってListが新たに追加されたことをNavに通知
+                    viewModel.todoList.value!!.peekContent.add(mutableMapOf(FileName().list to it))
                     navigationViewModel.setInsertFlag()
                 }
                 // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
@@ -210,7 +212,9 @@ class TodoFragment : Fragment(){
                 apAdapter!!.items.removeAt(position)
                 apAdapter?.notifyItemRemoved(position)
 
-                //nvAdapter?.notifyItemRemoved(position)
+                // コンテキストメニューからリストが削除されたことをNavに通知
+                viewModel.todoList.value!!.peekContent.removeAt(position)
+                navigationViewModel.setInsertFlag()
 
                 if (apAdapter!!.itemCount == 0){
                     binding.recyclerview.visibility = View.GONE

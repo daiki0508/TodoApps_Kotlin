@@ -129,8 +129,8 @@ class NavigationFragment: Fragment() {
         // insertFlagのobserver
         viewModel.insertFlag().observe(this.viewLifecycleOwner, {
             if (it){
-                //nvAdapter?.notifyItemInserted(nvAdapter?.itemCount!! - 1)
-                    Log.d("test", "hogehoge")
+                Log.d("test", "hogehoge")
+                // nvAdapterを更新
                 nvAdapter?.notifyDataSetChanged()
             }
         })
