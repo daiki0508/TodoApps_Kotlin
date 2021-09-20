@@ -24,15 +24,11 @@ class PrivateNavigationViewModel(
     private val offLineRepository: OffLineRepositoryClient,
     application: Application
 ) : AndroidViewModel(application) {
-    private val _context = MutableLiveData<Context>().apply {
-        MutableLiveData<Context>()
-    }
+    private val _context = MutableLiveData<Context>()
     private val _auth = MutableLiveData<FirebaseAuth>().apply {
         MutableLiveData<FirebaseAuth>()
     }
-    private val _bundle = MutableLiveData<NavBundleEvent<Bundle>>().apply {
-        MutableLiveData<NavBundleEvent<Bundle>>()
-    }
+    private val _bundle = MutableLiveData<NavBundleEvent<Bundle>>()
     val bundle: LiveData<NavBundleEvent<Bundle>> = _bundle
 
     fun countUnCompleteTask(list: String, todoViewModel: TodoViewModel): Int{
@@ -118,10 +114,6 @@ class PrivateNavigationViewModel(
             this.putInt(IntentBundle.Position.name, position)
         })
     }
-
-    /*fun bundle(): MutableLiveData<Bundle>{
-        return _bundle
-    }*/
 
     init {
         _context.value = getApplication<Application>().applicationContext

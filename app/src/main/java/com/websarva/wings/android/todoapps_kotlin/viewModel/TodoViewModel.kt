@@ -28,12 +28,8 @@ import java.io.File
 class TodoViewModel(
     application: Application
 ): AndroidViewModel(application) {
-    private val _context = MutableLiveData<Context>().apply {
-        MutableLiveData<Context>()
-    }
-    private val _todoList = MutableLiveData<TodoListEvent<MutableList<MutableMap<String, String>>>>().apply {
-        MutableLiveData<TodoListEvent<MutableList<MutableMap<String, String>>>>()
-    }
+    private val _context = MutableLiveData<Context>()
+    private val _todoList = MutableLiveData<TodoListEvent<MutableList<MutableMap<String, String>>>>()
     val todoList: LiveData<TodoListEvent<MutableList<MutableMap<String, String>>>> = _todoList
     private val _storage = MutableLiveData<FirebaseStorage>().apply {
         MutableLiveData<FirebaseStorage>()
@@ -41,15 +37,9 @@ class TodoViewModel(
     private val _auth = MutableLiveData<FirebaseAuth>().apply {
         MutableLiveData<FirebaseAuth>()
     }
-    private val _networkStatus = MutableLiveData<Boolean>().apply {
-        MutableLiveData<Boolean>()
-    }
-    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>().apply {
-        MutableLiveData<MutableMap<String, Boolean?>>()
-    }
-    private val _apAdapter = MutableLiveData<RecyclerViewAdapter>().apply {
-        MutableLiveData<RecyclerViewAdapter>()
-    }
+    private val _networkStatus = MutableLiveData<Boolean>()
+    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>()
+    private val _apAdapter = MutableLiveData<RecyclerViewAdapter>()
 
     fun connectingStatus(): NetworkCapabilities? {
         val connectivityManager =

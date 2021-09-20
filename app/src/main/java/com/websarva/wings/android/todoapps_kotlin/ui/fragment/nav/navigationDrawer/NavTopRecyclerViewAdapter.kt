@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
-import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
 
 class NavTopRecyclerViewAdapter(
     private var type: Int,

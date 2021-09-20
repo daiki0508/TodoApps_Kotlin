@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
-import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
-import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
-import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnChildItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateTodoViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
@@ -47,13 +47,13 @@ class RecyclerViewAdapter(
             return@OnLongClickListener false
         })
 
-        adapter.setOnItemClickListener(object: OnChildItemClickListener{
+        adapter.setOnItemClickListener(object: OnChildItemClickListener {
             override fun onItemClickListener(view: View, position: Int) {
                 todoViewModel.setBundle(items[position][FileName().list]!!, position)
             }
         })
 
-        adapter.setPreferenceListener(object: OnPreferenceListener{
+        adapter.setPreferenceListener(object: OnPreferenceListener {
             override fun onPreferenceWriteListener(
                 position: Int,
                 keyName: String,

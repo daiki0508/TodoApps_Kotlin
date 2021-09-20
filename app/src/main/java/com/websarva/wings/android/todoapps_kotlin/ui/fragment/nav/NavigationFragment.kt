@@ -14,11 +14,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.FragmentNavigationBinding
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
-import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavTopRecyclerViewAdapter
@@ -79,7 +78,7 @@ class NavigationFragment: Fragment() {
                 binding.navTopRecyclerView.addItemDecoration(DividerItemDecoration(it, DividerItemDecoration.VERTICAL))
                 binding.navTopRecyclerView.layoutManager = LinearLayoutManager(it)
 
-                nvTopAdapter.setOnItemClickListener(object: OnItemClickListener{
+                nvTopAdapter.setOnItemClickListener(object: OnItemClickListener {
                     override fun onItemClickListener(view: View, position: Int, list: String?) {
                         // TodoFragmentへ遷移
                         transaction.replace(R.id.container, TodoFragment()).commit()
@@ -94,7 +93,7 @@ class NavigationFragment: Fragment() {
             binding.navFooterRecyclerView.addItemDecoration(DividerItemDecoration(it, DividerItemDecoration.VERTICAL))
             binding.navFooterRecyclerView.layoutManager = LinearLayoutManager(it)
 
-            nvSettingsAdapter.setOnItemClickListener(object: OnItemClickListener{
+            nvSettingsAdapter.setOnItemClickListener(object: OnItemClickListener {
                 override fun onItemClickListener(view: View, position: Int, list: String?) {
                     // SettingsActivityへ遷移
                     Intent(it, SettingsActivity::class.java).apply {
@@ -131,7 +130,23 @@ class NavigationFragment: Fragment() {
             if (it){
                 Log.d("test", "hogehoge")
                 // nvAdapterを更新
-                nvAdapter?.notifyDataSetChanged()
+                nvAdapter?.notifyItemInserted(nvAdapter?.itemCount!! - 1)
+            }
+        })
+
+        // removeFlagのobserver
+        viewModel.removeFlag().observe(this.viewLifecycleOwner, {
+            if (it["flag"] as Boolean){
+                // nvAdapterを更新
+                nvAdapter?.notifyItemRemoved(it["position"] as Int)
+            }
+        })
+
+        // changeFlagのobserver
+        viewModel.changeFlag().observe(this.viewLifecycleOwner, {
+            if (it["flag"] as Boolean){
+                // nvAdapterを更新
+                nvAdapter?.notifyItemChanged(it["position"] as Int)
             }
         })
 

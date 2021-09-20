@@ -16,7 +16,7 @@ import com.websarva.wings.android.todoapps_kotlin.model.DialogBundle
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.AddListDialog
-import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
@@ -214,7 +214,7 @@ class TodoFragment : Fragment(){
 
                 // コンテキストメニューからリストが削除されたことをNavに通知
                 viewModel.todoList.value!!.peekContent.removeAt(position)
-                navigationViewModel.setInsertFlag()
+                navigationViewModel.setRemoveFlag(position)
 
                 if (apAdapter!!.itemCount == 0){
                     binding.recyclerview.visibility = View.GONE

@@ -25,24 +25,16 @@ class PrivateTodoViewModel(
     private val offLineRepository: OffLineRepositoryClient,
     application: Application
 ) : AndroidViewModel(application) {
-    private val _context = MutableLiveData<Context>().apply {
-        MutableLiveData<Context>()
-    }
+    private val _context = MutableLiveData<Context>()
     private val _storage = MutableLiveData<FirebaseStorage>().apply {
         MutableLiveData<FirebaseStorage>()
     }
     private val _auth = MutableLiveData<FirebaseAuth>().apply {
         MutableLiveData<FirebaseAuth>()
     }
-    private val _networkStatus = MutableLiveData<Boolean>().apply {
-        MutableLiveData<Boolean>()
-    }
-    private val _bundle = MutableLiveData<Bundle>().apply {
-        MutableLiveData<Bundle>()
-    }
-    private val _list = MutableLiveData<String>().apply {
-        MutableLiveData<String>()
-    }
+    private val _networkStatus = MutableLiveData<Boolean>()
+    private val _bundle = MutableLiveData<Bundle>()
+    private val _list = MutableLiveData<String>()
 
     fun connectingStatus(): NetworkCapabilities? {
         val connectivityManager =

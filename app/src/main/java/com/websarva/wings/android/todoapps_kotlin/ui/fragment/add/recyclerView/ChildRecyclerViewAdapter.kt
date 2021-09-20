@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
-import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
-import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnChildItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 
 class ChildRecyclerViewAdapter(

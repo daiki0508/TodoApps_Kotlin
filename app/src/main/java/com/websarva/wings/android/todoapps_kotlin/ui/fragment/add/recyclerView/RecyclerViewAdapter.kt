@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.AddListDialog
-import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
-import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnChildItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 
@@ -44,7 +44,7 @@ class RecyclerViewAdapter(
             holder.rvContents.adapter = ACAdapter
             holder.rvContents.addItemDecoration(DividerItemDecoration(it, DividerItemDecoration.VERTICAL))
 
-            ACAdapter!!.setOnItemClickListener(object: OnChildItemClickListener{
+            ACAdapter!!.setOnItemClickListener(object: OnChildItemClickListener {
                 override fun onItemClickListener(view: View, position: Int) {
                     // taskの更新
                     viewModel.setPosition(position)

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin.ui
+package com.websarva.wings.android.todoapps_kotlin.ui.fragment
 
 import android.view.View
 

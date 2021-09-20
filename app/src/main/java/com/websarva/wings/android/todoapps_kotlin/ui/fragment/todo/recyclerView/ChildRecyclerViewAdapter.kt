@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
-import com.websarva.wings.android.todoapps_kotlin.ui.OnChildItemClickListener
-import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnChildItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnPreferenceListener
 
 class ChildRecyclerViewAdapter(
     private var items: MutableList<MutableMap<String, String>>,

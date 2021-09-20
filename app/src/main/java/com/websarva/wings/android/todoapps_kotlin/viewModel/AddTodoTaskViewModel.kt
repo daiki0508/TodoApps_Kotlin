@@ -24,36 +24,20 @@ class AddTodoTaskViewModel(
     private val offLineRepository: OffLineRepositoryClient,
     application: Application
 ): AndroidViewModel(application) {
-    private val _todoTask = MutableLiveData<MutableList<MutableMap<String, String>>>().apply {
-        MutableLiveData<MutableList<MutableMap<String, String>>>()
-    }
-    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>().apply {
-        MutableLiveData<MutableMap<String, Boolean?>>()
-    }
-    private val _updateName = MutableLiveData<String>().apply {
-        MutableLiveData<String>()
-    }
-    private val _context = MutableLiveData<Context>().apply {
-        MutableLiveData<Context>()
-    }
+    private val _todoTask = MutableLiveData<MutableList<MutableMap<String, String>>>()
+    private val _completeFlag = MutableLiveData<MutableMap<String, Boolean?>>()
+    private val _updateName = MutableLiveData<String>()
+    private val _context = MutableLiveData<Context>()
     private val _storage = MutableLiveData<FirebaseStorage>().apply {
         MutableLiveData<FirebaseStorage>()
     }
     private val _auth = MutableLiveData<FirebaseAuth>().apply {
         MutableLiveData<FirebaseAuth>()
     }
-    private val _networkStatus = MutableLiveData<Boolean>().apply {
-        MutableLiveData<Boolean>()
-    }
-    private val _position = MutableLiveData<Int>().apply {
-        MutableLiveData<Int>()
-    }
-    private val _list = MutableLiveData<String>().apply {
-        MutableLiveData<String>()
-    }
-    private val _data = MutableLiveData<Bundle>().apply {
-        MutableLiveData<Bundle>()
-    }
+    private val _networkStatus = MutableLiveData<Boolean>()
+    private val _position = MutableLiveData<Int>()
+    private val _list = MutableLiveData<String>()
+    private val _data = MutableLiveData<Bundle>()
 
     fun connectingStatus(): NetworkCapabilities? {
         val connectivityManager =

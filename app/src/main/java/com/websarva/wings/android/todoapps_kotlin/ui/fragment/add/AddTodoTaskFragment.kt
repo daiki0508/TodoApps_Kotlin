@@ -21,12 +21,11 @@ import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.AddListDialog
-import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
-import com.websarva.wings.android.todoapps_kotlin.ui.OnPreferenceListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnPreferenceListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
-import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.NavigationViewModel
@@ -159,12 +158,14 @@ class AddTodoTaskFragment : Fragment(){
                             acAdapter?.notifyItemChanged(position)
 
                             // nvAdapter?.notifyItemChanged(position)
+                            navigationViewModel.setChangeFlag(position)
                         }
 
                         override fun onPreferenceReadListener(keyName: String): Boolean {
                             // 未完了タスクの件数をtextviewとNavigationDrawerに通知
                             binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items, list = null))
                             // nvAdapter?.notifyItemChanged(this@AddTodoTaskFragment.position)
+                            navigationViewModel.setChangeFlag(this@AddTodoTaskFragment.position)
 
                             return viewModel.readPreference(keyName)
                         }
@@ -291,7 +292,8 @@ class AddTodoTaskFragment : Fragment(){
                 acAdapter!!.items.removeAt(position)
                 acAdapter!!.notifyItemRemoved(position)
 
-                // nvAdapter?.notifyItemChanged(this.position)
+                // Navに更新を通知
+                navigationViewModel.setChangeFlag(this.position)
 
                 /*
                  taskの件数が0になったらrecyclerviewを非表示にしてNoContentを表示
