@@ -180,6 +180,7 @@ class TodoFragment : Fragment(){
                     apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
 
                     //nvAdapter?.notifyItemInserted(nvAdapter!!.itemCount - 1)
+                    navigationViewModel.setInsertFlag()
                 }
                 // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
                 if (networkStatus == true){

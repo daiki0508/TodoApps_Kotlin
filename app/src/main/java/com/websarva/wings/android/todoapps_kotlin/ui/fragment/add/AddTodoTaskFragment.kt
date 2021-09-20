@@ -53,7 +53,6 @@ class AddTodoTaskFragment : Fragment(){
     private var networkStatus: Boolean? = null
     private var apAdapter: RecyclerViewAdapter? = null
     private var acAdapter: ChildRecyclerViewAdapter? = null
-    private var nvAdapter: NavRecyclerViewAdapter? = null
     private lateinit var itemTouchHelper: ItemTouchHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -159,13 +158,13 @@ class AddTodoTaskFragment : Fragment(){
                             viewModel.writePreference(keyName, checkFlag)
                             acAdapter?.notifyItemChanged(position)
 
-                            nvAdapter?.notifyItemChanged(position)
+                            // nvAdapter?.notifyItemChanged(position)
                         }
 
                         override fun onPreferenceReadListener(keyName: String): Boolean {
                             // 未完了タスクの件数をtextviewとNavigationDrawerに通知
                             binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items, list = null))
-                            nvAdapter?.notifyItemChanged(this@AddTodoTaskFragment.position)
+                            // nvAdapter?.notifyItemChanged(this@AddTodoTaskFragment.position)
 
                             return viewModel.readPreference(keyName)
                         }
@@ -292,7 +291,7 @@ class AddTodoTaskFragment : Fragment(){
                 acAdapter!!.items.removeAt(position)
                 acAdapter!!.notifyItemRemoved(position)
 
-                nvAdapter?.notifyItemChanged(this.position)
+                // nvAdapter?.notifyItemChanged(this.position)
 
                 /*
                  taskの件数が0になったらrecyclerviewを非表示にしてNoContentを表示

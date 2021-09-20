@@ -2,6 +2,7 @@ package com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -115,6 +116,7 @@ class NavigationFragment: Fragment() {
                 itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoViewModel.apAdapter().value))
                 itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
 
+                // navigationDrawerのアイテムタップ時の処理
                 nvAdapter!!.setOnItemClickListener(object: OnItemClickListener {
                     override fun onItemClickListener(view: View, position: Int, list: String?) {
                         // bundleに値をセット
@@ -122,6 +124,15 @@ class NavigationFragment: Fragment() {
                     }
                 })
             })
+        })
+
+        // insertFlagのobserver
+        viewModel.insertFlag().observe(this.viewLifecycleOwner, {
+            if (it){
+                //nvAdapter?.notifyItemInserted(nvAdapter?.itemCount!! - 1)
+                    Log.d("test", "hogehoge")
+                nvAdapter?.notifyDataSetChanged()
+            }
         })
 
         // bundleのobserver
