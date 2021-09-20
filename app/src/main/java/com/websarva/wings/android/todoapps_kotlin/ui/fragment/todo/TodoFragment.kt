@@ -21,6 +21,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.NavigationViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateTodoViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -35,6 +36,7 @@ class TodoFragment : Fragment(){
     private val viewModel: TodoViewModel by sharedViewModel()
     private val afterLoginViewModel by activityViewModels<AfterLoginViewModel>()
     private val privateViewModel: PrivateTodoViewModel by viewModel()
+    private val navigationViewModel: NavigationViewModel by sharedViewModel()
 
     private var networkStatus: Boolean? = null
     private lateinit var auth: FirebaseAuth
@@ -50,6 +52,10 @@ class TodoFragment : Fragment(){
         setFragmentResultListener(DialogBundle.Result.name){ _, data ->
             privateViewModel.setList(data.getString(DialogBundle.List.name, ""))
         }
+
+        // navigationに通知
+        navigationViewModel.setFlag(flag = true)
+        navigationViewModel.setPosition(-1)
     }
 
     override fun onCreateView(
@@ -151,6 +157,7 @@ class TodoFragment : Fragment(){
             }
         })
 
+        // bundleのobserver
         privateViewModel.bundle().observe(this.viewLifecycleOwner, {
             AddTodoTaskFragment().apply {
                 // bundleに値をセット
@@ -161,6 +168,7 @@ class TodoFragment : Fragment(){
             }
         })
 
+        // listのobserver
         privateViewModel.list().observe(this.viewLifecycleOwner, {
             if (it.isNotEmpty()){
                 privateViewModel.update(it)

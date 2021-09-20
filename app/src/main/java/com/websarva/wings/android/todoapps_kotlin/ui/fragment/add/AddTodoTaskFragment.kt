@@ -29,6 +29,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.NavigationViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -42,6 +43,7 @@ class AddTodoTaskFragment : Fragment(){
     private val viewModel: AddTodoTaskViewModel by viewModel()
     private val afterLoginViewModel by activityViewModels<AfterLoginViewModel>()
     private val todoViewModel: TodoViewModel by sharedViewModel()
+    private val navigationViewModel: NavigationViewModel by sharedViewModel()
 
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
@@ -61,6 +63,9 @@ class AddTodoTaskFragment : Fragment(){
         setFragmentResultListener(DialogBundle.Result.name){ _, data ->
             viewModel.setData(data)
         }
+
+        // navigationに通知
+        navigationViewModel.setFlag(flag = false)
 
         // completeFlagのリセット
         todoViewModel.setCompleteFlag(mutableMapOf(
@@ -101,6 +106,9 @@ class AddTodoTaskFragment : Fragment(){
         task = arguments?.getString(FileName().list)!!
         position = arguments?.getInt(IntentBundle.Position.name, 0)!!
         networkStatus = afterLoginViewModel.networkStatus().value
+
+        // navigationに通知
+        navigationViewModel.setPosition(position)
 
         // ネットワークに接続されている場合はインスタンスを取得
         if (networkStatus == true){

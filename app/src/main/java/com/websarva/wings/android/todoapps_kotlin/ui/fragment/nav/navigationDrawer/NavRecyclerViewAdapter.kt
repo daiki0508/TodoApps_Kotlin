@@ -11,15 +11,14 @@ import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
-import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.NavigationViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateNavigationViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
 class NavRecyclerViewAdapter(
     private var items: MutableList<MutableMap<String, String>>,
     private var position: Int,
     private var todoViewModel: TodoViewModel?,
-    private val navViewModel: NavigationViewModel?,
+    private val navViewModelPrivate: PrivateNavigationViewModel?,
     private var activity: FragmentActivity
 ): RecyclerView.Adapter<NavRecyclerViewHolder>() {
     private lateinit var listener: OnItemClickListener
@@ -38,9 +37,9 @@ class NavRecyclerViewAdapter(
 
         holder.title.text = items[position][FileName().list]
 
-        if (navViewModel != null) {
+        if (navViewModelPrivate != null) {
             holder.count.text =
-                navViewModel.countUnCompleteTask(items[position][FileName().list]!!, todoViewModel!!).toString()
+                navViewModelPrivate.countUnCompleteTask(items[position][FileName().list]!!, todoViewModel!!).toString()
         }
 
         if (position == this.position) {
@@ -79,8 +78,8 @@ class NavRecyclerViewAdapter(
             val fromPosition = viewHolder.absoluteAdapterPosition
             val toPosition = target.absoluteAdapterPosition
 
-            if (navViewModel != null){
-                navViewModel.move(items, fromPosition, toPosition, todoViewModel!!)
+            if (navViewModelPrivate != null){
+                navViewModelPrivate.move(items, fromPosition, toPosition, todoViewModel!!)
                 todoRecyclerView?.notifyItemMoved(fromPosition, toPosition)
             }
 

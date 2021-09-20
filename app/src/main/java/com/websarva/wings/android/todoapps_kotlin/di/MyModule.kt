@@ -12,7 +12,8 @@ class MyModule {
         viewModel { AfterLoginViewModel() }
         viewModel { TodoViewModel(get()) }
         viewModel { PrivateTodoViewModel(get(), get(), get(), get()) }
-        viewModel { NavigationViewModel(get(), get(), get()) }
+        viewModel { PrivateNavigationViewModel(get(), get()) }
+        viewModel { NavigationViewModel() }
         viewModel { AddTodoTaskViewModel(get(), get(), get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get(), get()) }
     }
