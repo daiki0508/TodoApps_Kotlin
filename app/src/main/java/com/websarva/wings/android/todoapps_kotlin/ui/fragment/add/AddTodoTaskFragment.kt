@@ -118,12 +118,37 @@ class AddTodoTaskFragment : Fragment(){
             viewModel.setInit(list = task, auth = null, storage = null, networkStatus!!)
         }
 
-        /*
-        FirebaseStorageからデータをダウンロード
-        FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
-        */
-        if (File(requireActivity().filesDir, "task/$task/${FileName().task}").length() != 0L){
-            viewModel.createView()
+        viewModel.showBalloonFlag(this)
+        with(viewModel){
+            contentBalloon2().observe(this@AddTodoTaskFragment.viewLifecycleOwner, {
+                // balloonの表示順番を設定
+                fabBalloon().value!!.relayShowAlignBottom(contentBalloon0().value!!, binding.tvNoContent)
+                    .relayShowAlignBottom(contentBalloon1().value!!, binding.tvNoContent)
+                    .relayShowAlignBottom(it, binding.tvNoContent)
+
+                // balloonの表示
+                fabBalloon().value!!.showAlignTop(binding.fab)
+
+                it.setOnBalloonDismissListener {
+                    // 実行したことを保存
+                    save()
+                    // balloonCompleteに通知
+                    setBalloonComplete()
+                }
+            })
+
+            // balloonCompleteのobserver
+            balloonComplete().observe(this@AddTodoTaskFragment.viewLifecycleOwner, { flag ->
+                if (flag){
+                    /*
+                    FirebaseStorageからデータをダウンロード
+                    FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
+                    */
+                    if (File(requireActivity().filesDir, "task/$task/${FileName().task}").length() != 0L){
+                        viewModel.createView()
+                    }
+                }
+            })
         }
 
         binding.recyclerview.layoutManager = LinearLayoutManager(requireActivity())

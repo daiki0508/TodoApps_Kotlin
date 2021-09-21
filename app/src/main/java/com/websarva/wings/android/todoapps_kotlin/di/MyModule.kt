@@ -21,7 +21,7 @@ class MyModule {
         viewModel { PrivateTodoViewModel(get(), get(), get(), get(), get()) }
         viewModel { PrivateNavigationViewModel(get(), get()) }
         viewModel { NavigationViewModel() }
-        viewModel { AddTodoTaskViewModel(get(), get(), get(), get()) }
+        viewModel { AddTodoTaskViewModel(get(), get(), get(), get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get(), get()) }
     }
     val repository: Module = module {

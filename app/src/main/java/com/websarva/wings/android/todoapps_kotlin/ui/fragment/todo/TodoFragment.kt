@@ -104,7 +104,7 @@ class TodoFragment : Fragment(){
                 // balloonの表示
                 binding.fab.showAlignTop(fabBalloon().value!!)
 
-                contentBalloon1().value!!.setOnBalloonDismissListener {
+                it.setOnBalloonDismissListener {
                     // 実行したことを保存
                     save()
                     // balloonCompleteに通知
@@ -141,7 +141,7 @@ class TodoFragment : Fragment(){
             })
         }
 
-        //completeFlagのobserber
+        //completeFlagのobserver
         viewModel.completeFlag().observe(this.viewLifecycleOwner, {
             when {
                 (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) and (it[DownloadStatus().task] == true) and (it[DownloadStatus().iv_aes_task] == true) and (it[DownloadStatus().salt_task] == true) -> {
@@ -160,7 +160,7 @@ class TodoFragment : Fragment(){
             AddListDialog(flag = false, type = 0, position = null).show(requireActivity().supportFragmentManager, "AddListDialog")
         }
 
-        // todoListのobserber
+        // todoListのobserver
         viewModel.todoList.observe(this.viewLifecycleOwner, { event ->
             event.contentIfNotHandled.let {
                 if (it != null){

@@ -17,6 +17,11 @@
     <string name="context_deleteTask_title">このタスクを削除する</string>
     <string name="context_deleteList_title">このリストを削除する</string>
 
+    <string name="fab_balloon_task">このボタンをタップすることで新しいタスクを作成できます</string>
+    <string name="content_task_balloon0">タスクの作成が完了すると、ここに表示されます！</string>
+    <string name="content_task_balloon1">長押ししながら上下にスライドするとタスクの順番を変更できます</string>
+    <string name="content_task_balloon2">長押しするとタスクの削除が出来ます</string>
+
     <string-array name="themeEntries">
         <item>ライト</item>
         <item>ナイト</item>

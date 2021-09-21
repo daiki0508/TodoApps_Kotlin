@@ -9,13 +9,21 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import com.skydoves.balloon.Balloon
+import com.skydoves.balloon.BalloonAnimation
+import com.skydoves.balloon.BalloonSizeSpec
+import com.skydoves.balloon.overlay.BalloonOverlayAnimation
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
+import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.repository.*
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import java.io.File
 
 class AddTodoTaskViewModel(
+    private val preferenceBalloonRepository: PreferenceBalloonRepositoryClient,
     private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
     private val preferenceRepository: PreferenceRepositoryClient,
     private val offLineRepository: OffLineRepositoryClient,
@@ -35,7 +43,54 @@ class AddTodoTaskViewModel(
     private val _position = MutableLiveData<Int>()
     private val _list = MutableLiveData<String>()
     private val _data = MutableLiveData<Bundle>()
+    private val _fabBalloon = MutableLiveData<Balloon>()
+    private val _contentBalloon0 = MutableLiveData<Balloon>()
+    private val _contentBalloon1 = MutableLiveData<Balloon>()
+    private val _contentBalloon2 = MutableLiveData<Balloon>()
+    private val _balloonComplete = MutableLiveData<Boolean>()
 
+    fun showBalloonFlag(fragment: AddTodoTaskFragment){
+        if (preferenceBalloonRepository.read(_context.value!!, flag = false).retBalloon){
+            // 初回
+            setBalloon(fragment)
+        }else{
+            // 2回目以降
+            setBalloonComplete()
+        }
+    }
+    private fun setBalloon(fragment: AddTodoTaskFragment){
+        _fabBalloon.value = createBalloon(_context.value!!.getString(R.string.fab_balloon_task), fragment)
+        _contentBalloon0.value = createBalloon(_context.value!!.getString(R.string.content_task_balloon0), fragment)
+        _contentBalloon1.value = createBalloon(_context.value!!.getString(R.string.content_task_balloon1), fragment)
+        _contentBalloon2.value = createBalloon(_context.value!!.getString(R.string.content_task_balloon2), fragment)
+    }
+    private fun createBalloon(text: String, fragment: AddTodoTaskFragment): Balloon{
+        return com.skydoves.balloon.createBalloon(_context.value!!) {
+            setArrowSize(10)
+            setWidth(BalloonSizeSpec.WRAP)
+            setHeight(65)
+            setArrowPosition(0.7f)
+            setCornerRadius(4f)
+            setAlpha(0.9f)
+            setText(text)
+            setTextColorResource(R.color.white)
+            //setTextIsHtml(true)
+            //setIconDrawable(ContextCompat.getDrawable(context, R.drawable.ic_profile))
+            setBackgroundColorResource(R.color.dodgerblue)
+            //setOnBalloonClickListener(onBalloonClickListener)
+            setBalloonAnimation(BalloonAnimation.OVERSHOOT)
+            setIsVisibleOverlay(true)
+            setOverlayColorResource(R.color.darkgray)
+            setOverlayPadding(6f)
+            setBalloonOverlayAnimation(BalloonOverlayAnimation.FADE)
+            setDismissWhenOverlayClicked(false)
+            //setOverlayShape(BalloonOverlayRect)
+            setLifecycleOwner(fragment.viewLifecycleOwner)
+        }
+    }
+    fun save(){
+        preferenceBalloonRepository.save(_context.value!!, flag = false)
+    }
     fun connectingStatus(): NetworkCapabilities? {
         val connectivityManager =
             _context.value?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -115,23 +170,6 @@ class AddTodoTaskViewModel(
             todoTask.add(todo)
         }
         _todoTask.value = todoTask
-    }
-
-    fun getList(): MutableList<MutableMap<String, String>>{
-        // ネットワークの接続状況によって処理を分岐
-        val lists: String? = if (connectingStatus() != null){
-            CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
-        }else{
-            CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "",type = 0, task = null, aStr = null, flag = false)
-        }
-
-        val todoList: MutableList<MutableMap<String, String>> = mutableListOf()
-        var todo: MutableMap<String, String>
-        for (list in lists!!.split(" ")){
-            todo = mutableMapOf(FileName().list to list)
-            todoList.add(todo)
-        }
-        return todoList
     }
 
     fun add(list: String){
@@ -314,6 +352,21 @@ class AddTodoTaskViewModel(
     fun data(): MutableLiveData<Bundle>{
         return _data
     }
+    fun fabBalloon(): MutableLiveData<Balloon>{
+        return _fabBalloon
+    }
+    fun contentBalloon0(): MutableLiveData<Balloon>{
+        return _contentBalloon0
+    }
+    fun contentBalloon1(): MutableLiveData<Balloon>{
+        return _contentBalloon1
+    }
+    fun contentBalloon2(): MutableLiveData<Balloon>{
+        return _contentBalloon2
+    }
+    fun balloonComplete(): MutableLiveData<Boolean>{
+        return _balloonComplete
+    }
 
     fun setCompleteFlag(taskMap: MutableMap<String, Boolean?>){
         _completeFlag.value = taskMap
@@ -330,9 +383,13 @@ class AddTodoTaskViewModel(
     fun setData(data: Bundle){
         _data.value = data
     }
+    fun setBalloonComplete(){
+        _balloonComplete.value = true
+    }
 
     init {
         _context.value = getApplication<Application>().applicationContext
+        _balloonComplete.value = false
         _completeFlag.value = mutableMapOf(
             DownloadStatus().task to false,
             DownloadStatus().iv_aes_task to false,
