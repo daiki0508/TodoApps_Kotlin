@@ -18,7 +18,7 @@ class MyModule {
         viewModel { MainViewModel(get(), get()) }
         viewModel { AfterLoginViewModel() }
         viewModel { TodoViewModel(get()) }
-        viewModel { PrivateTodoViewModel(get(), get(), get(), get()) }
+        viewModel { PrivateTodoViewModel(get(), get(), get(), get(), get()) }
         viewModel { PrivateNavigationViewModel(get(), get()) }
         viewModel { NavigationViewModel() }
         viewModel { AddTodoTaskViewModel(get(), get(), get(), get()) }
@@ -26,6 +26,7 @@ class MyModule {
     }
     val repository: Module = module {
         factory { AppUpdateRepositoryClient() }
+        factory { PreferenceBalloonRepositoryClient() }
         factory { FirebaseTopRepositoryClient() }
         factory { FirebaseStorageRepositoryClient() }
         factory { PreferenceRepositoryClient() }

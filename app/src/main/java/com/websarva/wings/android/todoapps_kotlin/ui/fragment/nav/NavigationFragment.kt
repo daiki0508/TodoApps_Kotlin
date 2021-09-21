@@ -16,6 +16,7 @@ import com.google.firebase.ktx.Firebase
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.FragmentNavigationBinding
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
+import com.websarva.wings.android.todoapps_kotlin.model.NavNotify
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavRecyclerViewAdapter
@@ -140,17 +141,17 @@ class NavigationFragment: Fragment() {
 
         // removeFlagのobserver
         viewModel.removeFlag().observe(this.viewLifecycleOwner, {
-            if (it["flag"] as Boolean){
+            if (it[NavNotify.Flag.name] as Boolean){
                 // nvAdapterを更新
-                nvAdapter?.notifyItemRemoved(it["position"] as Int)
+                nvAdapter?.notifyItemRemoved(it[NavNotify.Position.name] as Int)
             }
         })
 
         // changeFlagのobserver
         viewModel.changeFlag().observe(this.viewLifecycleOwner, {
-            if (it["flag"] as Boolean){
+            if (it[NavNotify.Flag.name] as Boolean){
                 // nvAdapterを更新
-                nvAdapter?.notifyItemChanged(it["position"] as Int)
+                nvAdapter?.notifyItemChanged(it[NavNotify.Position.name] as Int)
             }
         })
 

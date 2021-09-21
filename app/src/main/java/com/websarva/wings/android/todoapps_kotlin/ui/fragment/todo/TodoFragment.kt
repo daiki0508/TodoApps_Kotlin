@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.skydoves.balloon.showAlignTop
 import com.websarva.wings.android.todoapps_kotlin.BuildConfig
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.FragmentTodoBinding
@@ -92,29 +93,55 @@ class TodoFragment : Fragment(){
             privateViewModel.setInit(auth = null, storage = null, networkStatus!!)
         }
 
-        activity?.let {
-            // メイン画面
-            binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        // balloonの作成
+        privateViewModel.showBalloonFlag(this)
+        with(privateViewModel){
+            contentBalloon1().observe(this@TodoFragment.viewLifecycleOwner, {
+                // balloonの表示順番を設定
+                fabBalloon().value!!.relayShowAlignBottom(contentBalloon0().value!!, binding.tvNoContent)
+                    .relayShowAlignBottom(contentBalloon1().value!!, binding.tvNoContent)
 
-            // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
-            if (networkStatus == true){
-                // TodoActivityで端末がoffline状態になった時の対応
-                if (viewModel.connectingStatus() != null){
-                    privateViewModel.download(flag = true, viewModel)
-                }else{
-                    networkStatus = false
-                    if (File(it.filesDir, FileName().list).length() != 0L){
-                        NetWorkFailureDialog(flag = false).show(it.supportFragmentManager, "NetWorkFailureDialog")
-                        viewModel.createView()
+                // balloonの表示
+                binding.fab.showAlignTop(fabBalloon().value!!)
+
+                contentBalloon1().value!!.setOnBalloonDismissListener {
+                    // 実行したことを保存
+                    save()
+                    // balloonCompleteに通知
+                    setBalloonComplete()
+                }
+            })
+
+            // balloonCompleteのobserver
+            balloonComplete().observe(this@TodoFragment.viewLifecycleOwner, { flag ->
+                if (flag){
+                    activity?.let {
+                        // メイン画面
+                        binding.recyclerview.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
+                        // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
+                        if (networkStatus == true){
+                            // TodoActivityで端末がoffline状態になった時の対応
+                            if (viewModel.connectingStatus() != null){
+                                privateViewModel.download(flag = true, viewModel)
+                            }else{
+                                networkStatus = false
+                                if (File(it.filesDir, FileName().list).length() != 0L){
+                                    NetWorkFailureDialog(flag = false).show(it.supportFragmentManager, "NetWorkFailureDialog")
+                                    viewModel.createView()
+                                }
+                            }
+                        }else{
+                            if (File(it.filesDir, FileName().list).length() != 0L){
+                                viewModel.createView()
+                            }
+                        }
                     }
                 }
-            }else{
-                if (File(it.filesDir, FileName().list).length() != 0L){
-                    viewModel.createView()
-                }
-            }
+            })
         }
 
+        //completeFlagのobserber
         viewModel.completeFlag().observe(this.viewLifecycleOwner, {
             when {
                 (it[DownloadStatus().list] == true) and (it[DownloadStatus().iv_aes_list] == true) and (it[DownloadStatus().salt_list] == true) and (it[DownloadStatus().task] == true) and (it[DownloadStatus().iv_aes_task] == true) and (it[DownloadStatus().salt_task] == true) -> {
@@ -133,6 +160,7 @@ class TodoFragment : Fragment(){
             AddListDialog(flag = false, type = 0, position = null).show(requireActivity().supportFragmentManager, "AddListDialog")
         }
 
+        // todoListのobserber
         viewModel.todoList.observe(this.viewLifecycleOwner, { event ->
             event.contentIfNotHandled.let {
                 if (it != null){

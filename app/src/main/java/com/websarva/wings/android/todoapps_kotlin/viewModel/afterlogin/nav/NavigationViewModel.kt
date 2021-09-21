@@ -2,6 +2,7 @@ package com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.websarva.wings.android.todoapps_kotlin.model.NavNotify
 
 class NavigationViewModel: ViewModel() {
     private val _flag = MutableLiveData<Boolean>()
@@ -20,10 +21,10 @@ class NavigationViewModel: ViewModel() {
         _insertFlag.value = true
     }
     fun setRemoveFlag(position: Int){
-        _removeFlag.value = mutableMapOf("flag" to true, "position" to position)
+        _removeFlag.value = mutableMapOf(NavNotify.Flag.name to true, NavNotify.Position.name to position)
     }
     fun setChangeFlag(position: Int){
-        _removeFlag.value = mutableMapOf("flag" to true, "position" to position)
+        _removeFlag.value = mutableMapOf(NavNotify.Flag.name to true, NavNotify.Position.name to position)
     }
 
     fun flag(): MutableLiveData<Boolean> {
@@ -44,7 +45,7 @@ class NavigationViewModel: ViewModel() {
 
     init {
         _insertFlag.value = false
-        _removeFlag.value = mutableMapOf("flag" to false, "position" to 0)
-        _changeFlag.value = mutableMapOf("flag" to false, "position" to 0)
+        _removeFlag.value = mutableMapOf(NavNotify.Flag.name to false, NavNotify.Position.name to 0)
+        _changeFlag.value = mutableMapOf(NavNotify.Flag.name to false, NavNotify.Position.name to 0)
     }
 }

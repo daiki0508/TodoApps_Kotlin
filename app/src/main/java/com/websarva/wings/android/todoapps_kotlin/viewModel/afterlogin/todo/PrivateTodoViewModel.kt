@@ -10,15 +10,25 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import com.skydoves.balloon.Balloon
+import com.skydoves.balloon.BalloonAnimation
+import com.skydoves.balloon.BalloonSizeSpec
+import com.skydoves.balloon.overlay.BalloonOverlayAnimation
+import com.skydoves.balloon.overlay.BalloonOverlayRect
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
+import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
+import com.websarva.wings.android.todoapps_kotlin.model.PreferenceBalloon
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceBalloonRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import java.io.File
 
 class PrivateTodoViewModel(
+    private val preferenceBalloonRepository: PreferenceBalloonRepositoryClient,
     private val firebaseStorageRepository: FirebaseStorageRepositoryClient,
     private val preferenceRepository: PreferenceRepositoryClient,
     private val offLineRepository: OffLineRepositoryClient,
@@ -34,7 +44,52 @@ class PrivateTodoViewModel(
     private val _networkStatus = MutableLiveData<Boolean>()
     private val _bundle = MutableLiveData<Bundle>()
     private val _list = MutableLiveData<String>()
+    private val _fabBalloon = MutableLiveData<Balloon>()
+    private val _balloonComplete = MutableLiveData<Boolean>()
+    private val _contentBalloon0 = MutableLiveData<Balloon>()
+    private val _contentBalloon1 = MutableLiveData<Balloon>()
 
+    fun showBalloonFlag(fragment: TodoFragment){
+        if (preferenceBalloonRepository.read(_context.value!!, flag = true).retBalloon){
+            // 初回
+            setBalloon(fragment)
+        }else{
+            // 2回目以降
+            setBalloonComplete()
+        }
+    }
+    private fun setBalloon(fragment: TodoFragment){
+        _fabBalloon.value = createBalloon(_context.value!!.getString(R.string.fab_balloon), fragment)
+        _contentBalloon0.value = createBalloon(_context.value!!.getString(R.string.content_list_balloon0), fragment)
+        _contentBalloon1.value = createBalloon(_context.value!!.getString(R.string.content_list_balloon1), fragment)
+    }
+    private fun createBalloon(text: String, fragment: TodoFragment): Balloon{
+        return com.skydoves.balloon.createBalloon(_context.value!!) {
+            setArrowSize(10)
+            setWidth(BalloonSizeSpec.WRAP)
+            setHeight(65)
+            setArrowPosition(0.7f)
+            setCornerRadius(4f)
+            setAlpha(0.9f)
+            setText(text)
+            setTextColorResource(R.color.white)
+            //setTextIsHtml(true)
+            //setIconDrawable(ContextCompat.getDrawable(context, R.drawable.ic_profile))
+            setBackgroundColorResource(R.color.dodgerblue)
+            //setOnBalloonClickListener(onBalloonClickListener)
+            setBalloonAnimation(BalloonAnimation.OVERSHOOT)
+            setIsVisibleOverlay(true)
+            setOverlayColorResource(R.color.darkgray)
+            setOverlayPadding(6f)
+            setBalloonOverlayAnimation(BalloonOverlayAnimation.FADE)
+            setDismissWhenOverlayClicked(false)
+            //setOverlayShape(BalloonOverlayRect)
+            setLifecycleOwner(fragment.viewLifecycleOwner)
+        }
+    }
+    fun save(){
+        preferenceBalloonRepository.save(_context.value!!, flag = true)
+    }
     fun connectingStatus(): NetworkCapabilities? {
         val connectivityManager =
             getApplication<Application>().applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -173,6 +228,18 @@ class PrivateTodoViewModel(
     fun list(): MutableLiveData<String>{
         return _list
     }
+    fun fabBalloon(): MutableLiveData<Balloon>{
+        return _fabBalloon
+    }
+    fun contentBalloon0(): MutableLiveData<Balloon>{
+        return _contentBalloon0
+    }
+    fun contentBalloon1(): MutableLiveData<Balloon>{
+        return _contentBalloon1
+    }
+    fun balloonComplete(): MutableLiveData<Boolean>{
+        return _balloonComplete
+    }
 
     fun setInit(auth: FirebaseAuth?, storage: FirebaseStorage?, networkStatus: Boolean){
         _auth.value = auth
@@ -188,8 +255,12 @@ class PrivateTodoViewModel(
     fun setList(list: String){
         _list.value = list
     }
+    fun setBalloonComplete(){
+        _balloonComplete.value = true
+    }
 
     init {
         _context.value = getApplication<Application>().applicationContext
+        _balloonComplete.value = false
     }
 }

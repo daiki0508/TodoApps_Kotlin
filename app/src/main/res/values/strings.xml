@@ -7,6 +7,10 @@
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
 
+    <string name="fab_balloon">このボタンをタップすることで新しいリストを作成することが出来ます</string>
+    <string name="content_list_balloon0">リストの作成が完了すると、ここに表示されます！</string>
+    <string name="content_list_balloon1">長押しするとリストの削除が出来ます</string>
+
     <string name="unCompleteTaskCount">未完了タスク %1$d件</string>
     <string name="option_allCheck_title">全てのタスクを完了済みにする</string>
     <string name="option_allUnCheck_title">全てのタスクを未完了にする</string>

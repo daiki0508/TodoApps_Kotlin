@@ -3,7 +3,7 @@ package com.websarva.wings.android.todoapps_kotlin.model
 import androidx.annotation.Keep
 
 @Keep
-enum class IntentBundle {
-    NetworkStatus,
+enum class NavNotify {
+    Flag,
     Position
 }
