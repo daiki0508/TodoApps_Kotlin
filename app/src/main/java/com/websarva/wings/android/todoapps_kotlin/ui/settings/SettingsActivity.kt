@@ -59,23 +59,6 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
     }
 
     override fun onBackPressed() {
-        /*// trueがTodoActivity
-        if (flag!!){
-            Intent(this, TodoFragment::class.java).apply {
-                this.putExtra("network", networkStatus)
-                startActivity(this)
-                finish()
-            }
-        }else{
-            Intent(this, AddTodoTaskFragment::class.java).apply {
-                this.putExtra("network", networkStatus)
-                this.putExtra(FileName().list, list)
-                this.putExtra("position", position)
-                startActivity(this)
-                finish()
-            }
-        }*/
-
         // AfterLoginActivityに戻る
         Intent(this, AfterLoginActivity::class.java).apply {
             this.putExtra(IntentBundle.NetworkStatus.name, networkStatus)

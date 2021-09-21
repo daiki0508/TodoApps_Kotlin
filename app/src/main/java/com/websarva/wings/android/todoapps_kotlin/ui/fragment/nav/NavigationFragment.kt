@@ -16,6 +16,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.FragmentNavigationBinding
+import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
@@ -109,27 +110,32 @@ class NavigationFragment: Fragment() {
 
         // NavigationDrawer
         viewModel.position().observe(this.viewLifecycleOwner, {
-            todoViewModel.todoList.observe(this.viewLifecycleOwner, { event ->
-                nvAdapter = NavRecyclerViewAdapter(event.peekContent, it, todoViewModel = todoViewModel, navViewModelPrivate = viewModelPrivate, requireActivity())
-                binding.navRecyclerView.adapter = nvAdapter
-                itemTouchHelper = ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoViewModel.apAdapter().value))
-                itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
+            nvAdapter = NavRecyclerViewAdapter(
+                todoViewModel.todoList.value!!.peekContent,
+                it,
+                todoViewModel = todoViewModel,
+                navViewModelPrivate = viewModelPrivate,
+                requireActivity()
+            )
+            binding.navRecyclerView.adapter = nvAdapter
+            itemTouchHelper =
+                ItemTouchHelper(nvAdapter!!.getRecyclerViewSimpleCallBack(todoViewModel.apAdapter().value))
+            itemTouchHelper.attachToRecyclerView(binding.navRecyclerView)
 
-                // navigationDrawerのアイテムタップ時の処理
-                nvAdapter!!.setOnItemClickListener(object: OnItemClickListener {
-                    override fun onItemClickListener(view: View, position: Int, list: String?) {
-                        // bundleに値をセット
-                        viewModelPrivate.setBundle(list!!, position)
-                    }
-                })
+            // navigationDrawerのアイテムタップ時の処理
+            nvAdapter!!.setOnItemClickListener(object : OnItemClickListener {
+                override fun onItemClickListener(view: View, position: Int, list: String?) {
+                    // bundleに値をセット
+                    viewModelPrivate.setBundle(list!!, position)
+                }
             })
         })
 
         // insertFlagのobserver
         viewModel.insertFlag().observe(this.viewLifecycleOwner, {
             if (it){
-                Log.d("test", "hogehoge")
                 // nvAdapterを更新
+                // Log.d("event2", todoViewModel.todoList.value!!.peekContent.toString())
                 nvAdapter?.notifyItemInserted(nvAdapter?.itemCount!! - 1)
             }
         })

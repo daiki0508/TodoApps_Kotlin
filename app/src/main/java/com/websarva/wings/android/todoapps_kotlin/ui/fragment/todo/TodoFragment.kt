@@ -179,9 +179,9 @@ class TodoFragment : Fragment(){
                 }else{
                     apAdapter!!.items.add(mutableMapOf(FileName().list to it))
                     apAdapter?.notifyItemInserted(apAdapter!!.itemCount - 1)
+                    // Log.d("event", viewModel.todoList.value!!.peekContent.toString())
 
                     // addListによってListが新たに追加されたことをNavに通知
-                    viewModel.todoList.value!!.peekContent.add(mutableMapOf(FileName().list to it))
                     navigationViewModel.setInsertFlag()
                 }
                 // ネットワークに接続されている場合のみ、FirebaseStoreからデータをダウンロード
@@ -213,7 +213,6 @@ class TodoFragment : Fragment(){
                 apAdapter?.notifyItemRemoved(position)
 
                 // コンテキストメニューからリストが削除されたことをNavに通知
-                viewModel.todoList.value!!.peekContent.removeAt(position)
                 navigationViewModel.setRemoveFlag(position)
 
                 if (apAdapter!!.itemCount == 0){

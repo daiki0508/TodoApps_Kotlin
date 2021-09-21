@@ -15,7 +15,7 @@ import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateNavigationVie
 import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
 
 class NavRecyclerViewAdapter(
-    private var items: MutableList<MutableMap<String, String>>,
+    var items: MutableList<MutableMap<String, String>>,
     private var position: Int,
     private var todoViewModel: TodoViewModel?,
     private val navViewModelPrivate: PrivateNavigationViewModel?,

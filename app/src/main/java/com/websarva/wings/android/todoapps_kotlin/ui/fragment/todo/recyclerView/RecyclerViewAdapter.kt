@@ -43,7 +43,7 @@ class RecyclerViewAdapter(
         holder.titleView.setOnCreateContextMenuListener(holder)
         // listが長押しされた時
         holder.titleView.setOnLongClickListener(View.OnLongClickListener {
-            setPosition(holder.absoluteAdapterPosition)
+            setPosition(holder.bindingAdapterPosition)
             return@OnLongClickListener false
         })
 
