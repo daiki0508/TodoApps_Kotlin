@@ -68,6 +68,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:19.2.0'
     implementation 'com.google.firebase:firebase-storage-ktx'
 
+    implementation "com.github.skydoves:balloon:1.3.7"
+
     // Koin core features
     implementation "io.insert-koin:koin-core:$koin_version"
     // Koin main features for Android (Scope,ViewModel ...)

@@ -1,18 +1,11 @@
-package com.websarva.wings.android.todoapps_kotlin.viewModel
+package com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
-import androidx.annotation.UiThread
-import androidx.annotation.WorkerThread
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
@@ -22,8 +15,6 @@ import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryCl
 import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoListEvent
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
-import kotlinx.coroutines.*
-import java.io.File
 
 class TodoViewModel(
     application: Application

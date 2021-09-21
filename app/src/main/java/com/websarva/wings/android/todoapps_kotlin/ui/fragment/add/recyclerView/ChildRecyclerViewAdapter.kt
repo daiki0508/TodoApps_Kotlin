@@ -11,7 +11,7 @@ import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnPreferenceListener
-import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.add.AddTodoTaskViewModel
 
 class ChildRecyclerViewAdapter(
     var items: MutableList<MutableMap<String, String>>,

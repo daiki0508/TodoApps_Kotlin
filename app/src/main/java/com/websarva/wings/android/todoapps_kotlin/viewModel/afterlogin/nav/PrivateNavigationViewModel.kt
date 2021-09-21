@@ -1,23 +1,18 @@
-package com.websarva.wings.android.todoapps_kotlin.viewModel
+package com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav
 
 import android.app.Application
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
-import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryClient
-import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.NavBundleEvent
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo.TodoViewModel
 import java.io.File
 
 class PrivateNavigationViewModel(

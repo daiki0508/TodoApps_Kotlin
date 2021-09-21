@@ -3,17 +3,13 @@ package com.websarva.wings.android.todoapps_kotlin.repository
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
-import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateTodoViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.SettingsViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.add.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.settings.SettingsViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo.TodoViewModel
 import java.io.File
 import java.io.IOException
 

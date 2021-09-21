@@ -8,7 +8,7 @@ import com.websarva.wings.android.todoapps_kotlin.databinding.ActivityAfterLogin
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.NavigationFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
-import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.AfterLoginViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AfterLoginActivity : AppCompatActivity() {

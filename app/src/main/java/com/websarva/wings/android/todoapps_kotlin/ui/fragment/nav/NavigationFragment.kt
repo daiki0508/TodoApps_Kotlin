@@ -2,7 +2,6 @@ package com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.FragmentNavigationBinding
-import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
@@ -24,10 +22,10 @@ import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDraw
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.nav.navigationDrawer.NavTopRecyclerViewAdapter
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.settings.SettingsActivity
-import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.NavigationViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.PrivateNavigationViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.AfterLoginViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav.NavigationViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav.PrivateNavigationViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo.TodoViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

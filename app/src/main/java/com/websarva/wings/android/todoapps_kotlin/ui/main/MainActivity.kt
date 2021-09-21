@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -24,7 +23,7 @@ import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.afterlogin.AfterLoginActivity
-import com.websarva.wings.android.todoapps_kotlin.viewModel.MainViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.main.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), DialogListener {

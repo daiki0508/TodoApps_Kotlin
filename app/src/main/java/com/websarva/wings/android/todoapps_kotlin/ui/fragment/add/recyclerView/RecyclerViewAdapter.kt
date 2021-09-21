@@ -12,7 +12,7 @@ import com.websarva.wings.android.todoapps_kotlin.ui.fragment.AddListDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnChildItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnItemClickListener
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
-import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.add.AddTodoTaskViewModel
 
 class RecyclerViewAdapter(
     var itemTouchHelper: ItemTouchHelper,

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin.viewModel
+package com.websarva.wings.android.todoapps_kotlin.viewModel.main
 
 import android.app.Activity
 import android.content.Context

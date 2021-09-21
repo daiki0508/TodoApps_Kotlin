@@ -1,7 +1,14 @@
 package com.websarva.wings.android.todoapps_kotlin.di
 
 import com.websarva.wings.android.todoapps_kotlin.repository.*
-import com.websarva.wings.android.todoapps_kotlin.viewModel.*
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.AfterLoginViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.add.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav.NavigationViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav.PrivateNavigationViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo.PrivateTodoViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo.TodoViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.main.MainViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.settings.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module

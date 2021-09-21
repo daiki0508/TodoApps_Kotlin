@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin.viewModel
+package com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

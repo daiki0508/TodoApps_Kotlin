@@ -5,8 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -15,13 +13,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivitySettingsBinding
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
-import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.ui.DialogListener
 import com.websarva.wings.android.todoapps_kotlin.ui.afterlogin.AfterLoginActivity
-import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
-import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
-import com.websarva.wings.android.todoapps_kotlin.viewModel.SettingsViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.settings.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {

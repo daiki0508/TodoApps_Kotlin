@@ -1,4 +1,4 @@
-package com.websarva.wings.android.todoapps_kotlin.viewModel
+package com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo
 
 import android.app.Application
 import android.content.Context
@@ -11,7 +11,6 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.websarva.wings.android.todoapps_kotlin.CryptClass
-import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
 import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepositoryClient

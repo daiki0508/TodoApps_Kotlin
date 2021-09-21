@@ -26,10 +26,10 @@ import com.websarva.wings.android.todoapps_kotlin.ui.fragment.OnPreferenceListen
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.recyclerView.*
 import com.websarva.wings.android.todoapps_kotlin.ui.NetWorkFailureDialog
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
-import com.websarva.wings.android.todoapps_kotlin.viewModel.AddTodoTaskViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.AfterLoginViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.NavigationViewModel
-import com.websarva.wings.android.todoapps_kotlin.viewModel.TodoViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.add.AddTodoTaskViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.AfterLoginViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav.NavigationViewModel
+import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo.TodoViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
