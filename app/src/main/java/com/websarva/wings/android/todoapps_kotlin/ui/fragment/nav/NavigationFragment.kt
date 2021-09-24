@@ -81,6 +81,7 @@ class NavigationFragment: Fragment() {
                 nvTopAdapter.setOnItemClickListener(object: OnItemClickListener {
                     override fun onItemClickListener(view: View, position: Int, list: String?) {
                         // TodoFragmentへ遷移
+                        transaction.replace(R.id.nav_fragment, NavigationFragment())
                         transaction.replace(R.id.container, TodoFragment()).commit()
                     }
                 })

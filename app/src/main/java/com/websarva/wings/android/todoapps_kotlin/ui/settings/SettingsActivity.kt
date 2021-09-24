@@ -11,6 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import com.websarva.wings.android.todoapps_kotlin.R
 import com.websarva.wings.android.todoapps_kotlin.databinding.ActivitySettingsBinding
 import com.websarva.wings.android.todoapps_kotlin.model.DownloadStatus
 import com.websarva.wings.android.todoapps_kotlin.model.IntentBundle
@@ -58,6 +59,7 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
         Intent(this, AfterLoginActivity::class.java).apply {
             this.putExtra(IntentBundle.NetworkStatus.name, networkStatus)
             startActivity(this)
+            overridePendingTransition(R.anim.nav_up_pop_enter_anim, R.anim.nav_up_pop_exit_anim)
             finish()
         }
     }

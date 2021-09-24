@@ -193,6 +193,7 @@ class TodoFragment : Fragment(){
                 this.arguments = it
 
                 // AddTodoTaskFragmentへ遷移
+                transaction.setCustomAnimations(R.anim.nav_up_enter_anim, R.anim.nav_up_exit_anim)
                 transaction.replace(R.id.container, this).commit()
             }
         })

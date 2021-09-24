@@ -77,6 +77,7 @@ class AddTodoTaskFragment : Fragment(){
 
         requireActivity().onBackPressedDispatcher.addCallback(this){
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.setCustomAnimations(R.anim.nav_up_pop_enter_anim, R.anim.nav_up_pop_exit_anim)
             transaction.replace(R.id.container, TodoFragment()).commit()
         }
     }
