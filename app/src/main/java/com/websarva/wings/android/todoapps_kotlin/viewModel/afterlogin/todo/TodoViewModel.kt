@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
@@ -15,6 +17,9 @@ import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryCl
 import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoListEvent
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.recyclerView.RecyclerViewAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TodoViewModel(
     application: Application
@@ -65,7 +70,14 @@ class TodoViewModel(
         }
         return todoContents
     }
+    @UiThread
     fun upload(){
+        viewModelScope.launch {
+            uploadBackGround()
+        }
+    }
+    @WorkerThread
+    private suspend fun uploadBackGround() = withContext(Dispatchers.IO){
         FirebaseStorageRepositoryClient().upload(_context.value!!, _storage.value!!, _auth.value!!, task = null, flag = false)
     }
     fun readPreference(list: String, keyName: String): Boolean{

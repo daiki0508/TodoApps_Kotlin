@@ -53,9 +53,6 @@ class TodoFragment : Fragment(){
         setFragmentResultListener(DialogBundle.Result.name){ _, data ->
             privateViewModel.setList(data.getString(DialogBundle.List.name, ""))
         }
-
-        // navigationに通知
-        navigationViewModel.setFlag(flag = true)
     }
 
     override fun onCreateView(
@@ -93,8 +90,15 @@ class TodoFragment : Fragment(){
             privateViewModel.setInit(auth = null, storage = null, networkStatus!!)
         }
 
-        // balloonの作成
-        privateViewModel.showBalloonFlag(this)
+        privateViewModel.deleteAllComplete.observe(this.viewLifecycleOwner, { event ->
+            event?.contentIfNotHandled.let { flag ->
+                if (flag != null && flag){
+                    // balloonの作成
+                    privateViewModel.showBalloonFlag(this)
+                }
+            }
+        })
+
         with(privateViewModel){
             contentBalloon1().observe(this@TodoFragment.viewLifecycleOwner, {
                 // balloonの表示順番を設定
@@ -173,6 +177,8 @@ class TodoFragment : Fragment(){
                         binding.recyclerview.adapter = apAdapter
                         viewModel.setAdapter(apAdapter!!)
 
+                        // navigationに通知
+                        navigationViewModel.setFlag(flag = true)
                         navigationViewModel.setPosition(-1)
 
                         apAdapter!!.setOnItemClickListener(object: OnItemClickListener {

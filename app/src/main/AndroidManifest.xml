@@ -14,18 +14,12 @@
         android:theme="@style/Theme.TodoApps_Kotlin">
         <activity
             android:name=".ui.afterlogin.AfterLoginActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".ui.licenses.LicensesActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".ui.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name="com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment"
-            android:exported="false" />
-        <activity
-            android:name="com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment"
             android:exported="false" />
         <activity
             android:name=".ui.main.MainActivity"

@@ -8,21 +8,19 @@ import com.websarva.wings.android.todoapps_kotlin.model.Balloon
 import com.websarva.wings.android.todoapps_kotlin.model.PreferenceBalloon
 
 interface PreferenceBalloonRepository {
-    fun save(context: Context, flag: Boolean)
-    fun read(context: Context, flag: Boolean): PreferenceBalloon
+    suspend fun save(context: Context, flag: Boolean)
+    suspend fun read(context: Context, flag: Boolean): PreferenceBalloon
 }
 
 class PreferenceBalloonRepositoryClient: PreferenceBalloonRepository {
-    override fun save(context: Context, flag: Boolean) {
-        // TODO("Not yet implemented")
+    override suspend fun save(context: Context, flag: Boolean) {
         with(createPreference(context, flag).edit()){
             putBoolean(Balloon.Balloon.name, false)
             apply()
         }
     }
 
-    override fun read(context: Context, flag: Boolean): PreferenceBalloon {
-        // TODO("Not yet implemented")
+    override suspend fun read(context: Context, flag: Boolean): PreferenceBalloon {
         return PreferenceBalloon(retBalloon = createPreference(context, flag).getBoolean(Balloon.Balloon.name, true))
     }
 

@@ -44,7 +44,7 @@ class NavigationFragment: Fragment() {
     private lateinit var itemTouchHelper: ItemTouchHelper
     private var networkStatus: Boolean? = null
 
-    private lateinit var transaction: FragmentTransaction
+    //private lateinit var transaction: FragmentTransaction
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,8 +60,6 @@ class NavigationFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         networkStatus = afterLoginViewModel.networkStatus().value
-
-        transaction = requireActivity().supportFragmentManager.beginTransaction()
 
         binding.navRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
 
@@ -81,8 +79,9 @@ class NavigationFragment: Fragment() {
                 nvTopAdapter.setOnItemClickListener(object: OnItemClickListener {
                     override fun onItemClickListener(view: View, position: Int, list: String?) {
                         // TodoFragmentへ遷移
-                        transaction.replace(R.id.nav_fragment, NavigationFragment())
-                        transaction.replace(R.id.container, TodoFragment()).commit()
+                        val transactionNvTop = requireActivity().supportFragmentManager.beginTransaction()
+                        transactionNvTop.replace(R.id.nav_fragment, this@NavigationFragment)
+                        transactionNvTop.replace(R.id.container, TodoFragment()).commit()
                     }
                 })
             }
@@ -158,14 +157,15 @@ class NavigationFragment: Fragment() {
 
         // bundleのobserver
         viewModelPrivate.bundle.observe(this.viewLifecycleOwner, { event ->
+            val transactionAddTask = requireActivity().supportFragmentManager.beginTransaction()
             event?.contentIfNotHandled.let {
                 if (it != null){
                     AddTodoTaskFragment().apply {
                         this.arguments = it
 
                         // AddTodoTaskFragmentに遷移
-                        transaction.replace(R.id.nav_fragment, NavigationFragment())
-                        transaction.replace(R.id.container, this).commit()
+                        transactionAddTask.replace(R.id.nav_fragment, this@NavigationFragment)
+                        transactionAddTask.replace(R.id.container, this).commit()
                     }
                 }
             }

@@ -59,7 +59,6 @@ class SettingsActivity : AppCompatActivity(), OnClickListener, DialogListener {
         Intent(this, AfterLoginActivity::class.java).apply {
             this.putExtra(IntentBundle.NetworkStatus.name, networkStatus)
             startActivity(this)
-            overridePendingTransition(R.anim.nav_up_pop_enter_anim, R.anim.nav_up_pop_exit_anim)
             finish()
         }
     }

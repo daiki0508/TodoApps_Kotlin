@@ -6,8 +6,12 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.skydoves.balloon.Balloon
@@ -24,7 +28,11 @@ import com.websarva.wings.android.todoapps_kotlin.repository.FirebaseStorageRepo
 import com.websarva.wings.android.todoapps_kotlin.repository.OffLineRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceBalloonRepositoryClient
 import com.websarva.wings.android.todoapps_kotlin.repository.PreferenceRepositoryClient
+import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.DeleteAllEvent
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class PrivateTodoViewModel(
@@ -48,15 +56,24 @@ class PrivateTodoViewModel(
     private val _balloonComplete = MutableLiveData<Boolean>()
     private val _contentBalloon0 = MutableLiveData<Balloon>()
     private val _contentBalloon1 = MutableLiveData<Balloon>()
+    private val _deleteAllComplete = MutableLiveData<DeleteAllEvent<Boolean>>()
+    val deleteAllComplete: LiveData<DeleteAllEvent<Boolean>> = _deleteAllComplete
 
+    @UiThread
     fun showBalloonFlag(fragment: TodoFragment){
-        if (preferenceBalloonRepository.read(_context.value!!, flag = true).retBalloon){
-            // 初回
-            setBalloon(fragment)
-        }else{
-            // 2回目以降
-            setBalloonComplete()
+        viewModelScope.launch {
+            if (showBalloonFlagBackGround()){
+                // 初回
+                setBalloon(fragment)
+            }else{
+                // 2回目以降
+                setBalloonComplete()
+            }
         }
+    }
+    @WorkerThread
+    private suspend fun showBalloonFlagBackGround(): Boolean = withContext(Dispatchers.IO){
+        preferenceBalloonRepository.read(_context.value!!, flag = true).retBalloon
     }
     private fun setBalloon(fragment: TodoFragment){
         _fabBalloon.value = createBalloon(_context.value!!.getString(R.string.fab_balloon), fragment)
@@ -87,7 +104,14 @@ class PrivateTodoViewModel(
             setLifecycleOwner(fragment.viewLifecycleOwner)
         }
     }
+    @UiThread
     fun save(){
+        viewModelScope.launch {
+            saveBackGround()
+        }
+    }
+    @WorkerThread
+    private suspend fun saveBackGround() = withContext(Dispatchers.IO){
         preferenceBalloonRepository.save(_context.value!!, flag = true)
     }
     fun connectingStatus(): NetworkCapabilities? {
@@ -96,13 +120,21 @@ class PrivateTodoViewModel(
         // 戻り値がnullでなければ、ネットワークに接続されている
         return connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     }
+    @UiThread
     fun download(flag: Boolean, todoViewModel: TodoViewModel){
+        viewModelScope.launch {
+            downloadBackGround(flag, todoViewModel)
+        }
+    }
+    @WorkerThread
+    private suspend fun downloadBackGround(flag: Boolean, todoViewModel: TodoViewModel) = withContext(Dispatchers.IO){
         if (flag){
             firebaseStorageRepository.download(_context.value!!, addViewModel = null, todoViewModel, _storage.value!!, _auth.value!!, tasks = null, flag)
         }else{
             if (File(_context.value?.filesDir, FileName().list).exists()){
                 val lists = CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
                 firebaseStorageRepository.download(_context.value!!, addViewModel = null, todoViewModel, _storage.value!!, _auth.value!!, lists, flag)
+            }else{
             }
         }
     }
@@ -119,7 +151,15 @@ class PrivateTodoViewModel(
     fun deletePreference(list: String){
         preferenceRepository.delete(_context.value!!, list)
     }
+    @UiThread
     fun deleteAll(){
+        viewModelScope.launch {
+            deleteAllBackGround()
+            _deleteAllComplete.value = DeleteAllEvent(true)
+        }
+    }
+    @WorkerThread
+    private suspend fun deleteAllBackGround() = withContext(Dispatchers.IO){
         if (_auth.value?.currentUser!!.uid != offLineRepository.read(_context.value!!)){
             if (File(_context.value?.filesDir, FileName().list).length() != 0L){
                 File("${_context.value?.filesDir}/${FileName().list}").deleteRecursively()

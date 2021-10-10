@@ -7,6 +7,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
@@ -30,6 +31,7 @@ import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.add.AddTo
 import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.AfterLoginViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.nav.NavigationViewModel
 import com.websarva.wings.android.todoapps_kotlin.viewModel.afterlogin.todo.TodoViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -189,7 +191,7 @@ class AddTodoTaskFragment : Fragment(){
 
                         override fun onPreferenceReadListener(keyName: String): Boolean {
                             // 未完了タスクの件数をtextviewとNavigationDrawerに通知
-                            binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items, list = null))
+                            binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
                             // nvAdapter?.notifyItemChanged(this@AddTodoTaskFragment.position)
                             navigationViewModel.setChangeFlag(this@AddTodoTaskFragment.position)
 
@@ -347,7 +349,7 @@ class AddTodoTaskFragment : Fragment(){
                     // 内部ストレージからtaskファイルを完全削除する
                     viewModel.taskDelete(position)
                 }else{
-                    binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items, list = null))
+                    binding.unCompleteCount.text = getString(R.string.unCompleteTaskCount, viewModel.countUnCompleteTask(acAdapter!!.items))
 
                     // 内部ストレージから該当taskを削除
                     viewModel.taskDelete(position)

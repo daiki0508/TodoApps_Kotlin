@@ -5,8 +5,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.skydoves.balloon.Balloon
@@ -20,6 +23,9 @@ import com.websarva.wings.android.todoapps_kotlin.model.FileName
 import com.websarva.wings.android.todoapps_kotlin.repository.*
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.add.AddTodoTaskFragment
 import com.websarva.wings.android.todoapps_kotlin.ui.fragment.todo.TodoFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class AddTodoTaskViewModel(
@@ -49,14 +55,21 @@ class AddTodoTaskViewModel(
     private val _contentBalloon2 = MutableLiveData<Balloon>()
     private val _balloonComplete = MutableLiveData<Boolean>()
 
+    @UiThread
     fun showBalloonFlag(fragment: AddTodoTaskFragment){
-        if (preferenceBalloonRepository.read(_context.value!!, flag = false).retBalloon){
-            // 初回
-            setBalloon(fragment)
-        }else{
-            // 2回目以降
-            setBalloonComplete()
+        viewModelScope.launch {
+            if (showBalloonFlagBackGround()){
+                // 初回
+                setBalloon(fragment)
+            }else{
+                // 2回目以降
+                setBalloonComplete()
+            }
         }
+    }
+    @WorkerThread
+    private suspend fun showBalloonFlagBackGround(): Boolean = withContext(Dispatchers.IO){
+        preferenceBalloonRepository.read(_context.value!!, flag = false).retBalloon
     }
     private fun setBalloon(fragment: AddTodoTaskFragment){
         _fabBalloon.value = createBalloon(_context.value!!.getString(R.string.fab_balloon_task), fragment)
@@ -88,7 +101,14 @@ class AddTodoTaskViewModel(
             setLifecycleOwner(fragment.viewLifecycleOwner)
         }
     }
+    @UiThread
     fun save(){
+        viewModelScope.launch {
+            saveBackGround()
+        }
+    }
+    @WorkerThread
+    private suspend fun saveBackGround() = withContext(Dispatchers.IO){
         preferenceBalloonRepository.save(_context.value!!, flag = false)
     }
     fun connectingStatus(): NetworkCapabilities? {
@@ -97,64 +117,54 @@ class AddTodoTaskViewModel(
         // 戻り値がnullでなければ、ネットワークに接続されている
         return connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     }
-
+    @UiThread
     fun upload(flag: Boolean){
+        viewModelScope.launch {
+            uploadBackGround(flag)
+        }
+    }
+    @WorkerThread
+    private suspend fun uploadBackGround(flag: Boolean) = withContext(Dispatchers.IO){
         firebaseStorageRepository.upload(_context.value!!, _storage.value!!, _auth.value!!, _list.value, flag)
     }
-
+    @UiThread
     fun delete(){
+        viewModelScope.launch {
+            deleteBackGround()
+        }
+    }
+    @WorkerThread
+    private suspend fun deleteBackGround() = withContext(Dispatchers.IO){
         firebaseStorageRepository.delete(_storage.value!!, _auth.value!!, _list.value, flag = false)
     }
-
     fun writePreference(keyName: String, checkFlag: Boolean){
         preferenceRepository.write(_context.value!!, _list.value!!, keyName, checkFlag)
     }
-
     fun readPreference(keyName: String): Boolean{
         return preferenceRepository.read(_context.value!!, _list.value!!, keyName)
     }
-
     fun deletePreference(list: String){
         preferenceRepository.delete(_context.value!!, list)
     }
-
-    fun countUnCompleteTask(items: MutableList<MutableMap<String, String>>?, list: String?): Int{
+    fun countUnCompleteTask(items: MutableList<MutableMap<String, String>>?): Int{
         var cnt = 0
 
         // listがnullでなければ、NavigationDrawer用
-        if (list != null){
-            if (File("${_context.value?.filesDir}/task/$list/${FileName().task}").length() != 0L){
-                val tasks: String? = if (connectingStatus() != null){
-                    CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 1, list, null, flag = false)
-                }else{
-                    CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), "",type = 1, list, null, flag = false)
-                }
-
-                val todoTask: MutableList<MutableMap<String, String>> = mutableListOf()
-                var todo: MutableMap<String, String>
-                for (task in tasks?.split(" ")!!){
-                    //Log.d("test", task)
-                    todo = mutableMapOf(FileName().task to task)
-                    todoTask.add(todo)
-                }
-
-                for (task in todoTask){
-                    if (!preferenceRepository.read(_context.value!!, list, task[FileName().task]!!)){
-                        cnt++
-                    }
-                }
-            }
-        }else{
-            for (item in items!!){
-                if (!readPreference(item[FileName().task]!!)){
+            for (item in items!!) {
+                if (!readPreference(item[FileName().task]!!)) {
                     cnt++
                 }
             }
-        }
         return cnt
     }
-
+    @UiThread
     fun createView(){
+        viewModelScope.launch {
+            _todoTask.value = createViewBackGround()
+        }
+    }
+    @WorkerThread
+    private suspend fun createViewBackGround(): MutableList<MutableMap<String, String>> = withContext(Dispatchers.IO){
         // ネットワークの接続状況によって処理を分岐
         val tasks: String? = if (connectingStatus() != null){
             CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 1, _list.value, null, flag = false)
@@ -169,9 +179,10 @@ class AddTodoTaskViewModel(
             todo = mutableMapOf(FileName().task to list)
             todoTask.add(todo)
         }
-        _todoTask.value = todoTask
-    }
 
+        // 返り値
+        todoTask
+    }
     fun add(list: String){
         if (connectingStatus() != null){
             CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), list, type = 1, _list.value, aStr = null, flag = true)
@@ -179,7 +190,6 @@ class AddTodoTaskViewModel(
             CryptClass().decrypt(_context.value!!, offLineRepository.read(_context.value!!)!!.toCharArray(), list, type = 1, _list.value, aStr = null, flag = true)
         }
     }
-
     fun update(
         aStr: String,
         flag: Boolean
@@ -227,7 +237,6 @@ class AddTodoTaskViewModel(
             }
         }
     }
-
     fun move(items: MutableList<MutableMap<String, String>>, fromPosition: Int, toPosition: Int, flag: Boolean){
         // trueがNavigationDrawer
         val toPositionItem = if (flag){
@@ -302,7 +311,6 @@ class AddTodoTaskViewModel(
             }
         }
     }
-
     fun taskDelete(position: Int){
         // ネットワークの接続状態によって処理を分岐
         val tasksBefore: String? = if (connectingStatus() != null){
