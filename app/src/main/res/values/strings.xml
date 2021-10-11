@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">ToDoApps</string>
-    <string name="nav_header">ToDoApps\nVersion2.1</string>
+    <string name="nav_header">ToDoApps\nVersion2.2.1</string>
     <string name="hello">Welcome to ToDoApps!</string>
     <string name="description">Google、もしくはメールアドレスとパスワードを用いてログインできます。</string>
 

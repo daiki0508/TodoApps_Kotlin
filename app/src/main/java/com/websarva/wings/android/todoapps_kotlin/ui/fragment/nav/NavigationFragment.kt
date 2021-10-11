@@ -44,8 +44,6 @@ class NavigationFragment: Fragment() {
     private lateinit var itemTouchHelper: ItemTouchHelper
     private var networkStatus: Boolean? = null
 
-    //private lateinit var transaction: FragmentTransaction
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

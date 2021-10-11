@@ -131,7 +131,7 @@ class PrivateTodoViewModel(
         if (flag){
             firebaseStorageRepository.download(_context.value!!, addViewModel = null, todoViewModel, _storage.value!!, _auth.value!!, tasks = null, flag)
         }else{
-            if (File(_context.value?.filesDir, FileName().list).exists()){
+            if (File(_context.value?.filesDir, FileName().list).exists() && File(_context.value?.filesDir, FileName().list).length() != 0L){
                 val lists = CryptClass().decrypt(_context.value!!, "${_auth.value?.currentUser!!.uid}0000".toCharArray(), "",type = 0, task = null, aStr = null, flag)
                 firebaseStorageRepository.download(_context.value!!, addViewModel = null, todoViewModel, _storage.value!!, _auth.value!!, lists, flag)
             }else{

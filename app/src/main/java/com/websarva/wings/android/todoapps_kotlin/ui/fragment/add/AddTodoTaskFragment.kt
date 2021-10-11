@@ -143,10 +143,6 @@ class AddTodoTaskFragment : Fragment(){
             // balloonCompleteのobserver
             balloonComplete().observe(this@AddTodoTaskFragment.viewLifecycleOwner, { flag ->
                 if (flag){
-                    /*
-                    FirebaseStorageからデータをダウンロード
-                    FirebaseStorageの料金タスクを抑えるために開発時は基本、内部ストレージのtaskファイルを利用
-                    */
                     if (File(requireActivity().filesDir, "task/$task/${FileName().task}").length() != 0L){
                         viewModel.createView()
                     }
